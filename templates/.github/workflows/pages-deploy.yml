@@ -1,0 +1,50 @@
+# Deploy a static HTML project to GitHub Pages on every push to main.
+#
+# This is the simple case: no build step, the repo root IS the site.
+# For projects with a build (Jekyll, Vite, etc.), see the website repo's
+# jekyll-gh-pages.yml for the multi-step pattern.
+
+name: Deploy Pages
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - 'README.md'
+      - 'CLAUDE.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.github/workflows/ci*.yml'
+  workflow_dispatch:
+
+# Pages deploys queue (no cancel) to avoid half-applied state.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: '.'
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v5
