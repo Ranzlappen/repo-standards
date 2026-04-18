@@ -1,0 +1,99 @@
+# =============================================================================
+# Combined .gitignore covering Node, Python, JVM/Android, and OS noise.
+# Trim the sections you don't need for a given project.
+# =============================================================================
+
+# --- Secrets ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+service-account*.json
+
+# --- Node / JavaScript / TypeScript ---
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.cache/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+.parcel-cache/
+coverage/
+.nyc_output/
+
+# --- Vite / bundlers ---
+.vite/
+*.local
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+.env-py/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- JVM / Android / Kotlin ---
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+build/
+.gradle/
+local.properties
+*.iml
+.idea/
+captures/
+.cxx/
+*.apk
+*.aab
+*.ap_
+
+# --- Jekyll / Ruby ---
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+vendor/
+.bundle/
+
+# --- Firebase ---
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+
+# --- IDEs / editors ---
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS noise ---
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --- Misc ---
+*.tmp
+*.bak
+*.orig

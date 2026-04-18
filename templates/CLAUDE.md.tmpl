@@ -1,0 +1,132 @@
+# <PROJECT_NAME>
+
+<ONE_SENTENCE_DESCRIPTION>. Hosted on <HOSTING_TARGET>.
+
+## Architecture
+
+<2–4 sentence overview of the project's shape — what's the entry point, what's the
+runtime, what's the deployment target. If the project has multiple modules
+(SPA + backend, frontend + functions, etc.) list them as bullets here.>
+
+* **<MODULE_1>** (`<path/>`) — <one sentence: what it is, what stack>.
+* **<MODULE_2>** (`<path/>`) — <same>.
+
+## Build & Development
+
+### <Module 1 name>
+
+```
+<command 1>          # <what it does, e.g. "Local dev server at :PORT">
+<command 2>          # <what it does>
+```
+
+### <Module 2 name>
+
+```
+<command 1>          # <what it does>
+```
+
+<Repeat per module. If the project has only one module, drop the subheadings
+and list commands directly under "Build & Development".>
+
+## Key Conventions
+
+<This section captures the rules a contributor (human or AI) MUST follow that
+they could not infer from reading the code. Examples of what belongs here:>
+
+* **Module boundaries**: <if applicable — e.g. "Don't cross-import between
+  `polyvote/` and `blog-admin/`. Duplicate intentionally if needed.">
+* **Storage / data conventions**: <e.g. "Posts use a `status` field in front
+  matter — only `published` and `placeholder` appear in the sitemap.">
+* **Security model**: <e.g. "Public client-side keys are in config files;
+  security is enforced server-side via Firestore rules and Cloud Functions.
+  No client may write directly to the database.">
+* **State / theming / i18n decisions**: <e.g. "Dark mode is default. Blog
+  Admin is dark-only by design — has no `.light` CSS variant.">
+* **Naming / structure rules**: <e.g. "Files in `cogs/` follow the discord.py
+  cog pattern; one file per logical command group.">
+
+<Aim for 4–8 bullets. If you have more than 10, you're documenting things
+Claude could infer from code — cut.>
+
+## Deployment & CI/CD
+
+<If the project has GitHub Actions workflows, document them here as a table.
+Each workflow gets one row.>
+
+| Workflow | Trigger | Scope | Deploys |
+| --- | --- | --- | --- |
+| `<workflow-name>.yml` | <PR / push / manual> | <which paths trigger it> | <what it deploys, or "Nothing (validation only)"> |
+
+**What fires on a given change:**
+
+<This second table is the "if I change file X, what happens" lookup. Keep
+short — only the most common change patterns.>
+
+| Change | CI | Deploy |
+| --- | --- | --- |
+| <e.g. "Source in `src/`"> | ✓ | ✓ |
+| <e.g. "Docs (`README.md`, `CLAUDE.md`)"> | — | — |
+
+**Concurrency**: <how superseded runs are handled — typically "CI cancels in
+progress per PR; deploys queue.">
+
+**Runtime versions**: <e.g. "Node 22 across all jobs" or "Python 3.12">
+
+**Required secrets**: <name them — e.g. `FIREBASE_SERVICE_ACCOUNT`. Document
+what each is used for and how to rotate it.>
+
+## Tech Stack
+
+<A single table. One row per significant technology. Include the role and the
+"why this choice" in one or two words. This table is what an outsider reads
+to understand the project's technical identity.>
+
+| Layer | Technology | Role | Why |
+| --- | --- | --- | --- |
+| <e.g. "Framework"> | <e.g. "React 19 + TypeScript"> | <e.g. "UI"> | <e.g. "Component model"> |
+| <e.g. "State"> | <e.g. "Zustand"> | <e.g. "Global state"> | <e.g. "Minimal boilerplate"> |
+| ... | ... | ... | ... |
+
+## Project Structure
+
+```
+<repo-root>/
+├── <key file or folder>      # what it is
+├── <key file or folder>      # what it is
+├── <subfolder>/
+│   ├── <key file>            # what it is
+│   └── ...
+├── .github/
+│   ├── dependabot.yml        # weekly dependency updates
+│   └── workflows/
+│       └── <workflow>.yml    # what it does
+├── CLAUDE.md                 # this file
+└── README.md                 # user-facing docs
+```
+
+<Show the top 2 levels of meaningful structure. Don't dump every file. Skip
+generated/ignored directories.>
+
+## Post-task self-check
+
+After every turn that produces a branch, PR, feature, or bug fix, do a quick
+self-check before replying: does the change introduce anything worth codifying
+in docs or automation? Scan for new env vars, npm scripts, path filters,
+deploy targets, secrets, setup steps, dependencies, or conventions that should
+be reflected in `README.md`, `CLAUDE.md`, `.github/workflows/*.yml`, or
+`.github/dependabot.yml`.
+
+Decide per case:
+
+* **Auto-implement** small, unambiguous updates — e.g. noting a newly
+  introduced env var in README, extending a workflow `paths` filter to a new
+  directory, adding a new npm script to the relevant command list, bumping a
+  Node version already changed in one workflow to match the others. Make the
+  edit in the same turn and call it out in the summary.
+* **Prompt first** for anything ambiguous, opinionated, or structurally
+  significant — rewriting a README section, adding a new top-level doc,
+  restructuring a workflow, or changes whose wording/location isn't obvious.
+
+If nothing is warranted, say "no doc/workflow updates needed" in one line.
+Skip this self-check entirely for pure Q&A turns that don't change code.

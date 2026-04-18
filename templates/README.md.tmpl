@@ -1,0 +1,126 @@
+# <PROJECT_NAME>
+
+<ONE_SENTENCE_TAGLINE_DESCRIBING_WHAT_THIS_DOES>.
+
+> **New here?** <If the project has both a "user" and "developer" path, give
+> the reader a one-sentence pointer to the right section. Example: "If you
+> just want to use the app, jump to [Getting Started](#getting-started). If
+> you're a developer, see [Developer Setup](#developer-setup).">
+
+---
+
+## What this is
+
+<2–4 sentences expanding on the tagline. Who is it for? What problem does it
+solve? What does the experience look like?>
+
+<If applicable, include a screenshot or short demo GIF here.>
+
+---
+
+## Quick Reference
+
+The most common tasks. For anything not listed, check the rest of this README
+or [`CLAUDE.md`](./CLAUDE.md).
+
+| I want to... | Do this |
+| --- | --- |
+| <Task 1, e.g. "Run the app locally"> | <Action — e.g. "Run `npm run dev` from the repo root"> |
+| <Task 2> | <Action> |
+| <Task 3> | <Action> |
+| <Task 4> | <Action> |
+| <Task 5> | <Action> |
+
+<Aim for 6–12 rows. The Quick Reference is the README's most-read section —
+keep it scannable and action-oriented.>
+
+---
+
+## Getting Started
+
+<For end users / non-developers, if applicable. Step-by-step, phone-friendly
+where possible. Skip this section if the project has no user-facing setup.>
+
+1. <Step 1>
+2. <Step 2>
+3. <Step 3>
+
+---
+
+## Developer Setup
+
+### Prerequisites
+
+* <Runtime, e.g. "Node 22"> — required for <what>. Check with `<command>`.
+* <Other dependency> — install with `<command>`.
+
+### Install and run
+
+```
+<command 1>          # install
+<command 2>          # run
+```
+
+### Modules
+
+<If the project has multiple modules / packages / sub-apps, list them as a
+table with paths and per-module dev commands. Drop this section for
+single-module projects.>
+
+| Module | Path | Role | Local dev |
+| --- | --- | --- | --- |
+| <name> | `<path/>` | <one sentence> | `<command>` |
+| <name> | `<path/>` | <one sentence> | `<command>` |
+
+### Architecture source of truth
+
+[`CLAUDE.md`](./CLAUDE.md) is the authoritative architecture doc (build
+commands, conventions, CI/CD, tech stack). When this README and `CLAUDE.md`
+disagree, `CLAUDE.md` wins and this README needs updating.
+
+### CI/CD at a glance
+
+<If the project has GitHub Actions, summarize them here as a one-line table.
+Detailed version lives in CLAUDE.md.>
+
+| Workflow | Trigger | What it does |
+| --- | --- | --- |
+| [`<workflow>.yml`](./.github/workflows/<workflow>.yml) | <trigger> | <one line> |
+
+---
+
+## How to <KEY_USER_TASK_1>
+
+<For each major feature or workflow, a short section with copy-pasteable
+examples. Borrow the pattern from the website repo: declarative HTML examples
+showing inputs and the resulting behavior. Use code fences and concrete values,
+not placeholders.>
+
+---
+
+## Project Structure
+
+```
+<repo-root>/
+├── <top-level-file>             ← <what it is, what to edit it for>
+├── <top-level-folder>/          ← <what's in it>
+│   ├── <important-file>         ← <what it is>
+│   └── ...
+├── .github/                     ← CI and dependency automation
+├── CLAUDE.md                    ← architecture source of truth
+└── README.md                    ← this file
+```
+
+**For everyday use** you only touch:
+
+* `<file or folder>` — to <action>
+* `<file or folder>` — to <action>
+
+**For deeper changes** see [`CLAUDE.md`](./CLAUDE.md).
+
+---
+
+## License
+
+<MIT, or whatever applies. Include the year and the project's owner. Match
+the LICENSE file at the repo root.>
