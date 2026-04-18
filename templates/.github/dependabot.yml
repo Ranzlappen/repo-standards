@@ -1,0 +1,63 @@
+# Weekly dependency updates across all ecosystems used in Ranzlappen repos.
+# Trim to the package-ecosystem entries that actually apply to a given repo.
+#
+# Grouping rule of thumb: minor + patch are grouped to reduce PR noise; major
+# updates open one PR per package so they get scrutinized individually.
+
+version: 2
+updates:
+  # GitHub Actions used in workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # npm — root
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      npm-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # npm — sub-app example (uncomment and adjust the directory per repo)
+  # - package-ecosystem: "npm"
+  #   directory: "/path/to/subapp"
+  #   schedule:
+  #     interval: "weekly"
+  #   groups:
+  #     subapp-minor-patch:
+  #       patterns: ["*"]
+  #       update-types: ["minor", "patch"]
+
+  # Python (pip)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      pip-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  # Ruby (Bundler) — for Jekyll projects
+  - package-ecosystem: "bundler"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Gradle — for Android / Kotlin projects
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      gradle-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
