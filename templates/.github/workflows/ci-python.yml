@@ -1,0 +1,51 @@
+# Lint and test checks for pull requests on Python projects.
+#
+# Adapt:
+#  - Pin the Python version to what the project actually targets.
+#  - If the project uses Poetry / uv / Pipenv, swap the install step accordingly.
+#  - Drop the test step if no tests exist yet (track adding tests as TODO).
+
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - '**.py'
+      - 'requirements*.txt'
+      - 'pyproject.toml'
+      - 'poetry.lock'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+
+      - name: Lint with ruff
+        run: |
+          pip install ruff
+          ruff check .
+
+      - name: Test with pytest
+        run: |
+          pip install pytest
+          pytest -q

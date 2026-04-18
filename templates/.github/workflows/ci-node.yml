@@ -1,0 +1,54 @@
+# Lint, test, and build checks for pull requests on Node/TypeScript projects.
+#
+# Adapt:
+#  - Replace <APP_PATH> with the path to your app (or "." for repo-root projects).
+#  - Adjust the `paths` filter and the `working-directory` accordingly.
+#  - Drop `npm test` if the project has no tests yet (track adding tests as TODO).
+#  - For multi-app repos, copy the pattern from
+#    https://github.com/Ranzlappen/website/blob/main/.github/workflows/ci.yml
+#    which uses dorny/paths-filter to gate per-app jobs.
+
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - '<APP_PATH>/**'
+      - '.github/workflows/ci.yml'
+      - '!**/README.md'
+      - '!**/.gitignore'
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: <APP_PATH>/package-lock.json
+
+      - name: Install dependencies
+        working-directory: <APP_PATH>
+        run: npm ci
+
+      - name: Lint
+        working-directory: <APP_PATH>
+        run: npm run lint
+
+      - name: Test
+        working-directory: <APP_PATH>
+        run: npm test
+
+      - name: Build
+        working-directory: <APP_PATH>
+        run: npm run build

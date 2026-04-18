@@ -1,0 +1,45 @@
+# Build + lint checks for pull requests on Android (Kotlin/Gradle) projects.
+#
+# Adapt:
+#  - Pin the JDK version to what the project's build.gradle.kts targets.
+#  - Add `./gradlew test` once you have unit tests worth running on every PR.
+#  - Drop the assembleDebug step if PRs only need the lint pass.
+
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.xml'
+      - 'gradle/**'
+      - 'gradle.properties'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Lint
+        run: ./gradlew lintDebug --stacktrace
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace

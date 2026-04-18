@@ -1,0 +1,51 @@
+# Validation checks for static HTML projects.
+#
+# Static HTML projects don't have a "build" — these checks catch broken HTML,
+# broken links, and accidentally-committed secrets. Cheap insurance for hobby
+# projects deployed to GitHub Pages.
+#
+# Adapt:
+#  - Drop link checking if the project has lots of intentional placeholder hrefs.
+#  - Add Lighthouse CI later if performance budgets matter.
+
+name: CI
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - '**.html'
+      - '**.css'
+      - '**.js'
+      - '.github/workflows/ci.yml'
+
+concurrency:
+  group: ci-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: HTML validation
+        run: |
+          npx --yes html-validate "**/*.html" --formatter stylish
+
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --verbose --no-progress './**/*.html' './**/*.md'
+          fail: true
+
+      - name: Basic secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
