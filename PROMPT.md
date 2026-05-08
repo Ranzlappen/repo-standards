@@ -30,10 +30,23 @@ pull requests that bring it into compliance.
    relevant slice of the checklist.
 
 2. **Behavior preservation.** Refactoring may not change observable behavior.
-   This includes UI, animations, storage keys, URLs, deployment shape, and
-   external dependencies. If you cannot prove a refactor preserves behavior,
-   skip it and add it to "Refactoring opportunities" in the PR description
-   instead of doing it.
+   "Observable behavior" is everything a user, installed-PWA client, external
+   integrator, or CI smoke check would notice:
+     - **UI**: rendered output, layout, animations, focus order, accessibility tree.
+     - **URLs**: deployed domain, route paths, query parameters, deep-link contracts.
+     - **Storage**: `localStorage` / `sessionStorage` keys, IndexedDB schema
+       versions, cache names, service-worker registration order.
+     - **Deployment shape**: hosting target, asset URLs, build-output paths,
+       redirect rules.
+     - **External dependencies**: third-party endpoint shapes, webhook payloads,
+       analytics identifiers, manifest `start_url` / `scope` / `id`,
+       `assetlinks.json` fingerprints.
+   Burden of proof is on the refactor: PR 4's Test plan must enumerate
+   before/after evidence for each touched item, and PWA work additionally
+   follows the **PWA Refactor Addendum** in `REFACTORING_GUIDE.md` (the
+   `pwa-inventory.md` artifact is its evidence). If you cannot prove
+   preservation, skip the refactor and add it to "Refactoring opportunities"
+   in the PR description instead of doing it.
 
 3. **Phased PRs.** Do NOT bundle docs, CI, structural changes, and refactoring
    into one mega-PR. Use the canonical 8-PR sequence in Step 2 below — open
@@ -100,13 +113,31 @@ pull requests that bring it into compliance.
     Non-conformant messages are blocked locally by the `commit-msg` hook
     in `templates/.pre-commit-config.yaml`.
 
-11. **Post-task self-check is mandatory after every code change.** The
-    template in `CLAUDE.md.tmpl` has the self-check block at the bottom.
-    For repo-upgrade work specifically, the rule is **stricter** than the
-    template's default ("skip for pure Q&A turns"): every commit that
-    changes tracked files runs the self-check. Output its result before
-    proposing the next change. This is non-negotiable — it's how doc
-    drift and inconsistent state are caught before they accumulate.
+11. **Post-task self-check is mandatory after every code change.** Run two
+    self-checks per commit:
+
+      a. **Drift-detection** (defined in `CLAUDE.md.tmpl`'s "Post-task
+         self-check" block): does this change introduce something that
+         should be codified in docs, workflows, or `dependabot.yml`?
+
+      b. **Mechanical verification** — at minimum:
+           - **Files exist** at every path the commit adds or modifies.
+           - **YAML/JSON parses** for any touched workflow, manifest,
+             lockfile, or config.
+           - **Links resolve** in touched markdown — relative paths point
+             to real files, anchors to real headings.
+           - **Line-count delta matches the plan** stated before the
+             commit (e.g. "+15 lines" predicted, +15 measured).
+           - **No template placeholders remain** — `<PROJECT_NAME>`,
+             `<OWNER>`, `<REPO>`, or unfilled `<TODO>` markers introduced
+             by templates are absent from tracked files outside
+             `templates/`.
+
+    Output both results inline in the response that proposes the next
+    change. Every commit that changes tracked files runs this — the
+    template's "skip for pure Q&A turns" exception does NOT apply during
+    a repo-upgrade pass. This is how doc drift and inconsistent state are
+    caught before they accumulate.
 
 12. **No PR opens without explicit user confirmation.** After the last
     commit of a category lands on the working branch, stop and ask the
