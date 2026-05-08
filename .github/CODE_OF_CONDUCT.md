@@ -8,7 +8,7 @@ This repo is the source of the templates that other Ranzlappen repos adopt — t
 
 Concerns may be reported privately via either of these channels:
 
-1. **GitHub private vulnerability reporting** (preferred for security-adjacent reports): [open a draft advisory](../../security/advisories/new).
+1. **GitHub private vulnerability reporting** (preferred for security-adjacent reports): [open a draft advisory](https://github.com/Ranzlappen/repo-standards/security/advisories/new).
 2. **Direct message to the repo owner** ([`@Ranzlappen`](https://github.com/Ranzlappen)) for everything else.
 
 Reports are read by the project maintainers and treated confidentially. Acknowledgement target: 3 business days. Triage decision target: 10 business days. The same SLAs as [`SECURITY.md`](./SECURITY.md), since the routes overlap.

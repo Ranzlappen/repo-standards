@@ -6,7 +6,7 @@ Please **do not** open a public issue for vulnerabilities in this repository.
 
 Use one of the private channels below:
 
-1. **GitHub private vulnerability reporting** (preferred): [open a draft advisory](../../security/advisories/new).
+1. **GitHub private vulnerability reporting** (preferred): [open a draft advisory](https://github.com/Ranzlappen/repo-standards/security/advisories/new).
 2. **Direct message** to the repo owner ([`@Ranzlappen`](https://github.com/Ranzlappen)) with a description, reproduction steps, and any relevant logs.
 
 Include in the report:

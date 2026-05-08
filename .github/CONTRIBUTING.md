@@ -4,8 +4,8 @@ Thanks for considering a contribution. This repo is the source of the standards 
 
 ## Quick links
 
-- [Open issues](../../issues) — bug reports, feature ideas, "the standards say X but should they say Y?".
-- [Pull requests](../../pulls) — submit changes for review.
+- [Open issues](https://github.com/Ranzlappen/repo-standards/issues) — bug reports, feature ideas, "the standards say X but should they say Y?".
+- [Pull requests](https://github.com/Ranzlappen/repo-standards/pulls) — submit changes for review.
 - [Code of Conduct](./CODE_OF_CONDUCT.md) — how we treat each other.
 - [Governance](../templates/.github/GOVERNANCE.md) — roles, decision-making, branch-protection rules. (The template lives under `templates/`; this repo follows it directly.)
 - [Security policy](./SECURITY.md) — how to report vulnerabilities privately.
