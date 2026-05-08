@@ -153,6 +153,16 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 - [ ] **Test failures are blocking**: PR can't merge with red CI. Branch protection on `main` requires the CI workflow to pass.
 - [ ] **Flaky tests are flagged with a label or skip**; chronic flakes get an issue instead of a `// TODO: fix flaky` comment that never gets addressed.
 
+## 13. Standards Versioning
+
+- [ ] **`.standards-version` file at repo root** containing one line with the major version this repo follows (e.g. `2`). Read by `PROMPT.md` Step 0 to gate upgrade runs.
+- [ ] **Standards-version badge in `README.md`** above the fold:
+  `[![Standards](https://img.shields.io/badge/repo--standards-v2-informational)](https://github.com/Ranzlappen/repo-standards)`.
+- [ ] **`Upgrade-History.md` wiki page** records the migration entry for the most recent upgrade (per section 9 — Wiki).
+- [ ] **`CHANGELOG.md` entry** dated and version-stamped for any change that introduces, removes, or alters a standards-version-relevant requirement (e.g. dropping support for an older Node version).
+- [ ] **Pinned dependency on the standards repo** is at a tag, not `main`. PROMPT.md fetches `VERSION` from `Ranzlappen/repo-standards/main` (always-current); but consumer-side references in CONTRIBUTING.md, badges, etc. point at `v2` (or a specific `v2.0.0`) so a future v3 doesn't silently break docs.
+- [ ] **No mixed-version state**: every reference in this repo to "repo-standards" cites the same major. Don't ship a v2 PROMPT result with a v1 README badge.
+
 ---
 
 ## How to score a repo
