@@ -34,6 +34,7 @@ areas (Phases A–K). Consumer repos pin to `v2.1` (or a specific
 - `templates/CLAUDE.md.tmpl` — new top-level sections "Behavior preservation (non-negotiable)", "AI readiness", "Out-of-scope / Unrelated Findings (opt-out)", and "Alternative Operating Mode: Single Feature Branch / Single PR". Existing Conventional Commits + Testing blocks tightened to keep template within the ~200-line target. (Phases A, D, K)
 - `templates/README.md.tmpl` — new subsections "Operating modes", "AI tooling", "Behavior preservation (non-negotiable)", "Template-repo origin (if applicable)", "Community standards". (Phases A, D, G, I, K)
 - `templates/.github/CONTRIBUTING.md` — "Governance" link in Quick links; "Community standards" section naming the three layered standards + reporting routes. (Phases C, I)
+- `PROMPT.md` rule 15 + `templates/CLAUDE.md.tmpl` "Plan Management & Clean State Rule" section + `UPGRADE_CHECKLIST.md` Section 13 audit bullet — critical safety net requiring AI-driven upgrade passes to start a fresh plan file or actively prune completed sections, never appending new phases to a plan that already contains shipped work. (Phase L)
 
 ### Changed
 
