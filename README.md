@@ -66,14 +66,14 @@ The prompt is identical for both. Pick the flow that fits where you are.
 
 ## Repo upgrade order (recommended)
 
-The template hardens fastest if you do small, similar repos first:
+Each repo upgrade follows the canonical 8-PR sequence in [`PROMPT.md`](./PROMPT.md) Step 2. The order in which you upgrade *repos* is your call; the template hardens fastest if you do small, similar repos first:
 
 1. **Single-file HTML** — `worldmap`, `ticked`, `twitch-mood-radar` (validates the static-HTML CI workflow + refactoring guide)
 2. **Smaller utilities** — `Exif`, `gadget`, `intuino`, `court-procedure-guide` (depends on what they are)
 3. **Larger projects** — `discord-musicbot` (Python), `synth-piano`, `polyvote`
 4. **Android** — `D2app` last (different stack, may need its own CLAUDE.md variant)
 
-After the first repo, expect to tweak the templates here based on what you learn. That's the point of having the standards in their own repo: change once, re-run.
+After the first downstream upgrade, expect to tweak the templates here based on what you learn. That's the point of having the standards in their own repo: change once, re-run.
 
 ## License
 
