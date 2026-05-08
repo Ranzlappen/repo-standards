@@ -3,6 +3,7 @@
 [![Standards](https://img.shields.io/badge/standards-v2.1.1-informational)](./VERSION)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./templates/LICENSE)
 [![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
+[![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ff69b4)](./SPONSORS.md)
 
 A portable toolkit for upgrading my repos to a consistent, high-quality baseline. Distilled from the [`website`](https://github.com/Ranzlappen/website) repo, which is the working reference implementation.
 
@@ -16,7 +17,14 @@ This repo answers two questions:
 | File | Purpose |
 | --- | --- |
 | [`VERSION`](./VERSION) | Current standards version (semver). Consumer repos pin a major via git tag (`v1`, `v2`, …). |
+| [`.standards-version`](./.standards-version) | The major version this repo follows itself (dogfood). Read by `PROMPT.md` Step 0. |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Notable changes per release. Keep-a-Changelog format. |
+| [`SPONSORS.md`](./SPONSORS.md) | Thank-you page + what sponsorship funds + what it does **not** buy. Surfaced from the badge block. |
+| [`.github/CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md) | This repo's live Code of Conduct (Contributor Covenant 2.1). The downstream-facing template lives at [`templates/.github/CODE_OF_CONDUCT.md`](./templates/.github/CODE_OF_CONDUCT.md). |
+| [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md) | This repo's live contributor guide. Downstream-facing template at [`templates/.github/CONTRIBUTING.md`](./templates/.github/CONTRIBUTING.md). |
+| [`.github/SECURITY.md`](./.github/SECURITY.md) | Vulnerability-reporting policy + threat model + supply-chain commitments. Downstream-facing template at [`templates/.github/SECURITY.md`](./templates/.github/SECURITY.md). |
+| [`.github/FUNDING.yml`](./.github/FUNDING.yml) | Sponsor-button config. Entries commented until a backing profile is live. |
+| [`.github/CODEOWNERS`](./.github/CODEOWNERS) | Code-owner mapping for review routing. |
 | [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) | The audit Claude Code runs against any repo. Pass/fail items grouped by category. |
 | [`REFACTORING_GUIDE.md`](./REFACTORING_GUIDE.md) | How to split big single-file projects into modules without changing behavior. |
 | [`PROMPT.md`](./PROMPT.md) | The standardized Claude Code prompt. One prompt, applied repo by repo. |
@@ -132,9 +140,11 @@ This repo is structured as a **GitHub Template repository** — a one-click star
 
 The `templates/` folder is intentionally left in the new repo as a reference; delete it once the consumer no longer needs the originals.
 
-## Community standards
+## Community standards (this repo)
 
-Contributions to this repo are governed by three layered standards: the [GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), and the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) referenced from [`templates/.github/CODE_OF_CONDUCT.md`](./templates/.github/CODE_OF_CONDUCT.md). The same three apply to every downstream repo built from these templates — see [`templates/.github/CONTRIBUTING.md`](./templates/.github/CONTRIBUTING.md) for the contributor-facing version and the reporting routes.
+The standards repo dogfoods its own community files. Live, binding-on-this-repo copies sit at the root under [`.github/`](./.github/); the `templates/.github/` copies are the unconsumed boilerplate every downstream repo adopts.
+
+Contributions to this repo are governed by three layered standards: the [GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), and the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) referenced from [`.github/CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md). The same three apply to every downstream repo built from these templates — see [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md) for the contributor-facing version and the reporting routes, and [`.github/SECURITY.md`](./.github/SECURITY.md) for vulnerability disclosure. Long-form sponsorship doc at [`SPONSORS.md`](./SPONSORS.md).
 
 ## License
 
