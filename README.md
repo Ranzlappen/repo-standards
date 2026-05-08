@@ -118,6 +118,10 @@ This repo is structured as a **GitHub Template repository** — a one-click star
 
 The `templates/` folder is intentionally left in the new repo as a reference; delete it once the consumer no longer needs the originals.
 
+## Community standards
+
+Contributions to this repo are governed by three layered standards: the [GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), and the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) referenced from [`templates/.github/CODE_OF_CONDUCT.md`](./templates/.github/CODE_OF_CONDUCT.md). The same three apply to every downstream repo built from these templates — see [`templates/.github/CONTRIBUTING.md`](./templates/.github/CONTRIBUTING.md) for the contributor-facing version and the reporting routes.
+
 ## License
 
 MIT.
