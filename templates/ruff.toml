@@ -1,0 +1,67 @@
+# Ruff configuration — https://docs.astral.sh/ruff/configuration/
+#
+# Single source of truth for both linting and formatting. Drop this at the
+# project root or merge into [tool.ruff] in pyproject.toml; pick one,
+# don't define both.
+
+# Match the project's actual minimum Python.
+target-version = "py312"
+
+# Line length aligned with Prettier's default for JS/TS.
+line-length = 100
+
+# Files / dirs Ruff should never look at.
+extend-exclude = [
+    "build",
+    "dist",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "_site",
+    "vendor",
+]
+
+[lint]
+# Curated rule set: pyflakes (F), pycodestyle (E,W), isort (I),
+# pyupgrade (UP), bugbear (B), simplify (SIM), comprehensions (C4),
+# return-fix (RET), naming (N), security warnings (S).
+select = [
+    "F",
+    "E",
+    "W",
+    "I",
+    "UP",
+    "B",
+    "SIM",
+    "C4",
+    "RET",
+    "N",
+    "S",
+]
+
+# Common false-positive opt-outs.
+ignore = [
+    # `assert` is fine in tests (S101 fires on every test file otherwise).
+    "S101",
+    # Allow long URLs in comments (line-length already enforced elsewhere).
+    "E501",
+]
+
+# Allow unused variables prefixed with an underscore.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[lint.per-file-ignores]
+# Tests can use private members and have looser security rules.
+"tests/**" = ["S", "N802"]
+"**/test_*.py" = ["S", "N802"]
+"**/conftest.py" = ["S"]
+
+[lint.isort]
+known-first-party = []
+combine-as-imports = true
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true

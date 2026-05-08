@@ -76,6 +76,58 @@ progress per PR; deploys queue.">
 **Required secrets**: <name them — e.g. `FIREBASE_SERVICE_ACCOUNT`. Document
 what each is used for and how to rotate it.>
 
+## Conventional Commits
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+Every commit message starts with one of:
+
+* `feat` — new user-visible capability
+* `fix` — bug fix
+* `docs` — documentation only
+* `refactor` — code change without behavior or feature change
+* `test` — adding or fixing tests
+* `chore` — build, deps, tooling
+* `ci` — CI configuration
+* `perf` — performance improvement
+* `style` — formatting, no behavior change
+* `revert` — reverts a previous commit
+
+Optional scope in parens (`feat(timer): …`). Breaking changes get `!` and a
+`BREAKING CHANGE:` footer (`feat!: drop legacy v1 API`).
+
+The pre-commit `commit-msg` hook (see [`.pre-commit-config.yaml`](./.pre-commit-config.yaml))
+blocks non-conformant messages locally; CI re-checks on the merge commit.
+
+## Testing
+
+<List the test command(s) and what they cover. Examples:>
+
+* **Unit tests**: `<command>` — runs <which suite>. Coverage gate: <e.g. "80% lines, 75% branches">.
+* **Integration tests** (if any): `<command>`.
+* **Manual smoke checklist** (for UI projects): list the critical user
+  flows that any change must verify before merging. Keep this short — 5–8
+  flows max — so it actually gets walked through.
+
+If the project has no automated tests yet, say so here explicitly with a
+one-line reason (and ideally a follow-up issue link). Silence in this
+section is worse than "tests deferred for now".
+
+## Security & Secrets
+
+* **Threat model**: <one paragraph — who could attack this, what's at stake.
+  E.g. "Public Pages site with no backend; the realistic attack is XSS via
+  user-controlled URLs in shareable links.">
+* **Secrets handled by this project**: list each one and where it lives
+  (env var, GitHub Secret, Firebase config, etc.). Reference [`.env.example`](./.env.example)
+  for the canonical list of variable names.
+* **Public client-side keys**: <if applicable, document explicitly why
+  they're safe to expose. E.g. "Firebase web config keys are public by
+  design; security is enforced via Firestore rules and Cloud Functions.">
+* **Reporting vulnerabilities**: see [`.github/SECURITY.md`](./.github/SECURITY.md).
+  Do not file public issues for security problems.
+* **Rotation cadence**: <e.g. "API keys rotate every 90 days. Service
+  account keys rotate annually.">
+
 ## Tech Stack
 
 <A single table. One row per significant technology. Include the role and the

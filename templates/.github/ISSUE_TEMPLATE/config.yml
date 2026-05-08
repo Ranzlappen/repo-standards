@@ -1,0 +1,14 @@
+# Issue-template chooser configuration.
+# Reference: https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository
+
+# Force users to pick a structured template; no "blank issue" escape hatch.
+blank_issues_enabled: false
+
+# Optional links surfaced above the template list. Uncomment and edit per repo.
+# contact_links:
+#   - name: Question or discussion
+#     url: https://github.com/<OWNER>/<REPO>/discussions
+#     about: Ask in Discussions if you're not sure whether something is a bug.
+#   - name: Security report
+#     url: https://github.com/<OWNER>/<REPO>/security/advisories/new
+#     about: Use private vulnerability reporting for security issues; do not file a public issue.

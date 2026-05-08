@@ -1,0 +1,94 @@
+# Example pyproject.toml — copy to `pyproject.toml` in target repos and edit.
+#
+# Reference: https://packaging.python.org/en/latest/specifications/pyproject-toml/
+#
+# Pairs with templates/ruff.toml (lint + format) and a separate vitest.config.ts
+# for any JS/TS testing the project also ships.
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "<project-name>"
+version = "0.1.0"
+description = "<one-sentence description>"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+authors = [
+    { name = "<Your Name>", email = "<you@example.com>" },
+]
+keywords = []
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    # "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+
+[project.urls]
+Homepage = "https://github.com/<OWNER>/<REPO>"
+Issues = "https://github.com/<OWNER>/<REPO>/issues"
+Changelog = "https://github.com/<OWNER>/<REPO>/blob/main/CHANGELOG.md"
+
+# --- Pytest configuration ---------------------------------------------------
+# Reference: https://docs.pytest.org/en/stable/reference/customize.html
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "--strict-config",
+    "--strict-markers",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:.*third_party.*",
+]
+markers = [
+    "slow: marks tests as slow (deselect with -m 'not slow')",
+    "integration: requires external services",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+omit = ["tests/*", "*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+show_missing = true
+fail_under = 80
+
+# --- Ruff (alternative location) --------------------------------------------
+# If you'd rather configure Ruff inline here instead of in templates/ruff.toml,
+# uncomment the block below and delete ruff.toml. Pick one.
+#
+# [tool.ruff]
+# target-version = "py312"
+# line-length = 100
+#
+# [tool.ruff.lint]
+# select = ["F", "E", "W", "I", "UP", "B", "SIM", "C4", "RET", "N", "S"]
+# ignore = ["S101", "E501"]
