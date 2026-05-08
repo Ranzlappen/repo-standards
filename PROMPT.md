@@ -84,6 +84,38 @@ pull requests that bring it into compliance.
    modules, picking which CI workflow template to start from, or any other
    reversible call. The PR is the conversation — the user reviews there.
 
+9. **Tiny commits — one file per response.** Make exactly one file change
+   per commit unless the change is atomically inseparable across two files
+   (rare). Each commit is preceded by a one-paragraph plain-English plan,
+   followed by a post-task self-check (file exists / YAML/JSON parses /
+   links resolve / line count consistent), and a one-line summary. This is
+   the rhythm the user has chosen for *every* upgrade — do not bundle
+   unrelated changes into a single commit even if they all belong in the
+   same PR.
+
+10. **Conventional Commits required.** Every commit message uses the
+    Conventional Commits spec
+    (https://www.conventionalcommits.org/en/v1.0.0/). Recommended scopes
+    for repo upgrades: `version`, `meta`, `tmpl`, `wf` (workflow), `gh`
+    (community files), `wiki`, `prompt`, `checklist`, `dependabot`,
+    `release`. Breaking changes get `!` and a `BREAKING CHANGE:` footer.
+    Non-conformant messages are blocked locally by the `commit-msg` hook
+    in `templates/.pre-commit-config.yaml`.
+
+11. **Post-task self-check is mandatory after every code change.** The
+    template in `CLAUDE.md.tmpl` has the self-check block at the bottom.
+    For repo-upgrade work specifically, the rule is **stricter** than the
+    template's default ("skip for pure Q&A turns"): every commit that
+    changes tracked files runs the self-check. Output its result before
+    proposing the next change. This is non-negotiable — it's how doc
+    drift and inconsistent state are caught before they accumulate.
+
+12. **No PR opens without explicit user confirmation.** After the last
+    commit of a category lands on the working branch, stop and ask the
+    user to confirm before calling `mcp__github__create_pull_request` (or
+    its CLI equivalent). Drafts are okay if the user explicitly asks. PR
+    sequencing is sequential: PR N must merge before PR N+1 opens.
+
 ## Step 0 — Standards version check (before anything else)
 
 This prompt is for **repo-standards v2**. Before reading or planning anything,
