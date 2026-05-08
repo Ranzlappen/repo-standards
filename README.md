@@ -1,5 +1,9 @@
 # Ranzlappen Repo Standards
 
+[![Standards](https://img.shields.io/badge/standards-v2.0.0-informational)](./VERSION)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./templates/LICENSE)
+[![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
+
 A portable toolkit for upgrading my repos to a consistent, high-quality baseline. Distilled from the [`website`](https://github.com/Ranzlappen/website) repo, which is the working reference implementation.
 
 This repo answers two questions:
