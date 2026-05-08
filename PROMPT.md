@@ -29,9 +29,24 @@ pull requests that bring it into compliance.
    `chore/v2-community-and-templates`, …). Every PR description carries the
    relevant slice of the checklist.
 
-2. **Behavior preservation.** Refactoring may not change observable behavior.
-   "Observable behavior" is everything a user, installed-PWA client, external
-   integrator, or CI smoke check would notice:
+2. **Behavior preservation (non-negotiable).** Every change must keep
+   **100% of the target repo's original functionality**. Before any edit:
+     - **Analyze the target repo first.** Read the entrypoints, the build
+       config, every workflow, every tracked config file, and the data
+       layer. Form a mental model of what observable behavior exists *today*
+       on `main` before proposing a single character of change.
+     - **Flag repo-specific risks explicitly.** Every PR description and
+       every post-task self-check (see rule 11) must include a
+       **Repo-specific risks / edge-cases** subsection naming any quirks
+       this particular repo has that interact with the change — non-obvious
+       conventions, in-flight migrations, hand-rolled scripts that depend
+       on file paths, undocumented env vars, browser/mobile quirks the
+       project specifically handles, etc. "None observed" is an acceptable
+       value, but the heading must appear.
+
+   Refactoring may not change observable behavior. "Observable behavior"
+   is everything a user, installed-PWA client, external integrator, or CI
+   smoke check would notice:
      - **UI**: rendered output, layout, animations, focus order, accessibility tree.
      - **URLs**: deployed domain, route paths, query parameters, deep-link contracts.
      - **Storage**: `localStorage` / `sessionStorage` keys, IndexedDB schema
