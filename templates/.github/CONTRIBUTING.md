@@ -7,6 +7,7 @@ Thanks for considering a contribution. This document is short on purpose — any
 - [Open issues](../../issues) — bug reports and feature ideas.
 - [Pull requests](../../pulls) — submit changes for review.
 - [Code of Conduct](./CODE_OF_CONDUCT.md) — how we treat each other.
+- [Governance](./GOVERNANCE.md) — roles, decision-making, branch-protection rules.
 - [Security policy](./SECURITY.md) — how to report vulnerabilities privately.
 
 ## How to propose a change
