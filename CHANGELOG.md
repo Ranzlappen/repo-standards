@@ -6,6 +6,8 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [2.1.0] — 2026-05-08
+
 ### Added
 
 - `templates/.github/PULL_REQUEST_TEMPLATE.md` "Behavior-preservation evidence" sub-block — five tickable buckets (UI / URLs / Storage / Deployment shape / External dependencies) for refactoring PRs to record before/after evidence per `PROMPT.md` rule 2. Section is opt-out via the HTML comment for non-refactor PRs.
@@ -122,6 +124,7 @@ Every existing workflow now declares a least-privilege `permissions:` block, has
 - `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner.
 - `.github/workflows/auto-tag.yml` — push-to-main + VERSION-changed automated tagger (creates `vX.Y.Z` and force-updates `vMAJOR` for non-prereleases).
 
-[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.0
 [2.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.0.0
 [1.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v1.0.0
