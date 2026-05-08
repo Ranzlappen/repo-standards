@@ -142,6 +142,17 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 - [ ] **`robots.txt`** present at site root, explicit about which paths bots should and shouldn't crawl.
 - [ ] **PWA manifest icons resolve** (every `icons[].src` exists). Lighthouse's installability audit catches this; running it locally before merge is the cheapest gate.
 
+## 12. Testing & Quality
+
+- [ ] **At least a smoke test exists** for any project with business logic. "Does the entry point start without crashing?" is a valid smoke test for the smallest projects; richer behavior gets richer tests.
+- [ ] **Test command is documented in `CLAUDE.md`** under "Build & Development" (or the project's equivalent), so a new contributor can run tests without guessing.
+- [ ] **Coverage thresholds set** for projects with `pyproject.toml`/pytest or `vitest.config.ts`. Defaults: lines / statements / functions ≥ 80%, branches ≥ 75%. Tune per project; don't lower without a recorded reason.
+- [ ] **Lint runs in CI** on every PR. Defaults: ruff for Python, ESLint for JS/TS, ktlint or detekt for Kotlin, html-validate for static HTML. Failures are blocking.
+- [ ] **Conventional Commits enforced locally** via the `commit-msg` hook in `templates/.pre-commit-config.yaml` (CI re-checks the merge commit).
+- [ ] **Pre-commit installed** by contributors (`pre-commit install`) — documented in `CONTRIBUTING.md`.
+- [ ] **Test failures are blocking**: PR can't merge with red CI. Branch protection on `main` requires the CI workflow to pass.
+- [ ] **Flaky tests are flagged with a label or skip**; chronic flakes get an issue instead of a `// TODO: fix flaky` comment that never gets addressed.
+
 ---
 
 ## How to score a repo
