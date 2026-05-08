@@ -37,10 +37,15 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 - [ ] At least one workflow exists in `.github/workflows/`.
 - [ ] Workflows are **scoped by `paths` filters** so unrelated changes don't trigger irrelevant runs.
 - [ ] **Concurrency control** is configured per workflow (cancel-in-progress for CI, queue for deploys).
-- [ ] **Action versions are pinned** to a major version at minimum (e.g. `actions/checkout@v6`, not `@main`).
+- [ ] **Every workflow declares a `permissions:` block** at workflow scope — least privilege (`contents: read` is the default for non-deploying CI). Jobs override per-step where they need more.
+- [ ] **Every `uses:` action is pinned to a 40-char commit SHA**, with a trailing comment naming the major version (e.g. `actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6`). Major-version pins (`@v6`) and floating refs (`@main`) are rejected. Self-validate enforces this as a hard fail.
+- [ ] **Every job declares `timeout-minutes`.** Defaults: Node 15, Python 15, static-html 10, Android 30, Pages-deploy 15, security-scan-codeql 30, security-scan-gitleaks 5.
 - [ ] Node version (or other runtime version) is **pinned and consistent** across all jobs.
+- [ ] **Lint/test tools are pinned and cached** (e.g. ruff/pytest in `requirements-dev.txt`, not inline `pip install ruff` per step). Cache keys include the dependency-pin file.
 - [ ] Required secrets are **named in the workflow comment** and documented in CLAUDE.md.
 - [ ] If the repo has multiple sub-projects, CI uses **per-app jobs gated on path filters** (see `website/.github/workflows/ci.yml` for the pattern).
+- [ ] **A `security-scan.yml` workflow exists** with CodeQL + gitleaks, triggered on PRs, push-to-main, and a weekly schedule.
+- [ ] **Reusable workflow available** (`lint-and-test.yml`) for projects that want a single callable lint+test entry point.
 
 ## 4. Project structure
 
