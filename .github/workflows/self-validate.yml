@@ -8,7 +8,8 @@ name: Self-validate standards
 #     own .github/workflows/.
 #   - lychee --offline on every Markdown file (no broken internal links).
 #   - VERSION parses as semver.
-#   - SHA-pinning lint on `uses:` lines (soft warn now; PR 4 makes it hard fail).
+#   - SHA-pinning lint on `uses:` lines: hard fail if any `uses:` is not
+#     pinned to a 40-char SHA. Major-version pins like @v6 are rejected.
 
 on:
   pull_request:
@@ -47,9 +48,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
       - name: Run actionlint
-        uses: raven-actions/actionlint@v2
+        uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8  # v2
         with:
           files: |
             .github/workflows/*.yml
@@ -60,9 +61,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
       - name: Lychee link check
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411  # v2
         with:
           # Skip templates/: those files use relative paths that are
           # intentionally consumer-repo-relative (`../../issues`,
@@ -77,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
       - name: Assert VERSION matches SemVer
         run: |
           VERSION_STR="$(tr -d '[:space:]' < VERSION)"
@@ -87,11 +88,11 @@ jobs:
             print('semver ok:', v)"
 
   validate-sha-pinning:
-    name: uses-line SHA-pinning lint (soft warn)
+    name: uses-line SHA-pinning lint
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
       - name: Scan workflow uses for non-SHA refs
         run: |
           set -e
@@ -101,9 +102,12 @@ jobs:
             [ -f "$f" ] || continue
             while IFS= read -r line; do
               ref="${line##*@}"
-              # Soft warn if not 40-char hex SHA. Hard fail enabled in PR 4.
+              # Hard fail if not a 40-char hex SHA. v2 enforces SHA pinning
+              # for every `uses:` line; major-version pins like @v6 are no
+              # longer accepted (use SHA + comment for major version).
               if ! echo "$ref" | grep -Eq '^[0-9a-f]{40}([[:space:]]|$)'; then
-                echo "::warning file=$f::uses pin is not a 40-char SHA: $line"
+                echo "::error file=$f::uses pin is not a 40-char SHA: $line"
+                FAIL=1
               fi
             done < <(grep -nE '^[[:space:]]*-?[[:space:]]*uses:[[:space:]]+[^[:space:]]+@[^[:space:]]+' "$f" || true)
           done
