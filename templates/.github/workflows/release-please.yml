@@ -17,7 +17,10 @@
 #   3. Add a `release-please-config.json` and `.release-please-manifest.json`
 #      at repo root (release-please generates initial templates on first
 #      run if they're missing).
-#   4. Remove the `if: false` on the job below.
+#   4. Enable the gate by creating a repository variable named
+#      `RELEASE_PLEASE_ENABLED` set to `true` (Settings → Secrets and
+#      variables → Actions → Variables tab → New repository variable).
+#      Until that variable is set, the job below short-circuits.
 
 name: Release Please
 
@@ -38,10 +41,10 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Remove or set to `true` to enable. Disabled by default so adding this
-    # template to a repo doesn't immediately open a release PR before the
-    # maintainer has decided whether release-please is the right tool.
-    if: false
+    # Gated on a repository variable so the workflow ships in a
+    # short-circuit state. Set vars.RELEASE_PLEASE_ENABLED to "true" in the
+    # repo's Actions Variables to activate.
+    if: ${{ vars.RELEASE_PLEASE_ENABLED == 'true' }}
     steps:
       - name: Run release-please
         uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5  # v4
