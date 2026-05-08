@@ -36,14 +36,10 @@ pull requests that bring it into compliance.
    instead of doing it.
 
 3. **Phased PRs.** Do NOT bundle docs, CI, structural changes, and refactoring
-   into one mega-PR. Use this order:
-     - PR 1: Docs only (README.md, CLAUDE.md, LICENSE if missing).
-     - PR 2: Repo hygiene (.gitignore, dependabot.yml, repo description / topics
-             noted in the PR body even if you can't set them yourself).
-     - PR 3: CI / GitHub Actions workflows.
-     - PR 4 (only if applicable): Refactoring per REFACTORING_GUIDE.md.
-   Open them sequentially. Do not start PR N+1 until PR N is reviewed.
-   If only PR 1–3 are needed, stop there.
+   into one mega-PR. Use the canonical 8-PR sequence in Step 2 below — open
+   the PRs sequentially per the hard-ordering rule there, and don't start
+   PR N+1 until PR N merges. Skip any PR whose scope is empty for this repo
+   (with a one-line reason).
 
 4. **Templates are starting points, not gospel.** Adapt the CLAUDE.md and
    README.md skeletons to this project's actual architecture. Don't paste
