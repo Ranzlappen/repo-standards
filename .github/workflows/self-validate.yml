@@ -64,7 +64,12 @@ jobs:
       - name: Lychee link check
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --offline --no-progress --include-fragments './**/*.md'
+          # Skip templates/: those files use relative paths that are
+          # intentionally consumer-repo-relative (`../../issues`,
+          # `../CLAUDE.md`, etc.) and resolve correctly only when the
+          # template has been copied into a real repo. Consumer repos
+          # check their own links via their own CI.
+          args: --offline --no-progress --include-fragments --exclude-path templates './**/*.md'
           fail: true
 
   validate-version:
