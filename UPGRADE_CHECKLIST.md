@@ -121,6 +121,16 @@ Wiki content is optional. A repo without a wiki is not "downgraded" — it just 
 
 Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 — the upgrade flow does not push to `<repo>.wiki.git` automatically.
 
+## 10. Security
+
+- [ ] **CodeQL is enabled** for the repo's primary language(s). For projects using the v2 templates, this means `templates/.github/workflows/security-scan.yml` is copied in and the language matrix matches what's in the repo.
+- [ ] **Secret scanning is on** (Settings → Code security and analysis → Secret scanning) with push protection enabled.
+- [ ] **Dependabot security alerts** are enabled (Settings → Code security and analysis → Dependabot alerts + Dependabot security updates).
+- [ ] **`SECURITY.md` exists** at `.github/SECURITY.md` (or repo root) with a private-reporting channel — GitHub private vulnerability reporting preferred, email fallback.
+- [ ] **Public client-side keys are documented** in `CLAUDE.md` under "Security & Secrets" if the project ships any (e.g. Firebase web config). Documentation explicitly says they're public-by-design and points at the server-side rule that secures the data.
+- [ ] **`.env` is `.gitignore`d**; `.env.example` is committed; documented variables list `<SECURITY_CONTACT_EMAIL>` rotation cadence.
+- [ ] **No secrets, API keys, or unredacted credentials in tracked files** (verified by gitleaks in the security-scan workflow on every PR + push to main + weekly schedule).
+
 ---
 
 ## How to score a repo
