@@ -30,10 +30,23 @@ pull requests that bring it into compliance.
    relevant slice of the checklist.
 
 2. **Behavior preservation.** Refactoring may not change observable behavior.
-   This includes UI, animations, storage keys, URLs, deployment shape, and
-   external dependencies. If you cannot prove a refactor preserves behavior,
-   skip it and add it to "Refactoring opportunities" in the PR description
-   instead of doing it.
+   "Observable behavior" is everything a user, installed-PWA client, external
+   integrator, or CI smoke check would notice:
+     - **UI**: rendered output, layout, animations, focus order, accessibility tree.
+     - **URLs**: deployed domain, route paths, query parameters, deep-link contracts.
+     - **Storage**: `localStorage` / `sessionStorage` keys, IndexedDB schema
+       versions, cache names, service-worker registration order.
+     - **Deployment shape**: hosting target, asset URLs, build-output paths,
+       redirect rules.
+     - **External dependencies**: third-party endpoint shapes, webhook payloads,
+       analytics identifiers, manifest `start_url` / `scope` / `id`,
+       `assetlinks.json` fingerprints.
+   Burden of proof is on the refactor: PR 4's Test plan must enumerate
+   before/after evidence for each touched item, and PWA work additionally
+   follows the **PWA Refactor Addendum** in `REFACTORING_GUIDE.md` (the
+   `pwa-inventory.md` artifact is its evidence). If you cannot prove
+   preservation, skip the refactor and add it to "Refactoring opportunities"
+   in the PR description instead of doing it.
 
 3. **Phased PRs.** Do NOT bundle docs, CI, structural changes, and refactoring
    into one mega-PR. Use the canonical 8-PR sequence in Step 2 below — open
