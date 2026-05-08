@@ -40,6 +40,8 @@ This contract is non-negotiable. The user's stated value of these projects is "w
 
 ## PWA Refactor Addendum (mandatory if the project is a PWA)
 
+This Addendum's `pwa-inventory.md` artifact (Step 1 below) is the **rule 2 evidence requirement** for PWA refactors. Non-PWA refactors satisfy rule 2 by enumerating touched buckets — UI, URLs, Storage, Deployment shape, External dependencies — directly in PR 4's Test plan.
+
 Apply this section automatically whenever the repo contains **any** of:
 
 * A `sw.js`, `service-worker.js`, or any file registered via `navigator.serviceWorker.register(...)`
