@@ -181,6 +181,13 @@ pull requests that bring it into compliance.
     completion. Per-change ritual (rules 9 and 11) still applies to
     every commit.
 
+15. **Plan Management & Clean State Rule.** When the user asks for a
+    new plan, or when plan mode reopens during a long session, start a
+    fresh plan file or actively prune completed sections. Never append
+    to an old plan that already contains shipped work — that's how plan
+    bloat happens. Keep plan files concise and focused on the remaining
+    scope.
+
 ## Step 0 — Standards version check (before anything else)
 
 This prompt is for **repo-standards v2**. Before reading or planning anything,
