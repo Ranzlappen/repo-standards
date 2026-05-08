@@ -6,6 +6,17 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+### Added — PR 6: checklist expansion
+
+- `UPGRADE_CHECKLIST.md` Section 10 — Security (CodeQL, secret scanning + push protection, Dependabot security alerts, SECURITY.md present, public-client-side-keys documented, .env hygiene, gitleaks-verified no-secrets-in-tracked-files).
+- `UPGRADE_CHECKLIST.md` Section 11 — Accessibility / Performance / SEO (Lighthouse defaults Perf 80 / A11y 95 / BP 95 / SEO 90, accessible names, focus order, contrast, meta tags incl. Open Graph, sitemap.xml, robots.txt, manifest icons resolve). Skippable for non-web projects with a one-line reason.
+- `UPGRADE_CHECKLIST.md` Section 12 — Testing & Quality (smoke tests, test command in CLAUDE.md, coverage thresholds matching pytest/vitest defaults, lint blocking in CI, Conventional Commits enforced via commit-msg hook, pre-commit installed by contributors, branch protection requires green CI, flaky tests get a label or issue rather than a TODO).
+- `UPGRADE_CHECKLIST.md` Section 13 — Standards Versioning (.standards-version file, README badge, Upgrade-History wiki entry, CHANGELOG entry for standards-version-relevant changes, consumer-side references pinned to a tag, no mixed-version state).
+
+### Changed
+
+- `UPGRADE_CHECKLIST.md` "How to score a repo" — extended scoring to include sections 9 (Wiki) and 10–13 (Security, A11y, Testing, Versioning). Wiki and A11y skippable for non-applicable repos; Security and Standards Versioning non-negotiable for v2 compliance.
+
 ### Added — PR 5: PROMPT.md hardening
 
 - `PROMPT.md` Step 0 — Standards version check preamble. Fetches the standards `VERSION` and the consumer repo's declared version (`.standards-version` file, README badge, or CLAUDE.md note); refuses on major mismatch, asks the user in offline-fallback mode, and proceeds otherwise.
