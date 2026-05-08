@@ -11,6 +11,18 @@ runtime, what's the deployment target. If the project has multiple modules
 * **<MODULE_1>** (`<path/>`) — <one sentence: what it is, what stack>.
 * **<MODULE_2>** (`<path/>`) — <same>.
 
+## Behavior preservation (non-negotiable)
+
+Every change to this repo — AI-driven or human — follows
+[`repo-standards`](https://github.com/Ranzlappen/repo-standards) `PROMPT.md`
+rule 2: **100% of original functionality preserved**, target repo analyzed
+*before* editing, and a **Repo-specific risks / edge-cases** subsection
+included in every PR description and post-task self-check. "None observed"
+is acceptable; the heading must be present. Refactoring PRs additionally
+enumerate evidence per rule 2's five buckets (UI / URLs / Storage /
+Deployment shape / External dependencies); PWA work follows the PWA
+Refactor Addendum in `REFACTORING_GUIDE.md`.
+
 ## Build & Development
 
 ### <Module 1 name>
@@ -167,7 +179,10 @@ self-check before replying: does the change introduce anything worth codifying
 in docs or automation? Scan for new env vars, npm scripts, path filters,
 deploy targets, secrets, setup steps, dependencies, or conventions that should
 be reflected in `README.md`, `CLAUDE.md`, `.github/workflows/*.yml`, or
-`.github/dependabot.yml`.
+`.github/dependabot.yml`. Per `PROMPT.md` rule 2, **always include a
+"Repo-specific risks / edge-cases" subsection** in the self-check — naming
+quirks unique to this repo that interact with the change, or "None observed"
+if there genuinely are none.
 
 Decide per case:
 
