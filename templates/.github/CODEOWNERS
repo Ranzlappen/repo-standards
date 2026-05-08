@@ -1,0 +1,42 @@
+# CODEOWNERS for <PROJECT_NAME>
+#
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Patterns are matched in order; the LAST matching pattern wins.
+# Owners can be GitHub usernames (@user), team handles (@org/team-name),
+# or email addresses.
+#
+# Tips:
+#   - Put broad fallback rules first, narrow overrides last.
+#   - GitHub auto-requests review from the matching owner on every PR
+#     touching the matched paths. Combine with branch protection's
+#     "Require review from Code Owners" for enforcement.
+#   - Keep the file short. If you find yourself maintaining a per-folder
+#     map for every directory, the codebase is probably already over-owned.
+
+# --- Default owner for everything not matched below ---
+*                       @<DEFAULT_OWNER>
+
+# --- Documentation ---
+# /README.md             @<DOCS_OWNER>
+# /CLAUDE.md             @<DOCS_OWNER>
+# /docs/                 @<DOCS_OWNER>
+
+# --- CI / build / dependency configuration ---
+# /.github/              @<INFRA_OWNER>
+# /.github/workflows/    @<INFRA_OWNER>
+# /.github/dependabot.yml @<INFRA_OWNER>
+
+# --- Security-sensitive areas ---
+# /.github/SECURITY.md   @<SECURITY_OWNER>
+# /.well-known/          @<SECURITY_OWNER>
+# /sw.js                 @<SECURITY_OWNER>
+# /service-worker.js     @<SECURITY_OWNER>
+# /manifest.json         @<SECURITY_OWNER>
+# /manifest.webmanifest  @<SECURITY_OWNER>
+
+# --- Per-language / per-module overrides (uncomment as needed) ---
+# *.py                   @<PYTHON_OWNER>
+# *.kt                   @<ANDROID_OWNER>
+# /web/                  @<FRONTEND_OWNER>
+# /server/               @<BACKEND_OWNER>
