@@ -166,6 +166,7 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 - [ ] **Pinned dependency on the standards repo** is at a tag, not `main`. PROMPT.md fetches `VERSION` from `Ranzlappen/repo-standards/main` (always-current); but consumer-side references in CONTRIBUTING.md, badges, etc. point at `v2` (or a specific `v2.0.0`) so a future v3 doesn't silently break docs.
 - [ ] **No mixed-version state**: every reference in this repo to "repo-standards" cites the same major. Don't ship a v2 PROMPT result with a v1 README badge.
 - [ ] **GitHub Template repository considered.** If this repo is intended as a starting point for other repos (e.g. `repo-standards` itself, or any internal "starter-x" repo), the **`Settings → General → Template repository`** checkbox is enabled so consumers can use the green "Use this template" button instead of cloning + scrubbing history. For ordinary application repos, leave the checkbox off — they're not templates.
+- [ ] **Operating-mode and out-of-scope opt-out understood (v2.1).** Maintainers know the repo supports both the canonical 8-PR sequence and the single-PR alternative mode (`PROMPT.md` rules 13–14), and the `DISABLE_OUT_OF_SCOPE_ISSUES=true` repo variable is set if the team prefers to keep out-of-scope findings in PR descriptions only (default is auto-file a labeled issue).
 
 ---
 
