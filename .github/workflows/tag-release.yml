@@ -1,0 +1,61 @@
+name: Tag Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag to create (e.g. v1.0.0, v2.0.0, v2)'
+        required: true
+        type: string
+      tag_sha:
+        description: 'Commit SHA to tag (full 40-char or short)'
+        required: true
+        type: string
+      tag_message:
+        description: 'Annotated tag message (defaults to tag name)'
+        required: false
+        type: string
+        default: ''
+      force:
+        description: 'Force-update an existing tag (use with care)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Verify SHA exists in repo history
+        run: git cat-file -e "${{ inputs.tag_sha }}^{commit}"
+
+      - name: Create annotated tag
+        run: |
+          MSG="${{ inputs.tag_message }}"
+          if [ -z "$MSG" ]; then MSG="${{ inputs.tag_name }}"; fi
+          if [ "${{ inputs.force }}" = "true" ]; then
+            git tag -fa "${{ inputs.tag_name }}" "${{ inputs.tag_sha }}" -m "$MSG"
+          else
+            git tag -a "${{ inputs.tag_name }}" "${{ inputs.tag_sha }}" -m "$MSG"
+          fi
+
+      - name: Push tag to origin
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            git push --force origin "${{ inputs.tag_name }}"
+          else
+            git push origin "${{ inputs.tag_name }}"
+          fi
