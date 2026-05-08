@@ -160,6 +160,27 @@ pull requests that bring it into compliance.
     its CLI equivalent). Drafts are okay if the user explicitly asks. PR
     sequencing is sequential: PR N must merge before PR N+1 opens.
 
+13. **Out-of-scope findings auto-file an issue (opt-out).** When the
+    upgrade pass surfaces something unrelated to the current task or PR,
+    auto-file a GitHub issue with
+    `gh issue create --title "<summary>" --body "<context>"
+    --label "out-of-scope,from-claude"` and link it from the PR's
+    "Refactoring opportunities" subsection. **Opt out** by setting the
+    repo variable `DISABLE_OUT_OF_SCOPE_ISSUES=true` — under opt-out,
+    surface the finding only in the PR description and skip the issue.
+
+14. **Alternative Operating Mode: Single Feature Branch / Single PR.**
+    The default is the canonical 8-PR sequence above. For focused work
+    that would otherwise produce three or fewer PRs (small repos, polish
+    passes, single-module refactors), the user may approve a one-branch /
+    one-PR mode. In that mode: open the PR draft after the first commit,
+    subscribe to PR activity (`gh pr subscribe <PR#>` or the MCP
+    equivalent) so CI failures and review comments arrive in the
+    session, push every subsequent commit to the same branch (each one
+    re-triggers integrity workflows), and mark ready-for-review only at
+    completion. Per-change ritual (rules 9 and 11) still applies to
+    every commit.
+
 ## Step 0 — Standards version check (before anything else)
 
 This prompt is for **repo-standards v2**. Before reading or planning anything,
