@@ -23,6 +23,16 @@ enumerate evidence per rule 2's five buckets (UI / URLs / Storage /
 Deployment shape / External dependencies); PWA work follows the PWA
 Refactor Addendum in `REFACTORING_GUIDE.md`.
 
+## AI readiness
+
+This repo is set up for AI-tool contributions. The source-of-truth
+hierarchy is: `CLAUDE.md` (this file) → `README.md` → tool-specific
+entrypoints (`.cursorrules` for Cursor, `.github/copilot-instructions.md`
+for Copilot if present). When tool-specific files disagree with this
+file, **this file wins**. See [`ai/AI_TEAM_PLAYBOOK.md`](./ai/AI_TEAM_PLAYBOOK.md)
+for multi-tool coordination rules (what each tool is best at,
+conflict-resolution defaults, per-tool ignore files).
+
 ## Build & Development
 
 ### <Module 1 name>
