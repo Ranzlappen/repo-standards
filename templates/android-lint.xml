@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Android Lint configuration for Kotlin/Java/XML projects.
+
+  Destination in target repos: app/lint.xml (or whichever module's lint.xml
+  the build expects). Reference the module-level build.gradle to point at it:
+
+      android {
+          lint {
+              lintConfig file("lint.xml")
+              abortOnError true
+              checkDependencies true
+          }
+      }
+
+  Reference: https://developer.android.com/studio/write/lint
+-->
+<lint>
+    <!-- ====================================================================
+         Severity overrides
+         ==================================================================== -->
+
+    <!-- Promote to error: things we never want shipped. -->
+    <issue id="HardcodedText" severity="error" />
+    <issue id="MissingTranslation" severity="error" />
+    <issue id="UnusedResources" severity="error" />
+    <issue id="ContentDescription" severity="error" />
+    <issue id="TouchTarget" severity="error" />
+    <issue id="LabelFor" severity="error" />
+    <issue id="Autofill" severity="error" />
+
+    <!-- Security-relevant: never warn-only. -->
+    <issue id="SetJavaScriptEnabled" severity="error" />
+    <issue id="UnsafeProtectedBroadcastReceiver" severity="error" />
+    <issue id="ExportedReceiver" severity="error" />
+    <issue id="ExportedService" severity="error" />
+    <issue id="ExportedContentProvider" severity="error" />
+
+    <!-- Frequently noisy in starter projects; downgrade rather than ignore. -->
+    <issue id="IconLocation" severity="warning" />
+    <issue id="GoogleAppIndexingWarning" severity="ignore" />
+
+    <!-- Allow lower-API usage when guarded by Build.VERSION checks. -->
+    <issue id="NewApi" severity="error">
+        <ignore path="**/legacy/**" />
+    </issue>
+
+    <!-- ====================================================================
+         Path-scoped exceptions
+         ==================================================================== -->
+
+    <!-- Generated code shouldn't gate the build on style. -->
+    <issue id="all">
+        <ignore path="**/build/**" />
+        <ignore path="**/generated/**" />
+    </issue>
+</lint>
