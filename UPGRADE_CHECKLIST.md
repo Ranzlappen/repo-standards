@@ -131,6 +131,17 @@ Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 
 - [ ] **`.env` is `.gitignore`d**; `.env.example` is committed; documented variables list `<SECURITY_CONTACT_EMAIL>` rotation cadence.
 - [ ] **No secrets, API keys, or unredacted credentials in tracked files** (verified by gitleaks in the security-scan workflow on every PR + push to main + weekly schedule).
 
+## 11. Accessibility, Performance, SEO (web projects only)
+
+Skip this section for non-web projects (CLI tools, Discord bots, libraries) with a one-line note.
+
+- [ ] **Lighthouse baseline** captured for the production URL. Defaults: Performance ≥ 80, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90. Tune per project; don't lower without a recorded reason.
+- [ ] **Accessibility audit basics**: every interactive element has an accessible name (button text, `aria-label`, or `alt` attribute), focus order is logical, contrast ratio ≥ 4.5:1 for body text, no keyboard traps. PWAs additionally need to handle the back-button correctly when modals are open.
+- [ ] **Meta tags** present in `<head>`: `<title>`, `<meta name="description">`, `<meta name="viewport" content="width=device-width, initial-scale=1">`, charset, and Open Graph (`og:title`, `og:description`, `og:image`) for shareability.
+- [ ] **`sitemap.xml`** present at site root for any site with more than ~5 distinct pages, and is referenced from `robots.txt`.
+- [ ] **`robots.txt`** present at site root, explicit about which paths bots should and shouldn't crawl.
+- [ ] **PWA manifest icons resolve** (every `icons[].src` exists). Lighthouse's installability audit catches this; running it locally before merge is the cheapest gate.
+
 ---
 
 ## How to score a repo
