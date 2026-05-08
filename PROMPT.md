@@ -24,8 +24,9 @@ The numbered files (`00`–`04`) are the canonical Step sequence. The unnumbered
 ## Prompt to paste
 
 ```
-You are upgrading this repository to match the standards defined at:
-  https://github.com/Ranzlappen/repo-standards
+You are upgrading this repository to **repo-standards v3.0.1** — the
+self-dogfooding, AI-first standards toolkit at
+https://github.com/Ranzlappen/repo-standards.
 
 Before doing anything else, fetch and read these files from that repo:
   - README.md
@@ -40,37 +41,74 @@ Before doing anything else, fetch and read these files from that repo:
   - prompt/03-pr-description.md
   - prompt/04-wiki-seeding.md
 
-Then audit THIS repository against UPGRADE_CHECKLIST.md and produce one or more
-pull requests that bring it into compliance.
+## Phase 0 — Migration Planning & Smart Adoption (mandatory first step)
 
-Run Phase 0 first per prompt/migration-planning.md — produce the repo profile,
-the must/should/could/skip scoring of UPGRADE_CHECKLIST.md, the tailored batch
-roadmap with AI-budget guardrails, and the Dependabot mitigation status. WAIT
-for user confirmation of the Phase 0 deliverable before invoking Step 0.
+Per prompt/migration-planning.md, before touching any file:
+  - Profile this repo's tech stack, size, complexity, architecture, and
+    current state.
+  - Score every UPGRADE_CHECKLIST.md item as must / should / could / skip
+    by effort × value × risk for *this specific* project.
+  - Produce a tailored migration roadmap respecting the canonical 8-PR
+    sequence's hard ordering.
+  - Surface AI / token / session / fair-use guardrails up front: each
+    response under ~30% context, ~4-hour session cap, fair-use
+    awareness, tiny resumable batches every batch ending with a clean
+    commit + push so a session crash never loses work.
+  - Audit Dependabot configuration against the v2 spam-mitigation rules
+    and note any gaps.
 
-Then follow prompt/00-version-check.md. On a major mismatch, refuse and
-tell the user.
+Output the Phase 0 deliverable (profile + scoring table + roadmap +
+guardrails ack + Dependabot status). WAIT for my explicit confirmation
+before invoking Step 0.
 
-Then follow prompt/01-ground-rules.md (the 15 non-negotiable rules — they
-apply for every commit, every PR, every Step below).
+## Non-negotiable ground rules (apply to every response)
 
-Then follow Steps 1–2 in prompt/02-canonical-pr-sequence.md (read & audit,
-then post the plan). WAIT for user confirmation before opening any PR.
+The full 15 rules live in prompt/01-ground-rules.md. Headlines:
 
-For each approved PR, follow prompt/03-pr-description.md (PR description
-structure) — and rule 12 (no PR opens without explicit user confirmation).
+1. Behavior preservation (rule 2). Keep 100% of original functionality,
+   user flows, UI, storage keys, URLs, deployment shape, observable
+   behavior. Analyze the target repo *before* editing. Flag a
+   "Repo-specific risks / edge-cases" subsection in every PR description
+   and post-task self-check ("None observed" acceptable; heading
+   mandatory).
+2. Tiny commits (rule 9). One file (or one inseparable pair) per
+   response, one Conventional Commit per change.
+3. Post-task self-check (rule 11). Mandatory after every code-change
+   commit — both drift-detection (per templates/CLAUDE.md.tmpl) and
+   mechanical verification (files exist, YAML/JSON parses, links
+   resolve, line-count delta matches the plan, no template placeholders
+   remain in tracked files outside templates/).
+4. Plan-file hygiene (rule 15). Never bloat plans with completed work
+   — start fresh or actively prune.
+5. Out-of-scope findings (rule 13). Auto-file a labeled GitHub issue by
+   default; opt out via the repo variable
+   DISABLE_OUT_OF_SCOPE_ISSUES=true.
+6. No PR opens without explicit user confirmation (rule 12).
+   Conventional Commits only.
+7. Operating mode default = canonical 8-PR sequence (rule 14). The
+   single-PR alternative mode is opt-in for focused work that would
+   otherwise produce ≤3 PRs.
 
-prompt/04-wiki-seeding.md is Step 4 — optional, opt-in only. Skipped by
-default unless the user explicitly says "seed the wiki".
+## After Phase 0 confirms
 
-Final note on adaptation: if anything in the standards genuinely doesn't
-fit this project, say so in the plan and propose how to handle it. The
-standards are meant to be lived with, not enforced robotically. If your
-audit reveals something that should be added to UPGRADE_CHECKLIST.md or
-the templates themselves, mention that too — it's a separate PR against
-the standards repo.
+Run prompt/00-version-check.md (Step 0). On major mismatch, refuse and
+tell the user. Then follow Steps 1–2 in
+prompt/02-canonical-pr-sequence.md (read & audit + plan the canonical
+8-PR sequence), Step 3 in prompt/03-pr-description.md (PR description
+structure for every approved PR), and — if the user opts in — Step 4
+in prompt/04-wiki-seeding.md (manual Wiki seeding via the GitHub web
+UI).
 
-Begin with Phase 0 in prompt/migration-planning.md.
+## Final note on adaptation
+
+If anything in the standards genuinely doesn't fit this project, say so
+in the Phase 0 plan and propose how to handle it. The standards are
+meant to be lived with, not enforced robotically. If your audit reveals
+something that should be added to UPGRADE_CHECKLIST.md or the templates
+themselves, mention it — it's a separate PR against the standards repo.
+
+Begin now with Phase 0 — produce the migration plan and wait for my
+explicit confirmation before invoking Step 0.
 ```
 
 ---

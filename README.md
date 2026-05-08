@@ -1,10 +1,18 @@
 # Ranzlappen Repo Standards
 
-[![Standards](https://img.shields.io/badge/standards-v3.0.0-informational)](./VERSION)
+[![Standards](https://img.shields.io/badge/standards-v3.0.1-informational)](./VERSION)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./templates/LICENSE)
 [![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Ranzlappen/repo-standards/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Ranzlappen/repo-standards)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ff69b4)](./SPONSORS.md)
+
+---
+
+## Upgrade any repo to v3.0.1 — the one-step instruction
+
+To upgrade any repository to **repo-standards v3.0.1**, copy the master prompt from [`PROMPT.md`](./PROMPT.md) and paste it into a fresh Claude Code session opened in your target repo. Claude runs **Phase 0** (migration planning) first, waits for your confirmation, then executes the canonical 8-PR sequence. No other setup required.
+
+---
 
 A portable toolkit for upgrading my repos to a consistent, high-quality baseline. Distilled from the [`website`](https://github.com/Ranzlappen/website) repo, which is the working reference implementation.
 

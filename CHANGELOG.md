@@ -6,6 +6,30 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.0.1] — 2026-05-08
+
+Final master upgrade prompt + README polish. Surface-only release: refines
+the canonical "copy this" pasteable block in `PROMPT.md` to the v3.0.1
+master prompt (fetch-list at the top, defers to the modular files for the
+ground rules, Phase 0 vs Step 0 disambiguated, closing line points at
+Phase 0); adds a prominent README quick-start section above the fold
+naming the one-step instruction; bumps `VERSION` and `.standards-version`
+to `3.0.1`. No semantic change to any rule, workflow template,
+governance doc, or checklist item — `prompt/00-version-check.md` still
+expects major `3` and consumer repos pinned to the `v3` major-tag keep
+working unchanged.
+
+### Added
+
+- Root `README.md` "Upgrade any repo to v3.0.1 — the one-step instruction" section, anchored between the badge block and the project tagline. Names the master-prompt-copy-paste flow as the entire setup story for the GitHub Action / direct Claude Code session, and points at `PROMPT.md`. Surfaces v3.0.1 above the fold.
+
+### Changed
+
+- `PROMPT.md` "Prompt to paste" block — full rewrite into the official v3.0.1 master prompt: opens with the v3.0.1 banner naming the standards repo URL; preserves the 11-file fetch-list at the top so Claude knows where the modular files live; collapses the ground-rules section to seven headlines that defer to `prompt/01-ground-rules.md` (no rule duplication, eliminating drift risk); separates Phase 0 (`prompt/migration-planning.md`) from Step 0 (`prompt/00-version-check.md`) explicitly; references Steps 1–4 by file path; closes with "Begin now with Phase 0". Same intent as the v3.0.0 block, hardened against the v3 modular structure.
+- `VERSION` bumped from `3.0.0` to `3.0.1`.
+- `.standards-version` bumped from `3.0.0` to `3.0.1` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.0.0` to `v3.0.1`.
+
 ## [3.0.0] — 2026-05-08
 
 The polished-rocket elevation. Six commits on top of v2.1.1 — five feature
@@ -250,7 +274,8 @@ Every existing workflow now declares a least-privilege `permissions:` block, has
 - `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner.
 - `.github/workflows/auto-tag.yml` — push-to-main + VERSION-changed automated tagger (creates `vX.Y.Z` and force-updates `vMAJOR` for non-prereleases).
 
-[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v3.0.1...HEAD
+[3.0.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.1
 [3.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.0
 [2.1.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.1
 [2.1.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.0
