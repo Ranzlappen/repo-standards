@@ -56,6 +56,7 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 
 - [ ] No file over **800 lines** unless it's data, generated code, or genuinely cohesive (e.g. a CSS theme). If a source file exceeds 800 lines, refactoring is flagged — see [`REFACTORING_GUIDE.md`](./REFACTORING_GUIDE.md).
 - [ ] If a refactor PR was opened in this upgrade pass, its Test plan enumerates before/after evidence per [`PROMPT.md`](./PROMPT.md) rule 2's five buckets — UI, URLs, Storage, Deployment shape, External dependencies — using the **Behavior-preservation evidence** sub-block in the shared [PR template](./templates/.github/PULL_REQUEST_TEMPLATE.md). For PWA repos, Section 6 below is the expansion of the **Storage** and **External dependencies** buckets.
+- [ ] **Every PR description includes a "Repo-specific risks / edge-cases" subsection** (per `PROMPT.md` rule 2's non-negotiable repo-tailoring clause). Names quirks unique to this repo that interact with the change — non-obvious conventions, in-flight migrations, hand-rolled scripts, undocumented env vars, browser/mobile quirks. "None observed" is acceptable; the heading must be present.
 - [ ] Folder names are **consistent** (kebab-case for assets, the project's idiomatic case for source).
 - [ ] No mystery directories without a README or comment explaining their purpose.
 - [ ] Generated artifacts (`dist/`, `_site/`, `node_modules/`, `__pycache__/`) are not tracked.
