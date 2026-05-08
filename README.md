@@ -35,6 +35,7 @@ This repo answers two questions:
 | [`templates/.env.example`](./templates/.env.example) | Documented environment-variable skeleton. |
 | [`templates/.gitignore.example`](./templates/.gitignore.example) | Combined .gitignore in named sections (Secrets, Node/Vite, Python, JVM/Android, Static sites, IDE, OS noise). |
 | [`templates/docs/`](./templates/docs/) | Starter folder for project docs with publishing-options guide. |
+| [`templates/wiki/`](./templates/wiki/) | GitHub Wiki templates: Home, Architecture, FAQ, Upgrade-History, PWA-Safety, Migration-v1-to-v2, _Sidebar, _Footer. |
 | [`templates/LICENSE`](./templates/LICENSE) | MIT, matching the website repo. |
 
 ## How to use it (phone-friendly)
