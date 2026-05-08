@@ -51,6 +51,21 @@ How to verify this PR doesn't break anything. Examples:
 
 -
 
+## Behavior-preservation evidence (only if this PR is a refactor)
+
+<!--
+Required by PROMPT.md rule 2 for any refactoring PR. Tick each bucket
+this refactor touched and state in one line what was verified before/
+after. PWA refactors expand Storage and External via the PWA-specific
+section below. Delete this section if this PR is not a refactor.
+-->
+
+- [ ] **UI** — rendered output, layout, animations, focus order, accessibility tree.
+- [ ] **URLs** — deployed domain, route paths, query parameters, deep-link contracts.
+- [ ] **Storage** — `localStorage` / `sessionStorage` keys, IndexedDB schema versions, cache names, service-worker registration order.
+- [ ] **Deployment shape** — hosting target, asset URLs, build-output paths, redirect rules.
+- [ ] **External dependencies** — third-party endpoint shapes, webhook payloads, analytics identifiers, manifest `start_url` / `scope` / `id`, `assetlinks.json` fingerprints.
+
 ## PWA-specific verification (only if this repo has a service worker, manifest, or persistent storage)
 
 <!--
