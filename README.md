@@ -38,6 +38,18 @@ This repo answers two questions:
 | [`templates/wiki/`](./templates/wiki/) | GitHub Wiki templates: Home, Architecture, FAQ, Upgrade-History, PWA-Safety, Migration-v1-to-v2, _Sidebar, _Footer. |
 | [`templates/LICENSE`](./templates/LICENSE) | MIT, matching the website repo. |
 
+## Next-level features (v2)
+
+What v2 adds on top of v1, in five sentences:
+
+- **Versioned standards.** A repo declares which major it follows in `.standards-version`; PROMPT.md's Step 0 refuses to upgrade a v1 repo with v2 rules (or vice versa), and `auto-tag.yml` watches `VERSION` so each release tag is automatic.
+- **Tiny-commit rhythm.** PROMPT.md ground rules 9–12 codify one file per response, Conventional Commits, mandatory post-task self-check, and explicit confirmation before any PR opens — the same rhythm this repo's own v2 upgrade followed end to end.
+- **Hardened CI everywhere.** Every workflow declares least-privilege `permissions:`, every `uses:` line is pinned to a 40-char SHA (with a major-version trailing comment), every job has `timeout-minutes`, lint/test tools are pinned and cached, and a self-validate workflow hard-fails any future regression on those rules.
+- **Security and quality baked in.** New `security-scan.yml` runs CodeQL + gitleaks on every PR, push to main, and weekly schedule; new `lint-and-test.yml` is a single reusable workflow with a `language` input; new `release-please.yml` ships disabled-by-default for projects that want Conventional-Commits-driven releases.
+- **Phone-friendly batteries.** Templates ship for community files (PR template, four issue forms, CoC, CONTRIBUTING, SECURITY, FUNDING, CODEOWNERS), language tooling (.editorconfig, prettier, ESLint flat config, ruff, pyproject + pytest, vitest, android-lint, pre-commit, markdownlint, .env.example), an expanded named-section `.gitignore.example`, a `docs/` starter, and a full GitHub Wiki layout (`Home`, `Architecture`, `FAQ`, `Upgrade-History`, `PWA-Safety`, `Migration-v1-to-v2`, plus sidebar and footer).
+
+The full canonical PR sequence to upgrade a repo from v1 to v2 lives in [`PROMPT.md`](./PROMPT.md) Step 2; the matching audit lives in [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) sections 1–13.
+
 ## How to use it (phone-friendly)
 
 **Option A — Claude Code GitHub Action (recommended for mobile).**
