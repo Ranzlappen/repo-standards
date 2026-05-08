@@ -27,7 +27,12 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 - [ ] **`.gitignore`** is appropriate for the project's language(s). No build artifacts, secrets, IDE config, or OS noise committed.
 - [ ] No secrets, API keys, or credentials in tracked files. Public client-side keys (e.g. Firebase config) are okay if security is enforced server-side, but this is documented in CLAUDE.md.
 - [ ] No files larger than ~5 MB unless justified (and then ideally via Git LFS).
-- [ ] **`.github/dependabot.yml`** exists with weekly schedule. Minor+patch updates grouped to reduce PR noise.
+- [ ] **`.github/dependabot.yml`** exists with weekly schedule and the v2 expectations applied per ecosystem:
+  - [ ] explicit `open-pull-requests-limit` (default: 10).
+  - [ ] `labels: ["dependencies", "<ecosystem>"]` for triage.
+  - [ ] `commit-message` with `prefix: "chore(deps)"` (and `prefix-development: "chore(deps-dev)"` where the ecosystem distinguishes dev/prod) plus `include: "scope"`.
+  - [ ] groups split production vs development for npm and pip (so dev bumps don't block prod review and vice versa); minor + patch grouped, majors land one-per-PR.
+  - [ ] explicit `package-ecosystem: "github-actions"` block with the same limits / labels / prefixes as npm.
 - [ ] Default branch is `main`.
 - [ ] Repo has a **non-empty description** on its GitHub page.
 - [ ] Repo has **topics/tags** set (language, framework, broad category).
