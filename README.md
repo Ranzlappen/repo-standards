@@ -1,6 +1,6 @@
 # Ranzlappen Repo Standards
 
-[![Standards](https://img.shields.io/badge/standards-v2.0.0-informational)](./VERSION)
+[![Standards](https://img.shields.io/badge/standards-v2.1.1-informational)](./VERSION)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./templates/LICENSE)
 [![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
 
@@ -77,6 +77,7 @@ v2.1 is the polish release. It shipped in two waves: an initial cut focused on t
 - **H — Stale-issue/PR housekeeping (opt-in).** New `templates/.github/workflows/stale.yml` gated on `STALE_ENABLED=true`. Defaults: issues 60d → 7d, PRs 90d → 14d, broad exemption labels.
 - **I — GitHub Community Guidelines + Acceptable Use audit.** CONTRIBUTING.md, root README, and templates/README.md.tmpl now explicitly bind contributions to the GitHub Community Guidelines, GitHub Acceptable Use Policies, and the repo's Code of Conduct, with reporting routes named.
 - **K — Out-of-scope auto-issue (opt-out) + Single-PR alternative mode.** CLAUDE.md template + PROMPT.md rules 13–14: out-of-scope findings auto-file a labeled GitHub issue (opt out via `DISABLE_OUT_OF_SCOPE_ISSUES=true`); a single-feature-branch / single-PR mode is sanctioned for focused work that would otherwise produce ≤3 PRs (open draft early, subscribe to PR activity, commits accumulate, ready-for-review at completion).
+- **L — Plan Management & Clean State Rule.** PROMPT.md rule 15 + `templates/CLAUDE.md.tmpl` "Plan Management & Clean State Rule" section + `UPGRADE_CHECKLIST.md` Section 13 audit bullet — when a long Claude session reopens plan mode, the rule mandates a fresh plan file or active pruning of completed sections, never appending new phases to a plan that already contains shipped work.
 
 ### Release & publish automation matrix
 
