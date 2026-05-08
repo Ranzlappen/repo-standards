@@ -1,0 +1,7 @@
+{
+  "name": "Python CI",
+  "description": "Install pinned Python, run ruff lint, ruff format check, and pytest. Lint/test tools are pinned via requirements-dev.txt and cached by setup-python.",
+  "iconName": "python",
+  "categories": ["Python"],
+  "filePatterns": ["pyproject.toml$", "requirements.*\\.txt$", "ruff\\.toml$"]
+}

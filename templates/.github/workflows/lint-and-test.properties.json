@@ -1,0 +1,7 @@
+{
+  "name": "Lint and test (reusable)",
+  "description": "Reusable workflow_call entry point for lint+test across stacks. Takes a `language` input (node | python | static-html | mixed) and dispatches to the matching tooling.",
+  "iconName": "checks",
+  "categories": ["Reusable", "Quality"],
+  "filePatterns": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Static HTML CI",
+  "description": "Validate a single-file or multi-file static HTML project (html-validate, broken-link check). For projects deployed via GitHub Pages with no build step.",
+  "iconName": "html",
+  "categories": ["HTML", "Static site"],
+  "filePatterns": ["index\\.html$", ".*\\.html$"]
+}

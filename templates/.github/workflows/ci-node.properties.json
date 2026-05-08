@@ -1,0 +1,7 @@
+{
+  "name": "Node CI",
+  "description": "Install pinned Node, run lint and tests for a JavaScript / TypeScript project. Caches npm dependencies via package-lock.json.",
+  "iconName": "node-js",
+  "categories": ["JavaScript", "TypeScript", "Node"],
+  "filePatterns": ["package.json$", "package-lock.json$", "tsconfig.json$"]
+}

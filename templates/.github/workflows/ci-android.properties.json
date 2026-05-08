@@ -1,0 +1,7 @@
+{
+  "name": "Android CI",
+  "description": "Lint, build, and unit-test an Android project (Gradle wrapper, ktlint, JUnit). Designed for app/ + library modules.",
+  "iconName": "android",
+  "categories": ["Android", "Mobile"],
+  "filePatterns": ["build.gradle(.kts)?$", "settings.gradle(.kts)?$", "gradle.properties$", "app/.*"]
+}
