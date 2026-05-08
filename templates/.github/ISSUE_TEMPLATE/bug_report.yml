@@ -1,0 +1,100 @@
+name: Bug report
+description: Something doesn't work the way it should.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill in the
+        sections below — concrete reproduction steps and your environment
+        are what move a bug from "not reproducible" to "fixed quickly".
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A short, clear description of the bug.
+      placeholder: When I tap the "Save" button on iOS Safari, the entry vanishes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps. Be specific — "click the thing" is not enough.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: I expected the entry to be saved and to appear in the list.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: The entry disappears and the list is unchanged.
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: App / commit version
+      description: Tag, commit SHA, or "latest from main on <date>".
+      placeholder: v1.4.2 (or commit abc1234)
+    validations:
+      required: false
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - iOS Safari
+        - Android Chrome
+        - Desktop Chrome
+        - Desktop Firefox
+        - Desktop Safari
+        - Other (specify in environment)
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment details
+      description: OS version, browser version, screen size if relevant.
+      placeholder: |
+        - iOS 18.2 on iPhone 15 Pro
+        - Safari 18.2
+        - Installed as PWA from home screen
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots, screen recordings, or console logs
+      description: Drag and drop files here, or paste console output between triple backticks.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I searched existing open and closed issues for duplicates.
+          required: true
