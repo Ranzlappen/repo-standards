@@ -1,0 +1,98 @@
+name: Auto-tag on VERSION change
+
+# Watches main for VERSION-file changes. When VERSION bumps and no matching
+# tag exists, creates an annotated tag `vX.Y.Z` at the merge commit and
+# (for non-prerelease versions) force-updates the moving major-version
+# pointer (e.g. `v2`).
+#
+# Pre-release versions (anything containing a hyphen, e.g. 2.0.0-rc.1):
+#   - Tag the exact version (vX.Y.Z-suffix).
+#   - DO NOT move the major-version pointer.
+#
+# Manual / retroactive tagging stays in tag-release.yml.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'VERSION'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-tag
+  cancel-in-progress: false
+
+jobs:
+  auto-tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read VERSION
+        id: ver
+        run: |
+          V="$(tr -d '[:space:]' < VERSION)"
+          if [ -z "$V" ]; then
+            echo "::error::VERSION file is empty"
+            exit 1
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "tag=v$V" >> "$GITHUB_OUTPUT"
+          MAJOR="v$(echo "$V" | cut -d. -f1)"
+          echo "major=$MAJOR" >> "$GITHUB_OUTPUT"
+          if [[ "$V" == *-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate semver
+        run: |
+          python3 -c "import re,sys; v='${{ steps.ver.outputs.version }}'; \
+            assert re.match(r'^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?(\+[A-Za-z0-9.-]+)?$', v), \
+            f'VERSION not semver: {v}'; print('semver ok:', v)"
+
+      - name: Check whether tag already exists
+        id: check
+        run: |
+          if git rev-parse --verify --quiet "refs/tags/${{ steps.ver.outputs.tag }}" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Tag ${{ steps.ver.outputs.tag }} already exists; nothing to do."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure git identity
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create annotated tag
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          git tag -a "${{ steps.ver.outputs.tag }}" \
+            -m "Release ${{ steps.ver.outputs.tag }}" \
+            "${{ github.sha }}"
+
+      - name: Push exact-version tag
+        if: steps.check.outputs.exists == 'false'
+        run: git push origin "${{ steps.ver.outputs.tag }}"
+
+      - name: Update moving major-version pointer
+        if: steps.check.outputs.exists == 'false' && steps.ver.outputs.prerelease == 'false'
+        run: |
+          git tag -fa "${{ steps.ver.outputs.major }}" \
+            -m "${{ steps.ver.outputs.major }} -> ${{ steps.ver.outputs.tag }}" \
+            "${{ github.sha }}"
+          git push --force origin "${{ steps.ver.outputs.major }}"
+
+      - name: Skipped major pointer (prerelease)
+        if: steps.check.outputs.exists == 'false' && steps.ver.outputs.prerelease == 'true'
+        run: echo "Skipped moving ${{ steps.ver.outputs.major }} for prerelease ${{ steps.ver.outputs.tag }}"
