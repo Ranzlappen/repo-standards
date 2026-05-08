@@ -161,8 +161,33 @@ Post a single comment (or your initial Claude Code response) containing:
   - One-sentence project summary
   - Detected stack and deployment shape
   - Checklist results: for each item, mark ✓ / — / ⚠️ with a short reason
-  - Proposed PR sequence (1, 2, 3, optionally 4) with a 1–2 line scope per PR
+  - Proposed PR sequence using the **canonical 8-PR template** below;
+    omit any PR whose scope doesn't apply to this repo and say so explicitly
   - Refactoring opportunities found (whether or not you'll act on them)
+
+### Canonical 8-PR sequence for v2 upgrades
+
+Follow this order unless the audit shows a PR has nothing to do (in which
+case skip with a one-line reason). PRs are sequential — PR N+1 only opens
+after PR N merges.
+
+| # | Branch | Scope |
+|---|---|---|
+| 1 | `chore/v2-versioning-meta` | `VERSION` + `CHANGELOG.md` + `self-validate.yml` + (if applicable) `tag-release.yml` and `auto-tag.yml`. |
+| 2 | `chore/v2-community-and-templates` | `templates/.github/` community files + tooling configs + expanded `.gitignore.example` + `templates/docs/` + badge block + new CLAUDE.md.tmpl sections. |
+| 3 | `chore/v2-wiki-templates` | `templates/wiki/*.md` + new optional Wiki phase in PROMPT + new section 9 in checklist. |
+| 4 | `chore/v2-ci-hardening` | least-privilege `permissions:` blocks + 40-char SHA pinning + `timeout-minutes` + cached lint/test tools + reusable lint-and-test + security-scan + release-please. |
+| 5 | `chore/v2-prompt-hardening` | PROMPT.md ground rules 9–12 + Step 0 version check + canonical 8-PR sequence. |
+| 6 | `chore/v2-checklist-expansion` | `UPGRADE_CHECKLIST.md` new sections (Security, A11y/Perf/SEO, Testing & Quality, Standards Versioning). |
+| 7 | `chore/v2-dependabot-tighten` | `dependabot.yml` v2 expectations: limits, conventional-commit prefixes, labels, npm/pip dev-vs-prod split. |
+| 8 | `chore/v2-readme-and-tag` | Root README "Next-level features (v2)" + standards-version badge; bump VERSION to `2.0.0`; cut CHANGELOG; tag `v2.0.0` and `v2`. |
+
+**Hard ordering**: 1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8.
+**Practical execution**: 1, 2, 3, 4, 7, 5, 6, 8.
+
+Skip any PR whose scope is empty for this repo (e.g. no PWA code → PR 4's
+PWA-relevant subsections drop out; no Python code → ruff/pytest configs
+in PR 2 are skipped).
 
 WAIT for user confirmation before opening any PR. The plan is the
 deliverable for this step.
