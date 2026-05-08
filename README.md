@@ -63,6 +63,19 @@ v2.1 is a polish release. What it adds on top of v2.0:
 
 The full v2.1 change list lives in [`CHANGELOG.md`](./CHANGELOG.md) under `[2.1.0] — 2026-05-08`.
 
+### Release & publish automation matrix
+
+`templates/.github/workflows/release-please.yml` ships disabled-by-default and gated on layered repo variables. Set each variable to `true` only when its trust setup is in place; everything else short-circuits.
+
+| Trigger | Repo variable | Action |
+| --- | --- | --- |
+| Push to `main` with Conventional Commits | `RELEASE_PLEASE_ENABLED=true` | Open / update a release-please PR; on merge, cut the GitHub Release + tag. |
+| ↳ Release created (above) | `PUBLISH_NPM_ENABLED=true` | `npm publish --provenance` via npm OIDC trusted publishing (no `NPM_TOKEN`). |
+| ↳ Release created (above) | `PUBLISH_PYPI_ENABLED=true` | `pypa/gh-action-pypi-publish` via PyPI OIDC trusted publishing (no `PYPI_API_TOKEN`). |
+| ↳ Release created (above) | `PUBLISH_GHCR_ENABLED=true` | `docker buildx` multi-arch image to `ghcr.io/<owner>/<repo>` with provenance + SBOM. |
+
+OIDC trust setup lives outside this repo: configure the npm package settings, the PyPI publishing account, or the GHCR token scope before flipping the variable. The workflow file's header comment lists the exact pages.
+
 ## How to use it (phone-friendly)
 
 **Option A — Claude Code GitHub Action (recommended for mobile).**
