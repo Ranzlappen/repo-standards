@@ -93,6 +93,22 @@ This repo supports multi-AI contributions. Tool-specific entrypoints
 [`ai/AI_TEAM_PLAYBOOK.md`](./ai/AI_TEAM_PLAYBOOK.md) for multi-tool
 coordination conventions.
 
+### Operating modes
+
+This repo supports two AI-assisted contribution rhythms (see
+[`repo-standards`](https://github.com/Ranzlappen/repo-standards) PROMPT.md
+rules 13–14):
+
+- **Default — Canonical 8-PR sequence** for full upgrade passes.
+- **Alternative — Single Feature Branch / Single PR** for focused work
+  that would otherwise produce ≤3 PRs (open a draft early, subscribe to
+  PR activity, commits accumulate on the branch, ready-for-review at
+  completion).
+
+Out-of-scope findings auto-file a GitHub issue (label
+`out-of-scope,from-claude`) by default; opt out per-repo by setting
+`DISABLE_OUT_OF_SCOPE_ISSUES=true` in repository variables.
+
 ### Behavior preservation (non-negotiable)
 
 Any AI-driven or human contribution against this repo follows
