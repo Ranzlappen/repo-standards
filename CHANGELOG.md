@@ -6,6 +6,84 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.0.0] — 2026-05-08
+
+The polished-rocket elevation. Six commits on top of v2.1.1 — five feature
+batches plus the versioning + ship batch. Theme: dogfood the standards (live
+community files at the standards repo's own root + sponsors page), modularize
+the prompt, harden the supply chain, expand the quality baseline, and add a
+strategic Phase 0 migration-planning layer that runs *before* the canonical
+8-PR sequence to produce a tailored, resumable, AI-budget-aware roadmap per
+target repo.
+
+### Added — Batch 1: dogfood community files at repo root
+
+- `.standards-version` at root containing `3.0.0` — dogfooded major-version declaration the standards repo follows itself. Read by `prompt/00-version-check.md` Step 0.
+- `.github/CODE_OF_CONDUCT.md`, `.github/CONTRIBUTING.md`, `.github/SECURITY.md`, `.github/FUNDING.yml`, `.github/CODEOWNERS` — live community files for the standards repo itself, distinct from the unconsumed downstream-facing boilerplate at `templates/.github/`. The standards repo proves its own checklist before asking consumers to.
+- `SPONSORS.md` at root — thank-you page documenting what sponsorship funds and explicitly what it does *not* buy. Surfaced from a new "Sponsor" badge in the README.
+- Root `README.md` "Sponsor" badge linking to `SPONSORS.md`.
+- Root `README.md` "What's in here" rows for the new root-level community files.
+- Root `README.md` "Community standards (this repo)" subsection naming the dogfooded copies and the three layered standards (GitHub Community Guidelines + Acceptable Use Policies + Contributor Covenant 2.1).
+
+### Added — Batch 2: modular PROMPT.md
+
+- `prompt/00-version-check.md` — Step 0 (refuse on major mismatch).
+- `prompt/01-ground-rules.md` — the 15 non-negotiable rules.
+- `prompt/02-canonical-pr-sequence.md` — Steps 1 + 2 (read & audit + canonical 8-PR sequence with hard ordering and practical execution).
+- `prompt/03-pr-description.md` — Step 3 (PR description structure: Summary / Checklist coverage / Refactoring opportunities / Test plan).
+- `prompt/04-wiki-seeding.md` — Step 4 (optional, opt-in Wiki seeding via the GitHub web UI).
+
+### Changed — Batch 2
+
+- `PROMPT.md` reduced from ~350 lines to a thin entry-point index over the modular `prompt/` files. Every cross-reference in `README.md`, `UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, and `templates/CLAUDE.md.tmpl` cites "`PROMPT.md` rule N" or "`PROMPT.md` Step N" and clicks through to the modular file. No semantic change to any rule; rule numbering preserved (1–15).
+- `REFACTORING_GUIDE.md` rule-2 anchor parenthetical updated to point at `prompt/01-ground-rules.md` instead of the old monolithic `PROMPT.md`.
+
+### Added — Batch 3: supply-chain baseline + workflow-summary system
+
+- `templates/.github/workflows/dependency-review.yml` — per-PR supply-chain gate. Fails the PR on `high`-severity (or above) CVEs in dependency changes; comments the diff summary on the PR. Pairs with `security-scan.yml` (deeper weekly sweep — the two are complementary, not redundant). Required as a status check on `main` per `templates/.github/GOVERNANCE.md`.
+- `templates/.github/workflows/workflow-summary.yml` — reusable workflow producing a structured, AI-parsable Markdown summary (status, jobs table, warnings, errors, timings) emitted to `$GITHUB_STEP_SUMMARY` and optionally posted as a sticky PR comment keyed by an HTML-comment marker. Comment shape (headings, table columns, sort order) is committed-to so AI agents can parse it reliably.
+- `templates/.github/workflows/dependency-review.properties.json` and `workflow-summary.properties.json` — companion sidecars (same schema as github/starter-workflows). Pairing enforced by the existing `validate-workflow-properties` job in `self-validate.yml`.
+- Root `README.md` OpenSSF Scorecard badge alongside the existing CI / License / Standards / Sponsor badges.
+- `templates/.github/SECURITY.md` "Supply-chain commitments" status table covering CodeQL, Gitleaks, dependency-review, OpenSSF Scorecard (floor `≥ 7.0`), and signed releases (cosign + Rekor).
+- `templates/.github/GOVERNANCE.md` "Supply-chain governance" subsection — signed-release rotation, Scorecard score floor, dependency-review as a required status check on `main`, regression-below-floor flagged as a `security` PR.
+- `UPGRADE_CHECKLIST.md` Section 3 — workflow-summary system bullet.
+- `UPGRADE_CHECKLIST.md` Section 10 — `dependency-review.yml` bullet (per-PR supply-chain gating, complementary to `security-scan.yml`) and signed-releases-with-sigstore bullet (tagged release artifacts carry a `.sig` and verify in the Rekor transparency log; OIDC trust setup per `release-please.yml` header comments).
+
+### Added — Batch 4: expanded quality baseline
+
+- `UPGRADE_CHECKLIST.md` Section 11 — Lighthouse CI baseline (automated run on every PR + push to `main`, blocks on regression below the Section 11 thresholds, results uploaded as a workflow artifact, wired into `workflow-summary.yml` so failures surface in the PR comment) and Performance budgets versioned in the repo (`lighthouserc.json` declaring resource-size + timing + assertion thresholds — budgets live in source so they're reviewed in PRs like any other config; CI thresholds alone drift silently when tuned via the UI).
+- `UPGRADE_CHECKLIST.md` Section 12 — Branch-protection rules enforced on `main`. Every recommended rule from `templates/.github/GOVERNANCE.md` "Recommended branch-protection rules" must be configured: required PR approvals (≥ 1) with stale-approval dismissal, required Code Owners review, required status checks (actionlint, lychee, VERSION-is-semver, uses-line SHA-pinning lint, dependency-review, project lint/test, CodeQL, Gitleaks), required conversation resolution, signed commits, linear history, no force-push, no deletions, **admin no-bypass**. Without admin no-bypass the rules are advisory.
+- `UPGRADE_CHECKLIST.md` Section 13 — GitHub Discussions enabled if the repo collects long-form Q&A. Use Discussions for open-ended Q&A, ideas, and show-and-tell; reserve Issues for tracked work. Graduate recurring Discussion threads to `README.md` / `CLAUDE.md` / `docs/` rather than letting them live forever in Discussions. Skippable for repos that don't need long-form Q&A.
+- `templates/.github/GOVERNANCE.md` "Automated triage" section — stale-bot tuning recap, label scheme alignment with Dependabot ecosystem labels, recommended auto-merge rules (Dependabot patch + minor after CI green; majors always human-reviewed).
+- Root `README.md` "GitHub Discussions" subsection explaining when to use Discussions vs. Issues.
+- `docs/README.md` (new root-level long-form documentation index for the standards repo itself — distinct from `templates/docs/`, which remains the boilerplate downstream consumers copy).
+- Root `README.md` "What's in here" rows for `prompt/` and `docs/`.
+
+### Added — Batch 5: Phase 0 migration planning + Dependabot PR-spam handling
+
+- `prompt/migration-planning.md` — strategic-planning layer that runs **before** Step 0 (version check). Phase 0 produces a tailored, prioritized migration roadmap reflecting the target repo's actual size, complexity, and stack. Six sub-sections: (1) repo profiling (tech stack, project type, size bucket, complexity signals, owner profile), (2) score every checklist item by effort × value × risk and bucket as must / should / could / skip, (3) tailored migration roadmap with inter-batch hard ordering mirrored from the canonical 8-PR sequence, (4) AI / token / session / fair-use guardrails (each response under ~30% context window, ~4-hour session cap, fair-use awareness, tiny resumable batches every batch ending with a clean commit + push so a session crash never loses work), (5) Dependabot PR-spam mitigation audit (reference-only — points at `templates/.github/dependabot.yml`'s v2-era rules: grouping, weekly schedule, `open-pull-requests-limit`, labels, conventional-commit prefixes, dev/prod split — plus auto-merge via repo-setting + branch-protection or labeled-auto-merge workflow, plus `CODEOWNERS *` for routing), (6) the output artifact (profile + scoring table + roadmap + guardrails ack + dependabot status, posted as the first comment / response and gated on user confirmation before Step 0 runs).
+- `UPGRADE_CHECKLIST.md` Section 0 (Migration Planning, Phase 0) at the top of the checklist with a single audit bullet asserting the Phase 0 artifact was produced before any other batch landed.
+- `templates/CLAUDE.md.tmpl` "Migration planning" subsection right after AI readiness, pointing consumers at Phase 0.
+
+### Changed — Batch 5
+
+- `PROMPT.md` modular-structure table grew to six rows (Phase 0 added at the top alongside the five numbered Steps); pasteable block now fetches `prompt/migration-planning.md` and instructs Claude to run Phase 0 *before* Step 0; closing line points at Phase 0 instead of Step 0.
+- `templates/README.md.tmpl` Operating modes subsection now states both rhythms (canonical 8-PR sequence and single-PR alternative) are preceded by Phase 0.
+- `UPGRADE_CHECKLIST.md` "How to score a repo" — Section 0 added as the first gate; numbering now 0–10.
+
+### Added — Batch 6: versioning + ship
+
+- `templates/wiki/Migration-v2-to-v3.md` — per-repo migration log template for v2 → v3 upgrades. Mirrors the structure of `Migration-v1-to-v2.md`. Referenced from `prompt/00-version-check.md`.
+- Root `README.md` "Next-level features (v3)" mini-section with six bullets, one per batch (dogfooded community files; modular prompt; supply-chain baseline + workflow-summary system; expanded quality baseline; Phase 0 migration planning + Dependabot PR-spam mitigation; sponsors page).
+
+### Changed — Batch 6
+
+- `VERSION` bumped from `2.1.1` to `3.0.0`.
+- Root `README.md` standards badge bumped from `v2.1.1` to `v3.0.0`.
+- `templates/README.md.tmpl` standards-version badge bumped from `repo--standards-v2` to `repo--standards-v3`.
+- `UPGRADE_CHECKLIST.md` Section 13 — badge example bumped from `v2` to `v3`; pinned-dependency reference bumped from "`v2` (or a specific `v2.0.0`) so a future v3 doesn't silently break docs" to "`v3` (or a specific `v3.0.0`) so a future v4 doesn't silently break docs".
+- `prompt/00-version-check.md` — expected major bumped from `2` to `3`; example `.standards-version` value bumped from `2` to `3` (or `3.0.0`); `Standards: v2` badge example bumped to `Standards: v3`; refusal-condition example bumped from "target says v1, prompt says v2" to "target says v2, prompt says v3"; migration-guide reference bumped from `Migration-v1-to-v2.md` to `Migration-v2-to-v3.md`; closing forward-looking note bumped from "v2 → v3" to "v3 → v4".
+
 ## [2.1.1] — 2026-05-08
 
 Documentation-only patch closing three loose ends from the v2.1.0
@@ -172,7 +250,8 @@ Every existing workflow now declares a least-privilege `permissions:` block, has
 - `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner.
 - `.github/workflows/auto-tag.yml` — push-to-main + VERSION-changed automated tagger (creates `vX.Y.Z` and force-updates `vMAJOR` for non-prereleases).
 
-[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v2.1.1...HEAD
+[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.0
 [2.1.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.1
 [2.1.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.0
 [2.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.0.0

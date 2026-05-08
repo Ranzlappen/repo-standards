@@ -1,6 +1,6 @@
 # Ranzlappen Repo Standards
 
-[![Standards](https://img.shields.io/badge/standards-v2.1.1-informational)](./VERSION)
+[![Standards](https://img.shields.io/badge/standards-v3.0.0-informational)](./VERSION)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./templates/LICENSE)
 [![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Ranzlappen/repo-standards/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Ranzlappen/repo-standards)
@@ -102,6 +102,19 @@ v2.1 is the polish release. It shipped in two waves: an initial cut focused on t
 | ↳ Release created (above) | `PUBLISH_GHCR_ENABLED=true` | `docker buildx` multi-arch image to `ghcr.io/<owner>/<repo>` with provenance + SBOM. |
 
 OIDC trust setup lives outside this repo: configure the npm package settings, the PyPI publishing account, or the GHCR token scope before flipping the variable. The workflow file's header comment lists the exact pages.
+
+## Next-level features (v3)
+
+v3 is the polished-rocket elevation: take v2.1's polished foundation and lift it into a fully dogfooded, supply-chain-hardened, smart-adoption-aware standard. Six things changed:
+
+- **Dogfooded community files.** The standards repo now ships its own live `.github/CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`, `FUNDING.yml`, and `CODEOWNERS` at the root (distinct from the downstream-facing boilerplate in `templates/.github/`), plus a [`.standards-version`](./.standards-version) of `3.0.0` so the standards repo passes its own Section 13 audit. The standards repo proves its own checklist before asking consumers to.
+- **Modular prompt.** `PROMPT.md` shrank from ~350 lines to a thin entry-point index over six focused files under [`prompt/`](./prompt/) — Phase 0 (migration planning), Step 0 (version check), the 15 ground rules, the canonical 8-PR sequence, the PR description structure, and the optional Wiki seeding each now live in one searchable file at one stable path.
+- **Supply-chain baseline + workflow-summary system.** New `templates/.github/workflows/dependency-review.yml` (per-PR `high`-severity CVE gate, complementary to `security-scan.yml`'s deeper weekly sweep) and `templates/.github/workflows/workflow-summary.yml` (reusable workflow producing an AI-parsable sticky-comment Markdown summary of CI runs); paired sidecars same schema as github/starter-workflows; OpenSSF Scorecard badge on the root README; signed-releases-with-cosign / Scorecard floor `≥ 7.0` / dependency-review-as-required-status-check codified in `templates/.github/SECURITY.md` and the new "Supply-chain governance" block in `templates/.github/GOVERNANCE.md`.
+- **Expanded quality baseline.** New checklist items for Lighthouse CI on every PR with budgets versioned in `lighthouserc.json`, mandatory branch-protection rules on `main` (admin no-bypass), GitHub Discussions for long-form Q&A, and an Automated triage section in `templates/.github/GOVERNANCE.md` (stale-bot tuning, label scheme, Dependabot auto-merge for patch + minor). Root [`docs/`](./docs/) folder added as the long-form documentation home for the standards repo itself, distinct from `templates/docs/` which remains the boilerplate downstream consumers copy.
+- **Phase 0 migration planning + Dependabot PR-spam mitigation.** A new strategic-planning layer ([`prompt/migration-planning.md`](./prompt/migration-planning.md)) that runs *before* Step 0: profile the target repo, score every checklist item by effort × value × risk, package the must / should / could items into resumable batches sized to fit a single Claude session, surface AI / token / session / fair-use guardrails to the user up front, and audit Dependabot configuration against the v2 spam-mitigation rules (grouping, weekly schedule, `open-pull-requests-limit`, labels, dev/prod split, conventional-commit prefixes, `CODEOWNERS *` routing). The output is the migration roadmap; the canonical 8-PR sequence is one possible shape it takes.
+- **Sponsors page.** [`SPONSORS.md`](./SPONSORS.md) at the root — thank-you page, what funding goes toward, what it does *not* buy. Surfaced from a new "Sponsor" badge above the fold.
+
+The full canonical PR sequence to upgrade a repo from v2 to v3 lives in [`PROMPT.md`](./PROMPT.md) (Phase 0 + Step 2); the matching audit lives in [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) sections 0–13.
 
 ## How to use it (phone-friendly)
 
