@@ -48,6 +48,16 @@ If this project uses [`release-please.yml`](../.github/workflows/release-please.
 
 Configure the OIDC trust policy on each external service *before* setting the corresponding variable to `true` — until then, the publish jobs short-circuit and a release-please run that cuts a release simply doesn't trigger them.
 
+## OpenSSF Scorecard badge
+
+The `scorecard` job in [`security-scan.yml`](../.github/workflows/security-scan.yml) publishes the project's score weekly. Add the badge to your `README.md`:
+
+```markdown
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/<OWNER>/<REPO>/badge)](https://securityscorecards.dev/viewer/?uri=github.com/<OWNER>/<REPO>)
+```
+
+Replace `<OWNER>/<REPO>`. The first run after enabling Scorecard takes ~10 minutes to publish before the badge resolves.
+
 ## When to graduate from option 1 → 2 → 3
 
 - Stay on **plain Markdown** while there are <10 doc files and no search.

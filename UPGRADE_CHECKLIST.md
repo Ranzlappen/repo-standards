@@ -132,6 +132,7 @@ Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 
 - [ ] **Public client-side keys are documented** in `CLAUDE.md` under "Security & Secrets" if the project ships any (e.g. Firebase web config). Documentation explicitly says they're public-by-design and points at the server-side rule that secures the data.
 - [ ] **`.env` is `.gitignore`d**; `.env.example` is committed; documented variables list `<SECURITY_CONTACT_EMAIL>` rotation cadence.
 - [ ] **No secrets, API keys, or unredacted credentials in tracked files** (verified by gitleaks in the security-scan workflow on every PR + push to main + weekly schedule).
+- [ ] **OpenSSF Scorecard job present** in `security-scan.yml` (added in v2.1). Runs weekly + on `branch_protection_rule` changes + on push-to-main, publishes SARIF to the Security tab, and (with `publish_results: true`) makes the score badge available at `https://api.securityscorecards.dev/projects/github.com/<owner>/<repo>` for inclusion in `README.md`.
 
 ## 11. Accessibility, Performance, SEO (web projects only)
 
