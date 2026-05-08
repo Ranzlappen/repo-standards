@@ -1,0 +1,7 @@
+{
+  "name": "GitHub Pages deploy",
+  "description": "Deploy a static site to GitHub Pages on push to main. Uses actions/deploy-pages with the standard upload-pages-artifact pattern.",
+  "iconName": "pages",
+  "categories": ["Deploy", "GitHub Pages"],
+  "filePatterns": ["index\\.html$", "_config\\.yml$"]
+}

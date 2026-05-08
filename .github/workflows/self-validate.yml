@@ -112,3 +112,46 @@ jobs:
             done < <(grep -nE '^[[:space:]]*-?[[:space:]]*uses:[[:space:]]+[^[:space:]]+@[^[:space:]]+' "$f" || true)
           done
           exit $FAIL
+
+  validate-workflow-properties:
+    name: workflow properties.json pairing
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
+      - name: Assert every workflow has a properties.json sidecar
+        # v2.1 ships a `*.properties.json` per workflow template (name,
+        # description, iconName, categories, filePatterns) so internal
+        # catalogs and AI agents can consume the same schema as
+        # github/starter-workflows. This job hard-fails if any new
+        # workflow lands without its sidecar, or if a sidecar is invalid
+        # JSON.
+        run: |
+          set -e
+          shopt -s nullglob
+          FAIL=0
+          for wf in templates/.github/workflows/*.yml; do
+            [ -f "$wf" ] || continue
+            base="${wf%.yml}"
+            sidecar="${base}.properties.json"
+            if [ ! -f "$sidecar" ]; then
+              echo "::error file=$wf::missing companion ${sidecar} (v2.1 requires every workflow template to ship a properties.json sidecar)"
+              FAIL=1
+              continue
+            fi
+            if ! python3 -m json.tool < "$sidecar" >/dev/null 2>&1; then
+              echo "::error file=$sidecar::properties.json does not parse as JSON"
+              FAIL=1
+            fi
+          done
+          # Also catch orphan sidecars (sidecar without workflow).
+          for sc in templates/.github/workflows/*.properties.json; do
+            [ -f "$sc" ] || continue
+            base="${sc%.properties.json}"
+            wf="${base}.yml"
+            if [ ! -f "$wf" ]; then
+              echo "::error file=$sc::orphan properties.json — no matching ${wf}"
+              FAIL=1
+            fi
+          done
+          exit $FAIL

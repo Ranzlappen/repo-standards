@@ -1,0 +1,7 @@
+{
+  "name": "Security scan",
+  "description": "CodeQL static analysis (matrix on language, security-extended queries) plus Gitleaks full-history secret scan. Triggers on PR, push to main, and weekly schedule.",
+  "iconName": "shield",
+  "categories": ["Security", "Code scanning"],
+  "filePatterns": []
+}

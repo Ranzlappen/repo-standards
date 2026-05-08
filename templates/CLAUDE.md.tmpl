@@ -11,6 +11,28 @@ runtime, what's the deployment target. If the project has multiple modules
 * **<MODULE_1>** (`<path/>`) — <one sentence: what it is, what stack>.
 * **<MODULE_2>** (`<path/>`) — <same>.
 
+## Behavior preservation (non-negotiable)
+
+Every change to this repo — AI-driven or human — follows
+[`repo-standards`](https://github.com/Ranzlappen/repo-standards) `PROMPT.md`
+rule 2: **100% of original functionality preserved**, target repo analyzed
+*before* editing, and a **Repo-specific risks / edge-cases** subsection
+included in every PR description and post-task self-check. "None observed"
+is acceptable; the heading must be present. Refactoring PRs additionally
+enumerate evidence per rule 2's five buckets (UI / URLs / Storage /
+Deployment shape / External dependencies); PWA work follows the PWA
+Refactor Addendum in `REFACTORING_GUIDE.md`.
+
+## AI readiness
+
+This repo is set up for AI-tool contributions. The source-of-truth
+hierarchy is: `CLAUDE.md` (this file) → `README.md` → tool-specific
+entrypoints (`.cursorrules` for Cursor, `.github/copilot-instructions.md`
+for Copilot if present). When tool-specific files disagree with this
+file, **this file wins**. See [`ai/AI_TEAM_PLAYBOOK.md`](./ai/AI_TEAM_PLAYBOOK.md)
+for multi-tool coordination rules (what each tool is best at,
+conflict-resolution defaults, per-tool ignore files).
+
 ## Build & Development
 
 ### <Module 1 name>
@@ -78,39 +100,25 @@ what each is used for and how to rotate it.>
 
 ## Conventional Commits
 
-This project follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-Every commit message starts with one of:
-
-* `feat` — new user-visible capability
-* `fix` — bug fix
-* `docs` — documentation only
-* `refactor` — code change without behavior or feature change
-* `test` — adding or fixing tests
-* `chore` — build, deps, tooling
-* `ci` — CI configuration
-* `perf` — performance improvement
-* `style` — formatting, no behavior change
-* `revert` — reverts a previous commit
-
-Optional scope in parens (`feat(timer): …`). Breaking changes get `!` and a
-`BREAKING CHANGE:` footer (`feat!: drop legacy v1 API`).
-
-The pre-commit `commit-msg` hook (see [`.pre-commit-config.yaml`](./.pre-commit-config.yaml))
-blocks non-conformant messages locally; CI re-checks on the merge commit.
+This project follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/):
+`feat` / `fix` / `docs` / `refactor` / `test` / `chore` / `ci` / `perf` /
+`style` / `revert`. Optional `(scope)`. Breaking changes get `!` plus a
+`BREAKING CHANGE:` footer. The `commit-msg` pre-commit hook
+(see [`.pre-commit-config.yaml`](./.pre-commit-config.yaml)) blocks
+non-conformant messages locally; CI re-checks the merge commit.
 
 ## Testing
 
 <List the test command(s) and what they cover. Examples:>
 
-* **Unit tests**: `<command>` — runs <which suite>. Coverage gate: <e.g. "80% lines, 75% branches">.
-* **Integration tests** (if any): `<command>`.
-* **Manual smoke checklist** (for UI projects): list the critical user
-  flows that any change must verify before merging. Keep this short — 5–8
-  flows max — so it actually gets walked through.
+* **Unit tests**: `<command>` — runs <suite>. Coverage gate: <e.g. "80% lines, 75% branches">.
+* **Integration tests**: `<command>`.
+* **Manual smoke checklist** (UI projects): the critical 5–8 user flows
+  that every change must verify before merging.
 
-If the project has no automated tests yet, say so here explicitly with a
-one-line reason (and ideally a follow-up issue link). Silence in this
-section is worse than "tests deferred for now".
+If the project has no automated tests yet, say so explicitly with a
+one-line reason and follow-up issue link. Silence is worse than
+"tests deferred for now".
 
 ## Security & Secrets
 
@@ -160,25 +168,55 @@ to understand the project's technical identity.>
 <Show the top 2 levels of meaningful structure. Don't dump every file. Skip
 generated/ignored directories.>
 
+## Out-of-scope / Unrelated Findings (opt-out)
+
+When work surfaces something unrelated to the current task, **by default**
+auto-file a GitHub issue and link it in the PR's "Refactoring opportunities":
+`gh issue create --title "<summary>" --body "<context>"
+--label "out-of-scope,from-claude"`. **Opt out** by setting
+`DISABLE_OUT_OF_SCOPE_ISSUES=true` as a repo variable; with opt-out, surface
+the finding only in the PR description.
+
+## Alternative Operating Mode: Single Feature Branch / Single PR
+
+The default is the canonical 8-PR sequence in `repo-standards` PROMPT.md.
+For focused work that would otherwise produce ≤3 PRs, an alternative is
+sanctioned: one long-lived feature branch + one PR opened **early** (after
+the first commit, draft); subscribe to PR activity (`gh pr subscribe <PR#>`
+or the MCP equivalent) so CI/comment events arrive in-session; each commit
+pushes to the same branch and re-triggers integrity workflows; mark
+ready-for-review only at completion. Per-change ritual (plain-English plan →
+edit → self-check → summary) still applies to every commit.
+
+## Plan Management & Clean State Rule
+
+**Plan Management & Clean State Rule (critical safety net).** When the
+user asks you to create, update, or refresh a plan (or when you enter
+plan mode multiple times in a long session):
+
+* Always start a completely fresh plan file, OR
+* Actively delete / remove / mark as completed all sections that have
+  already been shipped and merged.
+* Never append new sections to an old plan file that already contains
+  finished work.
+* Keep the plan file concise and focused only on remaining work.
+
+This prevents plan bloat and redundant entries in long Claude sessions.
+
 ## Post-task self-check
 
-After every turn that produces a branch, PR, feature, or bug fix, do a quick
-self-check before replying: does the change introduce anything worth codifying
-in docs or automation? Scan for new env vars, npm scripts, path filters,
-deploy targets, secrets, setup steps, dependencies, or conventions that should
-be reflected in `README.md`, `CLAUDE.md`, `.github/workflows/*.yml`, or
-`.github/dependabot.yml`.
+After every turn that changes code, scan for things that should be codified
+in `README.md`, this file, `.github/workflows/*.yml`, or `.github/dependabot.yml`
+— new env vars, npm scripts, path filters, deploy targets, secrets, setup
+steps, dependencies, conventions. Per `PROMPT.md` rule 2, **always include a
+"Repo-specific risks / edge-cases" subsection** — quirks unique to this repo
+that interact with the change, or "None observed".
 
-Decide per case:
+* **Auto-implement** small, unambiguous updates (new env var → README,
+  workflow `paths` filter → new directory, npm script → command list,
+  Node-version bump consistency) and call it out in the summary.
+* **Prompt first** for anything ambiguous or structurally significant —
+  rewriting a README section, adding a top-level doc, restructuring a workflow.
 
-* **Auto-implement** small, unambiguous updates — e.g. noting a newly
-  introduced env var in README, extending a workflow `paths` filter to a new
-  directory, adding a new npm script to the relevant command list, bumping a
-  Node version already changed in one workflow to match the others. Make the
-  edit in the same turn and call it out in the summary.
-* **Prompt first** for anything ambiguous, opinionated, or structurally
-  significant — rewriting a README section, adding a new top-level doc,
-  restructuring a workflow, or changes whose wording/location isn't obvious.
-
-If nothing is warranted, say "no doc/workflow updates needed" in one line.
-Skip this self-check entirely for pure Q&A turns that don't change code.
+If nothing is warranted, say "no doc/workflow updates needed". Skip entirely
+for pure Q&A turns.

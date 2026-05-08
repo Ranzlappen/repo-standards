@@ -21,6 +21,22 @@
 #      `RELEASE_PLEASE_ENABLED` set to `true` (Settings → Secrets and
 #      variables → Actions → Variables tab → New repository variable).
 #      Until that variable is set, the job below short-circuits.
+#
+# OPTIONAL POST-RELEASE PUBLISH JOBS (also opt-in, gated on additional repo
+# variables — set each to "true" only when your trusted-publishing /
+# permissions setup is in place):
+#   - PUBLISH_NPM_ENABLED   → publishes to npm via npm OIDC trusted publishing
+#                              (no NPM_TOKEN needed; configure on
+#                              https://www.npmjs.com/settings/<owner>/packages
+#                              with the GitHub Actions trust policy).
+#   - PUBLISH_PYPI_ENABLED  → publishes to PyPI via PyPI trusted publishing
+#                              (configure at https://pypi.org/manage/account/publishing/
+#                              with the workflow filename + environment).
+#   - PUBLISH_GHCR_ENABLED  → builds and pushes a container image to
+#                              ghcr.io/<owner>/<repo> using the workflow's
+#                              GITHUB_TOKEN (no extra secret required).
+# Each job is conditional on (a) its own enable variable AND (b) the
+# release-please job actually creating a release on this run.
 
 name: Release Please
 
@@ -45,8 +61,13 @@ jobs:
     # short-circuit state. Set vars.RELEASE_PLEASE_ENABLED to "true" in the
     # repo's Actions Variables to activate.
     if: ${{ vars.RELEASE_PLEASE_ENABLED == 'true' }}
+    outputs:
+      releases_created: ${{ steps.release.outputs.releases_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
     steps:
       - name: Run release-please
+        id: release
         uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5  # v4
         with:
           # Common release-types:
@@ -59,3 +80,103 @@ jobs:
           release-type: simple
           # Default branch to release from.
           target-branch: main
+
+  publish-npm:
+    name: Publish to npm
+    needs: release-please
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ vars.PUBLISH_NPM_ENABLED == 'true' && needs.release-please.outputs.releases_created == 'true' }}
+    permissions:
+      contents: read
+      # Required for npm OIDC trusted publishing.
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+      - name: Setup Node
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903  # v5
+        with:
+          node-version: '22'
+          # registry-url is required for `npm publish` to target npm.
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: npm ci
+      - name: Publish (OIDC)
+        # No NPM_TOKEN; npm reads the OIDC token from the GitHub runner.
+        # Set up the trust policy on the npm package settings page first.
+        run: npm publish --provenance --access public
+
+  publish-pypi:
+    name: Publish to PyPI
+    needs: release-please
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ vars.PUBLISH_PYPI_ENABLED == 'true' && needs.release-please.outputs.releases_created == 'true' }}
+    # PyPI trusted publishing typically uses an environment with deployment
+    # protection rules. Configure the environment in repo Settings →
+    # Environments and reference its name here if you adopt that pattern.
+    # environment: pypi
+    permissions:
+      contents: read
+      # Required for PyPI trusted publishing.
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+      - name: Setup Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5
+        with:
+          python-version: '3.12'
+      - name: Build sdist + wheel
+        run: |
+          python -m pip install --upgrade build
+          python -m build
+      - name: Publish to PyPI
+        # No PYPI_API_TOKEN; PyPI accepts the OIDC token from this runner.
+        # Set up the trusted publisher at
+        # https://pypi.org/manage/account/publishing/ before enabling.
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc  # v1
+
+  publish-ghcr:
+    name: Publish to GHCR
+    needs: release-please
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: ${{ vars.PUBLISH_GHCR_ENABLED == 'true' && needs.release-please.outputs.releases_created == 'true' }}
+    permissions:
+      contents: read
+      # Required to push images to ghcr.io with the workflow's GITHUB_TOKEN.
+      packages: write
+      # Required for sigstore signing if buildx attests provenance.
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392  # v3
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435  # v3
+      - name: Login to GHCR
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772  # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75  # v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ needs.release-please.outputs.tag_name }}
+            ghcr.io/${{ github.repository }}:latest
+          provenance: true
+          sbom: true

@@ -35,6 +35,29 @@ Pick exactly one — don't ship two:
 
 Both deploy to GitHub Pages via a workflow. The `templates/.github/workflows/pages-deploy.yml` starter handles the publish step; you only add the build step.
 
+## Release & publish automation
+
+If this project uses [`release-please.yml`](../.github/workflows/release-please.yml) for Conventional-Commits-driven releases, the workflow ships three opt-in post-release publish jobs gated on repo variables:
+
+| Trigger | Repo variable | Action |
+| --- | --- | --- |
+| Push to `main` with Conventional Commits | `RELEASE_PLEASE_ENABLED=true` | Open / update a release PR; on merge, cut the GitHub Release. |
+| ↳ Release created | `PUBLISH_NPM_ENABLED=true` | `npm publish --provenance` via npm OIDC. |
+| ↳ Release created | `PUBLISH_PYPI_ENABLED=true` | PyPI publish via OIDC trusted publishing. |
+| ↳ Release created | `PUBLISH_GHCR_ENABLED=true` | Multi-arch container to `ghcr.io/<owner>/<repo>`. |
+
+Configure the OIDC trust policy on each external service *before* setting the corresponding variable to `true` — until then, the publish jobs short-circuit and a release-please run that cuts a release simply doesn't trigger them.
+
+## OpenSSF Scorecard badge
+
+The `scorecard` job in [`security-scan.yml`](../.github/workflows/security-scan.yml) publishes the project's score weekly. Add the badge to your `README.md`:
+
+```markdown
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/<OWNER>/<REPO>/badge)](https://securityscorecards.dev/viewer/?uri=github.com/<OWNER>/<REPO>)
+```
+
+Replace `<OWNER>/<REPO>`. The first run after enabling Scorecard takes ~10 minutes to publish before the badge resolves.
+
 ## When to graduate from option 1 → 2 → 3
 
 - Stay on **plain Markdown** while there are <10 doc files and no search.

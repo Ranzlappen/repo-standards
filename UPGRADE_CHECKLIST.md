@@ -56,6 +56,7 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 
 - [ ] No file over **800 lines** unless it's data, generated code, or genuinely cohesive (e.g. a CSS theme). If a source file exceeds 800 lines, refactoring is flagged — see [`REFACTORING_GUIDE.md`](./REFACTORING_GUIDE.md).
 - [ ] If a refactor PR was opened in this upgrade pass, its Test plan enumerates before/after evidence per [`PROMPT.md`](./PROMPT.md) rule 2's five buckets — UI, URLs, Storage, Deployment shape, External dependencies — using the **Behavior-preservation evidence** sub-block in the shared [PR template](./templates/.github/PULL_REQUEST_TEMPLATE.md). For PWA repos, Section 6 below is the expansion of the **Storage** and **External dependencies** buckets.
+- [ ] **Every PR description includes a "Repo-specific risks / edge-cases" subsection** (per `PROMPT.md` rule 2's non-negotiable repo-tailoring clause). Names quirks unique to this repo that interact with the change — non-obvious conventions, in-flight migrations, hand-rolled scripts, undocumented env vars, browser/mobile quirks. "None observed" is acceptable; the heading must be present.
 - [ ] Folder names are **consistent** (kebab-case for assets, the project's idiomatic case for source).
 - [ ] No mystery directories without a README or comment explaining their purpose.
 - [ ] Generated artifacts (`dist/`, `_site/`, `node_modules/`, `__pycache__/`) are not tracked.
@@ -131,6 +132,7 @@ Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 
 - [ ] **Public client-side keys are documented** in `CLAUDE.md` under "Security & Secrets" if the project ships any (e.g. Firebase web config). Documentation explicitly says they're public-by-design and points at the server-side rule that secures the data.
 - [ ] **`.env` is `.gitignore`d**; `.env.example` is committed; documented variables list `<SECURITY_CONTACT_EMAIL>` rotation cadence.
 - [ ] **No secrets, API keys, or unredacted credentials in tracked files** (verified by gitleaks in the security-scan workflow on every PR + push to main + weekly schedule).
+- [ ] **OpenSSF Scorecard job present** in `security-scan.yml` (added in v2.1). Runs weekly + on `branch_protection_rule` changes + on push-to-main, publishes SARIF to the Security tab, and (with `publish_results: true`) makes the score badge available at `https://api.securityscorecards.dev/projects/github.com/<owner>/<repo>` for inclusion in `README.md`.
 
 ## 11. Accessibility, Performance, SEO (web projects only)
 
@@ -163,6 +165,9 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 - [ ] **`CHANGELOG.md` entry** dated and version-stamped for any change that introduces, removes, or alters a standards-version-relevant requirement (e.g. dropping support for an older Node version).
 - [ ] **Pinned dependency on the standards repo** is at a tag, not `main`. PROMPT.md fetches `VERSION` from `Ranzlappen/repo-standards/main` (always-current); but consumer-side references in CONTRIBUTING.md, badges, etc. point at `v2` (or a specific `v2.0.0`) so a future v3 doesn't silently break docs.
 - [ ] **No mixed-version state**: every reference in this repo to "repo-standards" cites the same major. Don't ship a v2 PROMPT result with a v1 README badge.
+- [ ] **GitHub Template repository considered.** If this repo is intended as a starting point for other repos (e.g. `repo-standards` itself, or any internal "starter-x" repo), the **`Settings → General → Template repository`** checkbox is enabled so consumers can use the green "Use this template" button instead of cloning + scrubbing history. For ordinary application repos, leave the checkbox off — they're not templates.
+- [ ] **Operating-mode and out-of-scope opt-out understood (v2.1).** Maintainers know the repo supports both the canonical 8-PR sequence and the single-PR alternative mode (`PROMPT.md` rules 13–14), and the `DISABLE_OUT_OF_SCOPE_ISSUES=true` repo variable is set if the team prefers to keep out-of-scope findings in PR descriptions only (default is auto-file a labeled issue).
+- [ ] **Plan-file hygiene observed (v2.1).** During any AI-driven upgrade pass, the plan file follows the **Plan Management & Clean State Rule** (`PROMPT.md` rule 15 / `CLAUDE.md.tmpl` "Plan Management & Clean State Rule"): plan files are pruned of completed work or replaced with fresh files, never bloated by appending.
 
 ---
 

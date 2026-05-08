@@ -29,9 +29,24 @@ pull requests that bring it into compliance.
    `chore/v2-community-and-templates`, …). Every PR description carries the
    relevant slice of the checklist.
 
-2. **Behavior preservation.** Refactoring may not change observable behavior.
-   "Observable behavior" is everything a user, installed-PWA client, external
-   integrator, or CI smoke check would notice:
+2. **Behavior preservation (non-negotiable).** Every change must keep
+   **100% of the target repo's original functionality**. Before any edit:
+     - **Analyze the target repo first.** Read the entrypoints, the build
+       config, every workflow, every tracked config file, and the data
+       layer. Form a mental model of what observable behavior exists *today*
+       on `main` before proposing a single character of change.
+     - **Flag repo-specific risks explicitly.** Every PR description and
+       every post-task self-check (see rule 11) must include a
+       **Repo-specific risks / edge-cases** subsection naming any quirks
+       this particular repo has that interact with the change — non-obvious
+       conventions, in-flight migrations, hand-rolled scripts that depend
+       on file paths, undocumented env vars, browser/mobile quirks the
+       project specifically handles, etc. "None observed" is an acceptable
+       value, but the heading must appear.
+
+   Refactoring may not change observable behavior. "Observable behavior"
+   is everything a user, installed-PWA client, external integrator, or CI
+   smoke check would notice:
      - **UI**: rendered output, layout, animations, focus order, accessibility tree.
      - **URLs**: deployed domain, route paths, query parameters, deep-link contracts.
      - **Storage**: `localStorage` / `sessionStorage` keys, IndexedDB schema
@@ -144,6 +159,34 @@ pull requests that bring it into compliance.
     user to confirm before calling `mcp__github__create_pull_request` (or
     its CLI equivalent). Drafts are okay if the user explicitly asks. PR
     sequencing is sequential: PR N must merge before PR N+1 opens.
+
+13. **Out-of-scope findings auto-file an issue (opt-out).** When the
+    upgrade pass surfaces something unrelated to the current task or PR,
+    auto-file a GitHub issue with
+    `gh issue create --title "<summary>" --body "<context>"
+    --label "out-of-scope,from-claude"` and link it from the PR's
+    "Refactoring opportunities" subsection. **Opt out** by setting the
+    repo variable `DISABLE_OUT_OF_SCOPE_ISSUES=true` — under opt-out,
+    surface the finding only in the PR description and skip the issue.
+
+14. **Alternative Operating Mode: Single Feature Branch / Single PR.**
+    The default is the canonical 8-PR sequence above. For focused work
+    that would otherwise produce three or fewer PRs (small repos, polish
+    passes, single-module refactors), the user may approve a one-branch /
+    one-PR mode. In that mode: open the PR draft after the first commit,
+    subscribe to PR activity (`gh pr subscribe <PR#>` or the MCP
+    equivalent) so CI failures and review comments arrive in the
+    session, push every subsequent commit to the same branch (each one
+    re-triggers integrity workflows), and mark ready-for-review only at
+    completion. Per-change ritual (rules 9 and 11) still applies to
+    every commit.
+
+15. **Plan Management & Clean State Rule.** When the user asks for a
+    new plan, or when plan mode reopens during a long session, start a
+    fresh plan file or actively prune completed sections. Never append
+    to an old plan that already contains shipped work — that's how plan
+    bloat happens. Keep plan files concise and focused on the remaining
+    scope.
 
 ## Step 0 — Standards version check (before anything else)
 

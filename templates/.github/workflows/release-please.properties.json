@@ -1,0 +1,7 @@
+{
+  "name": "Release Please",
+  "description": "Conventional-Commits-driven release automation. Opens release PRs, cuts GitHub Releases on merge. Includes opt-in npm / PyPI (OIDC) / GHCR publish jobs gated on per-target repo variables.",
+  "iconName": "tag",
+  "categories": ["Release", "Automation"],
+  "filePatterns": ["release-please-config\\.json$", "\\.release-please-manifest\\.json$"]
+}

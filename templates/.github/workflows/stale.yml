@@ -1,0 +1,71 @@
+# Stale issue / PR housekeeping.
+#
+# Default: marks an issue stale after 60 days of inactivity, closes it
+# after another 7. PRs are more permissive: 90 days to stale, 14 days to
+# close. Pinned items, security items, and items labeled "keep-open" are
+# exempt.
+#
+# DISABLED BY DEFAULT. Enable by setting repository variable
+# `STALE_ENABLED=true` (Settings → Secrets and variables → Actions →
+# Variables tab → New repository variable).
+
+name: Stale
+
+on:
+  schedule:
+    # Daily at 04:00 UTC. The job is idempotent, so multiple runs / day
+    # would be safe, but daily is enough.
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: stale
+  cancel-in-progress: false
+
+jobs:
+  stale:
+    name: Mark / close stale items
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ vars.STALE_ENABLED == 'true' }}
+    steps:
+      - name: Apply stale policy
+        uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639  # v9
+        with:
+          # Issues
+          days-before-issue-stale: 60
+          days-before-issue-close: 7
+          stale-issue-label: stale
+          stale-issue-message: |
+            This issue has been automatically marked as stale after 60 days
+            of inactivity. It will close in 7 days unless someone adds a
+            comment or removes the `stale` label. If this is still relevant,
+            a quick "still active" comment is enough to reset the timer.
+          close-issue-message: |
+            Closing automatically — feel free to reopen if this is still
+            relevant. No offence intended; this is a housekeeping bot.
+          # Pull requests (more permissive — they tend to be in flight longer)
+          days-before-pr-stale: 90
+          days-before-pr-close: 14
+          stale-pr-label: stale
+          stale-pr-message: |
+            This pull request has been automatically marked as stale after
+            90 days of inactivity. It will close in 14 days unless someone
+            pushes a new commit or removes the `stale` label.
+          close-pr-message: |
+            Closing automatically — please reopen and rebase if you'd like
+            to continue. No offence intended; this is a housekeeping bot.
+          # Exemptions
+          exempt-issue-labels: 'pinned,security,keep-open'
+          exempt-pr-labels: 'pinned,security,keep-open,dependencies'
+          exempt-all-milestones: true
+          exempt-all-assignees: true
+          # Operations cap protects the action's API budget on large repos.
+          operations-per-run: 100
+          # Order oldest-first so the most-overdue items are addressed first
+          # if the cap is reached.
+          ascending: true

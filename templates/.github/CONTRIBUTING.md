@@ -7,6 +7,7 @@ Thanks for considering a contribution. This document is short on purpose — any
 - [Open issues](../../issues) — bug reports and feature ideas.
 - [Pull requests](../../pulls) — submit changes for review.
 - [Code of Conduct](./CODE_OF_CONDUCT.md) — how we treat each other.
+- [Governance](./GOVERNANCE.md) — roles, decision-making, branch-protection rules.
 - [Security policy](./SECURITY.md) — how to report vulnerabilities privately.
 
 ## How to propose a change
@@ -47,6 +48,16 @@ The PR template surfaces these automatically. Repeated here for reference:
 ## Reviewing
 
 Maintainers aim to triage within a week. If a PR sits longer than that without a response, ping the issue or the PR — you're not being ignored, just lost in noise.
+
+## Community standards
+
+Because this project is hosted on GitHub, contributions are governed by **three** community standards in addition to this repo's own [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md):
+
+1. The [GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines) — what's expected of all GitHub users.
+2. The [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies) — what GitHub disallows on its platform (spam, harassment, illegal content, malware, doxxing, etc.).
+3. This repo's [Code of Conduct](./CODE_OF_CONDUCT.md) and (if applicable) [Governance](./GOVERNANCE.md).
+
+Maintainers will close, hide, or report contributions that violate any of the three. Reporting routes: CoC concerns to the contact in `CODE_OF_CONDUCT.md`; platform-policy concerns to GitHub Trust & Safety via [github.com/contact/report-content](https://github.com/contact/report-content).
 
 ## License
 

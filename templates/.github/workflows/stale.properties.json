@@ -1,0 +1,7 @@
+{
+  "name": "Stale",
+  "description": "Daily housekeeping for stale issues and PRs. Marks issues stale after 60d / closes after 7d; PRs after 90d / 14d. Exempts pinned, security, keep-open, milestoned, and assigned items.",
+  "iconName": "clock",
+  "categories": ["Housekeeping", "Triage"],
+  "filePatterns": []
+}

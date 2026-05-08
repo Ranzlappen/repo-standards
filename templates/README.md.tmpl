@@ -85,6 +85,39 @@ single-module projects.>
 commands, conventions, CI/CD, tech stack). When this README and `CLAUDE.md`
 disagree, `CLAUDE.md` wins and this README needs updating.
 
+### AI tooling
+
+This repo supports multi-AI contributions. Tool-specific entrypoints
+(`.cursorrules`, `.github/copilot-instructions.md` if present) defer to
+[`CLAUDE.md`](./CLAUDE.md) on disagreement. See
+[`ai/AI_TEAM_PLAYBOOK.md`](./ai/AI_TEAM_PLAYBOOK.md) for multi-tool
+coordination conventions.
+
+### Operating modes
+
+This repo supports two AI-assisted contribution rhythms (see
+[`repo-standards`](https://github.com/Ranzlappen/repo-standards) PROMPT.md
+rules 13–14):
+
+- **Default — Canonical 8-PR sequence** for full upgrade passes.
+- **Alternative — Single Feature Branch / Single PR** for focused work
+  that would otherwise produce ≤3 PRs (open a draft early, subscribe to
+  PR activity, commits accumulate on the branch, ready-for-review at
+  completion).
+
+Out-of-scope findings auto-file a GitHub issue (label
+`out-of-scope,from-claude`) by default; opt out per-repo by setting
+`DISABLE_OUT_OF_SCOPE_ISSUES=true` in repository variables.
+
+### Behavior preservation (non-negotiable)
+
+Any AI-driven or human contribution against this repo follows
+[`repo-standards`](https://github.com/Ranzlappen/repo-standards) `PROMPT.md`
+rule 2: keep **100% of original functionality**, analyze the repo *before*
+editing, and flag **repo-specific risks / edge-cases** in every PR
+description and post-task self-check. "None observed" is acceptable; the
+heading must be present.
+
 ### CI/CD at a glance
 
 <If the project has GitHub Actions, summarize them here as a one-line table.
@@ -125,7 +158,20 @@ not placeholders.>
 
 **For deeper changes** see [`CLAUDE.md`](./CLAUDE.md).
 
+### Template-repo origin (if applicable)
+
+If this repo was created via GitHub's **"Use this template"** button from [`repo-standards`](https://github.com/Ranzlappen/repo-standards), the `templates/` folder (if still present) is the unconsumed reference set — the originals you can copy more files out of as the project grows. Once you've moved everything you need into the live tree, you can delete `templates/` in a single commit. After deletion, this section can be removed too.
+
 ---
+
+## Community standards
+
+Contributions to this repo are governed by three layered standards: the
+[GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines),
+the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies),
+and this repo's [`CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md). See
+[`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md) for the
+contributor-facing version and the reporting routes.
 
 ## License
 

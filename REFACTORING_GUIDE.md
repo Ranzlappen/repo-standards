@@ -4,6 +4,14 @@ How to split big single-file projects (HTML, JS, Python) into modules **without 
 
 This guide is referenced by [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) section 5.
 
+> **Rule-2 anchor.** [`PROMPT.md`](./PROMPT.md) rule 2 is the source of truth
+> for behavior preservation, and it is **non-negotiable**: every refactor
+> keeps 100% of the target repo's original functionality, analyzes the repo
+> *before* editing, and flags repo-specific risks / edge-cases in the PR
+> description and post-task self-check. The PWA Refactor Addendum below
+> supplies `pwa-inventory.md` as the rule-2 evidence artifact for PWA
+> projects; non-PWA refactors enumerate touched buckets directly.
+
 ---
 
 ## When to refactor
