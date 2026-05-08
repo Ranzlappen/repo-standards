@@ -6,6 +6,16 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+### Fixed
+
+- `PROMPT.md` rule 1 — replaced the legacy `chore/upgrade-standards` single-branch instruction with a reference to Step 2's canonical 8-PR sequence, resolving the internal contradiction with rule 3 and Step 2.
+- `PROMPT.md` rule 3 — replaced the v1-era 4-PR list (Docs / Hygiene / CI / Refactor) with a reference to Step 2's canonical 8-PR sequence, so phased-PR guidance lives in exactly one place.
+
+### Changed
+
+- `PROMPT.md` Step 2 hard-vs-practical ordering — unpacked the dense one-liner (`1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8`) into a bulleted dependency list and a single-row practical-execution sequence. Same content, easier to scan.
+- `README.md` "Repo upgrade order (recommended)" — opened with a reference to PROMPT.md Step 2's canonical 8-PR sequence; trailing sentence now says "first downstream upgrade" to acknowledge the standards repo itself was the first v2 application.
+
 ## [2.0.0] — 2026-05-08
 
 The v2 cut. Eight phased PRs landed across the standards repo's docs, templates, CI, and PROMPT — see the breakdown below for traceability. Consumer repos pin to `v2` (or a specific `v2.0.0`) by referencing the matching git tag.

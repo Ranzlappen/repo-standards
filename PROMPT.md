@@ -24,8 +24,10 @@ pull requests that bring it into compliance.
 
 ## Ground rules (non-negotiable)
 
-1. **Branch and PR.** Never commit directly to main. Create a branch named
-   `chore/upgrade-standards` and open a PR with the checklist in the description.
+1. **Branch and PR.** Never commit directly to main. Each PR uses the branch
+   it's assigned in Step 2's canonical 8-PR sequence (`chore/v2-versioning-meta`,
+   `chore/v2-community-and-templates`, …). Every PR description carries the
+   relevant slice of the checklist.
 
 2. **Behavior preservation.** Refactoring may not change observable behavior.
    This includes UI, animations, storage keys, URLs, deployment shape, and
@@ -34,14 +36,10 @@ pull requests that bring it into compliance.
    instead of doing it.
 
 3. **Phased PRs.** Do NOT bundle docs, CI, structural changes, and refactoring
-   into one mega-PR. Use this order:
-     - PR 1: Docs only (README.md, CLAUDE.md, LICENSE if missing).
-     - PR 2: Repo hygiene (.gitignore, dependabot.yml, repo description / topics
-             noted in the PR body even if you can't set them yourself).
-     - PR 3: CI / GitHub Actions workflows.
-     - PR 4 (only if applicable): Refactoring per REFACTORING_GUIDE.md.
-   Open them sequentially. Do not start PR N+1 until PR N is reviewed.
-   If only PR 1–3 are needed, stop there.
+   into one mega-PR. Use the canonical 8-PR sequence in Step 2 below — open
+   the PRs sequentially per the hard-ordering rule there, and don't start
+   PR N+1 until PR N merges. Skip any PR whose scope is empty for this repo
+   (with a one-line reason).
 
 4. **Templates are starting points, not gospel.** Adapt the CLAUDE.md and
    README.md skeletons to this project's actual architecture. Don't paste
@@ -182,8 +180,13 @@ after PR N merges.
 | 7 | `chore/v2-dependabot-tighten` | `dependabot.yml` v2 expectations: limits, conventional-commit prefixes, labels, npm/pip dev-vs-prod split. |
 | 8 | `chore/v2-readme-and-tag` | Root README "Next-level features (v2)" + standards-version badge; bump VERSION to `2.0.0`; cut CHANGELOG; tag `v2.0.0` and `v2`. |
 
-**Hard ordering**: 1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8.
-**Practical execution**: 1, 2, 3, 4, 7, 5, 6, 8.
+**Hard ordering** (what must come before what):
+- PR 1 first.
+- PRs 2, 3, and 7 can run in parallel after PR 1.
+- PR 4 needs PR 2 done first.
+- Then PR 5 → PR 6 → PR 8, strictly sequential.
+
+**Practical execution** (one PR at a time): PR 1 → 2 → 3 → 4 → 7 → 5 → 6 → 8.
 
 Skip any PR whose scope is empty for this repo (e.g. no PWA code → PR 4's
 PWA-relevant subsections drop out; no Python code → ruff/pytest configs
