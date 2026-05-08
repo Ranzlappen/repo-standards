@@ -100,39 +100,25 @@ what each is used for and how to rotate it.>
 
 ## Conventional Commits
 
-This project follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-Every commit message starts with one of:
-
-* `feat` — new user-visible capability
-* `fix` — bug fix
-* `docs` — documentation only
-* `refactor` — code change without behavior or feature change
-* `test` — adding or fixing tests
-* `chore` — build, deps, tooling
-* `ci` — CI configuration
-* `perf` — performance improvement
-* `style` — formatting, no behavior change
-* `revert` — reverts a previous commit
-
-Optional scope in parens (`feat(timer): …`). Breaking changes get `!` and a
-`BREAKING CHANGE:` footer (`feat!: drop legacy v1 API`).
-
-The pre-commit `commit-msg` hook (see [`.pre-commit-config.yaml`](./.pre-commit-config.yaml))
-blocks non-conformant messages locally; CI re-checks on the merge commit.
+This project follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/):
+`feat` / `fix` / `docs` / `refactor` / `test` / `chore` / `ci` / `perf` /
+`style` / `revert`. Optional `(scope)`. Breaking changes get `!` plus a
+`BREAKING CHANGE:` footer. The `commit-msg` pre-commit hook
+(see [`.pre-commit-config.yaml`](./.pre-commit-config.yaml)) blocks
+non-conformant messages locally; CI re-checks the merge commit.
 
 ## Testing
 
 <List the test command(s) and what they cover. Examples:>
 
-* **Unit tests**: `<command>` — runs <which suite>. Coverage gate: <e.g. "80% lines, 75% branches">.
-* **Integration tests** (if any): `<command>`.
-* **Manual smoke checklist** (for UI projects): list the critical user
-  flows that any change must verify before merging. Keep this short — 5–8
-  flows max — so it actually gets walked through.
+* **Unit tests**: `<command>` — runs <suite>. Coverage gate: <e.g. "80% lines, 75% branches">.
+* **Integration tests**: `<command>`.
+* **Manual smoke checklist** (UI projects): the critical 5–8 user flows
+  that every change must verify before merging.
 
-If the project has no automated tests yet, say so here explicitly with a
-one-line reason (and ideally a follow-up issue link). Silence in this
-section is worse than "tests deferred for now".
+If the project has no automated tests yet, say so explicitly with a
+one-line reason and follow-up issue link. Silence is worse than
+"tests deferred for now".
 
 ## Security & Secrets
 
@@ -181,6 +167,26 @@ to understand the project's technical identity.>
 
 <Show the top 2 levels of meaningful structure. Don't dump every file. Skip
 generated/ignored directories.>
+
+## Out-of-scope / Unrelated Findings (opt-out)
+
+When work surfaces something unrelated to the current task, **by default**
+auto-file a GitHub issue and link it in the PR's "Refactoring opportunities":
+`gh issue create --title "<summary>" --body "<context>"
+--label "out-of-scope,from-claude"`. **Opt out** by setting
+`DISABLE_OUT_OF_SCOPE_ISSUES=true` as a repo variable; with opt-out, surface
+the finding only in the PR description.
+
+## Alternative Operating Mode: Single Feature Branch / Single PR
+
+The default is the canonical 8-PR sequence in `repo-standards` PROMPT.md.
+For focused work that would otherwise produce ≤3 PRs, an alternative is
+sanctioned: one long-lived feature branch + one PR opened **early** (after
+the first commit, draft); subscribe to PR activity (`gh pr subscribe <PR#>`
+or the MCP equivalent) so CI/comment events arrive in-session; each commit
+pushes to the same branch and re-triggers integrity workflows; mark
+ready-for-review only at completion. Per-change ritual (plain-English plan →
+edit → self-check → summary) still applies to every commit.
 
 ## Post-task self-check
 
