@@ -96,6 +96,21 @@ The upgrade pass should produce a short **"Refactoring opportunities"** section 
 
 These are **proposals**, not part of the upgrade PR. They become future work.
 
+## 9. Wiki (optional)
+
+Wiki content is optional. A repo without a wiki is not "downgraded" — it just doesn't get the long-form companion docs that complement README and CLAUDE.md. If the wiki **is** populated:
+
+- [ ] **Wiki is enabled** on the repo (Settings → Features → Wikis).
+- [ ] **`Home.md` exists** with a "where to look" task-oriented table.
+- [ ] **`Architecture.md` exists** and explicitly states that `CLAUDE.md` wins on disagreement (single source of truth for architecture).
+- [ ] **`FAQ.md` exists** with categorised entries; recurring questions are graduated to README/CLAUDE.md rather than living forever in FAQ.
+- [ ] **`Upgrade-History.md` exists** and is append-only (newest entry on top).
+- [ ] **`PWA-Safety.md` exists** if the repo is a PWA, and links to `REFACTORING_GUIDE.md`'s PWA Refactor Addendum rather than duplicating the rules.
+- [ ] **`Migration-v1-to-v2.md` (or current major) exists** with the per-repo migration entry recorded.
+- [ ] **`_Sidebar.md` and `_Footer.md` exist** and stay short (long sidebars push content below the fold).
+
+Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 — the upgrade flow does not push to `<repo>.wiki.git` automatically.
+
 ---
 
 ## How to score a repo
