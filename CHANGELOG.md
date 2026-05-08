@@ -6,6 +6,10 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [2.0.0] — 2026-05-08
+
+The v2 cut. Eight phased PRs landed across the standards repo's docs, templates, CI, and PROMPT — see the breakdown below for traceability. Consumer repos pin to `v2` (or a specific `v2.0.0`) by referencing the matching git tag.
+
 ### Added — PR 6: checklist expansion
 
 - `UPGRADE_CHECKLIST.md` Section 10 — Security (CodeQL, secret scanning + push protection, Dependabot security alerts, SECURITY.md present, public-client-side-keys documented, .env hygiene, gitleaks-verified no-secrets-in-tracked-files).
@@ -91,15 +95,15 @@ Every existing workflow now declares a least-privilege `permissions:` block, has
 - `templates/README.md.tmpl` — added a badge block (CI / License / Standards-version) and surfaced the LICENSE file with a one-sentence MIT summary instead of placeholder text.
 - `templates/CLAUDE.md.tmpl` — added Conventional Commits, Testing, and Security & Secrets sections (template now 184 lines, still under the 200-line target).
 
-## [2.0.0-rc.1] — 2026-05-08
+### Added — PR 1: versioning + meta-CI scaffold
 
-### Added
 - `VERSION` file at repo root declaring the current standards version.
 - `CHANGELOG.md` at repo root.
-- `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner (used to publish `v1.0.0` retroactively and `v2.0.0` / `v2` at release time).
+- `templates/CHANGELOG.md.tmpl` — Keep-a-Changelog skeleton for downstream repos.
+- `.github/workflows/self-validate.yml` — actionlint + lychee `--offline` + semver assertion + uses-line SHA-pinning lint.
+- `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner.
+- `.github/workflows/auto-tag.yml` — push-to-main + VERSION-changed automated tagger (creates `vX.Y.Z` and force-updates `vMAJOR` for non-prereleases).
 
-### Notes
-- This is the first release candidate of the v2 standards. Final v2.0.0 ships once all eight planned PRs land. See the v2 implementation plan for the full sequence.
-
-[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v2.0.0-rc.1...HEAD
-[2.0.0-rc.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.0.0-rc.1
+[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.0.0
+[1.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v1.0.0
