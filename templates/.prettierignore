@@ -1,0 +1,38 @@
+# Paths Prettier should NOT format. Prefer narrow rules.
+
+# --- Build artifacts ---
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.vite/
+coverage/
+
+# --- Dependency stores ---
+node_modules/
+vendor/
+.pnp.*
+.yarn/
+
+# --- Auto-generated ---
+*.min.js
+*.min.css
+*.bundle.js
+*.bundle.css
+*.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# --- Static-site outputs ---
+_site/
+.jekyll-cache/
+.jekyll-metadata
+
+# --- Documentation that should stay verbatim ---
+LICENSE
+LICENCE
+CHANGELOG.md
