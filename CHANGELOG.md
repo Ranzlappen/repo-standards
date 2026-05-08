@@ -6,6 +6,12 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+### Added — PR 5: PROMPT.md hardening
+
+- `PROMPT.md` Step 0 — Standards version check preamble. Fetches the standards `VERSION` and the consumer repo's declared version (`.standards-version` file, README badge, or CLAUDE.md note); refuses on major mismatch, asks the user in offline-fallback mode, and proceeds otherwise.
+- `PROMPT.md` ground rules 9–12 — Tiny commits (one file per response), Conventional Commits required, mandatory post-task self-check on every code-change commit, no PR opens without explicit user confirmation. These were the implicit rules followed throughout this v2 upgrade; codifying them so every downstream upgrade follows the same rhythm.
+- `PROMPT.md` Step 2 — Canonical 8-PR sequence (`chore/v2-versioning-meta` through `chore/v2-readme-and-tag`) with branch names, per-PR scope, hard-ordering and practical-execution rules. Replaces the previous loose "1, 2, 3, optionally 4" guidance.
+
 ### Changed — PR 7: dependabot tightening
 
 - `templates/.github/dependabot.yml` now applies the v2 expectations across every ecosystem entry: explicit `open-pull-requests-limit: 10`, `labels: ["dependencies", "<ecosystem>"]` for triage, conventional `commit-message` prefixes (`chore(deps)` / `chore(deps-dev)` plus `include: "scope"`), and dev-vs-prod group split for npm and pip (dev bumps no longer block prod review). The previously-bare `bundler` entry now matches the rest. Sub-app npm entry mirror-updated in the commented-out block so consumers uncomment a complete row.

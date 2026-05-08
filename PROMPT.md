@@ -84,6 +84,67 @@ pull requests that bring it into compliance.
    modules, picking which CI workflow template to start from, or any other
    reversible call. The PR is the conversation — the user reviews there.
 
+9. **Tiny commits — one file per response.** Make exactly one file change
+   per commit unless the change is atomically inseparable across two files
+   (rare). Each commit is preceded by a one-paragraph plain-English plan,
+   followed by a post-task self-check (file exists / YAML/JSON parses /
+   links resolve / line count consistent), and a one-line summary. This is
+   the rhythm the user has chosen for *every* upgrade — do not bundle
+   unrelated changes into a single commit even if they all belong in the
+   same PR.
+
+10. **Conventional Commits required.** Every commit message uses the
+    Conventional Commits spec
+    (https://www.conventionalcommits.org/en/v1.0.0/). Recommended scopes
+    for repo upgrades: `version`, `meta`, `tmpl`, `wf` (workflow), `gh`
+    (community files), `wiki`, `prompt`, `checklist`, `dependabot`,
+    `release`. Breaking changes get `!` and a `BREAKING CHANGE:` footer.
+    Non-conformant messages are blocked locally by the `commit-msg` hook
+    in `templates/.pre-commit-config.yaml`.
+
+11. **Post-task self-check is mandatory after every code change.** The
+    template in `CLAUDE.md.tmpl` has the self-check block at the bottom.
+    For repo-upgrade work specifically, the rule is **stricter** than the
+    template's default ("skip for pure Q&A turns"): every commit that
+    changes tracked files runs the self-check. Output its result before
+    proposing the next change. This is non-negotiable — it's how doc
+    drift and inconsistent state are caught before they accumulate.
+
+12. **No PR opens without explicit user confirmation.** After the last
+    commit of a category lands on the working branch, stop and ask the
+    user to confirm before calling `mcp__github__create_pull_request` (or
+    its CLI equivalent). Drafts are okay if the user explicitly asks. PR
+    sequencing is sequential: PR N must merge before PR N+1 opens.
+
+## Step 0 — Standards version check (before anything else)
+
+This prompt is for **repo-standards v2**. Before reading or planning anything,
+verify the version compatibility:
+
+1. Fetch the current standards version:
+   `https://raw.githubusercontent.com/Ranzlappen/repo-standards/main/VERSION`
+   Expected major version: **2** (i.e. the file starts with `2.`).
+
+2. Check this repo's declared standards version. Look for:
+   - `.standards-version` at the repo root (one line, e.g. `2`), OR
+   - A `Standards: v2` badge in `README.md`, OR
+   - A note in `CLAUDE.md` declaring the version followed.
+
+3. Decide:
+   - **Match** (both are major v2): proceed to Step 1.
+   - **No declared version** in the target repo: assume the user wants the
+     latest major; surface a one-line confirmation in the plan and proceed.
+   - **Major mismatch** (target says v1, prompt says v2): **refuse** to
+     proceed. Tell the user to either upgrade the target repo to v2 first
+     (using the v1 → v2 migration guide in `templates/wiki/Migration-v1-to-v2.md`)
+     or paste the v1 prompt instead.
+   - **Network unavailable** (can't fetch the standards `VERSION`): proceed
+     in offline-fallback mode — ask the user for the version they're
+     targeting and trust their answer.
+
+This check exists so any future major-version bump (v2 → v3) doesn't
+silently apply v3 rules to a v2 repo or vice versa.
+
 ## Step 1 — Read and audit
 
 Read every top-level file in the repo. Read the entrypoints of every code
@@ -100,8 +161,33 @@ Post a single comment (or your initial Claude Code response) containing:
   - One-sentence project summary
   - Detected stack and deployment shape
   - Checklist results: for each item, mark ✓ / — / ⚠️ with a short reason
-  - Proposed PR sequence (1, 2, 3, optionally 4) with a 1–2 line scope per PR
+  - Proposed PR sequence using the **canonical 8-PR template** below;
+    omit any PR whose scope doesn't apply to this repo and say so explicitly
   - Refactoring opportunities found (whether or not you'll act on them)
+
+### Canonical 8-PR sequence for v2 upgrades
+
+Follow this order unless the audit shows a PR has nothing to do (in which
+case skip with a one-line reason). PRs are sequential — PR N+1 only opens
+after PR N merges.
+
+| # | Branch | Scope |
+|---|---|---|
+| 1 | `chore/v2-versioning-meta` | `VERSION` + `CHANGELOG.md` + `self-validate.yml` + (if applicable) `tag-release.yml` and `auto-tag.yml`. |
+| 2 | `chore/v2-community-and-templates` | `templates/.github/` community files + tooling configs + expanded `.gitignore.example` + `templates/docs/` + badge block + new CLAUDE.md.tmpl sections. |
+| 3 | `chore/v2-wiki-templates` | `templates/wiki/*.md` + new optional Wiki phase in PROMPT + new section 9 in checklist. |
+| 4 | `chore/v2-ci-hardening` | least-privilege `permissions:` blocks + 40-char SHA pinning + `timeout-minutes` + cached lint/test tools + reusable lint-and-test + security-scan + release-please. |
+| 5 | `chore/v2-prompt-hardening` | PROMPT.md ground rules 9–12 + Step 0 version check + canonical 8-PR sequence. |
+| 6 | `chore/v2-checklist-expansion` | `UPGRADE_CHECKLIST.md` new sections (Security, A11y/Perf/SEO, Testing & Quality, Standards Versioning). |
+| 7 | `chore/v2-dependabot-tighten` | `dependabot.yml` v2 expectations: limits, conventional-commit prefixes, labels, npm/pip dev-vs-prod split. |
+| 8 | `chore/v2-readme-and-tag` | Root README "Next-level features (v2)" + standards-version badge; bump VERSION to `2.0.0`; cut CHANGELOG; tag `v2.0.0` and `v2`. |
+
+**Hard ordering**: 1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8.
+**Practical execution**: 1, 2, 3, 4, 7, 5, 6, 8.
+
+Skip any PR whose scope is empty for this repo (e.g. no PWA code → PR 4's
+PWA-relevant subsections drop out; no Python code → ruff/pytest configs
+in PR 2 are skipped).
 
 WAIT for user confirmation before opening any PR. The plan is the
 deliverable for this step.
