@@ -128,3 +128,26 @@ jobs:
                 ;;
             esac
           fi
+
+# Optional consumer wiring (paste into the per-repo workflow that calls
+# this one). Adds an AI-parsable Markdown summary to $GITHUB_STEP_SUMMARY
+# and an updateable PR comment. `if: ${{ always() }}` ensures the summary
+# runs even when lint or test failed — without it, the PR comment never
+# refreshes with the failure detail.
+#
+# jobs:
+#   lint-test:
+#     uses: ./.github/workflows/lint-and-test.yml
+#     with: { language: node }
+#   summarize:
+#     needs: [lint-test]
+#     if: ${{ always() }}
+#     uses: ./.github/workflows/workflow-summary.yml
+#     with:
+#       workflow-name: CI
+#       post-pr-comment: true
+#     permissions:
+#       contents: read
+#       actions: read
+#       pull-requests: write
+#       checks: read

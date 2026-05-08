@@ -62,11 +62,52 @@ Configure under **Settings → Branches → Branch protection rules → Add rule
 
 For tag patterns (`v*`), add a second rule that mirrors the above plus restricts who can push tags. `auto-tag.yml` and `tag-release.yml` only run from `main`, so tag pushes are still gated.
 
+## Supply-chain governance
+
+The repo's supply-chain primitives — SHA-pinning, Scorecard, dependency review, signed releases — are policy-bound, not best-effort. The matrix in [`SECURITY.md`](./SECURITY.md) "Supply-chain commitments" is the source of truth; this section is the maintainer-facing policy that pins the floor.
+
+- **OpenSSF Scorecard floor: 7.0.** A score below 7.0 (read from [securityscorecards.dev](https://securityscorecards.dev/) or the SARIF in the Security tab) is treated as a regression. Open a `security` PR to remediate within 30 days. If 30 days pass without a fix, record an explicit waiver in [`SECURITY.md`](./SECURITY.md) under the relevant primitive's row, with the reason and the next review date — never silently fall under floor.
+- **`dependency-review.yml` is required on every PR to `main`.** Branch protection's required-status-checks list includes the dependency-review job. A PR that introduces a `high`-or-above CVE blocks merge until the CVE is resolved upstream (preferred), pinned to a patched range (acceptable), or explicitly waived in the PR description with a CVE-ID and a justification (last resort).
+- **CodeQL is required on every language present in the repo.** Matrix in `templates/.github/workflows/security-scan.yml` matches the languages actually checked in. Adding a new language is a `security` PR that updates the matrix in the same commit as the first source file.
+- **Signed releases via sigstore / cosign.** Once the publishing OIDC trust is configured (npm package settings, PyPI publishing account, or GHCR token scope per `release-please.yml` header), every tagged release artifact carries a `.sig`. Releases without a signature are flagged on the release page and should be re-cut after the signing step lands.
+- **Dependabot's role.** Dependabot opens the PRs; `dependency-review.yml` gates them; a maintainer reviews and merges. Dependabot **does not** auto-merge in this repo (or in downstream repos using these templates by default) — auto-merge bypasses the human "is this minor pin actually safe" check.
+- **Waivers are public.** Any time a primitive is bypassed, the bypass lives in `SECURITY.md` with the reason and the review date. Private waivers create surprises; public waivers create accountability.
+
+A regression on any of the **live** primitives above is a security finding; route it through [`SECURITY.md`](./SECURITY.md)'s private-reporting channel rather than opening a public issue.
+
 ## Triage and release rhythm
 
 - **Triage cadence**: Maintainers aim to acknowledge new issues within 7 days. "Acknowledge" means triage label + a one-line response, not a fix.
 - **Release cadence**: Driven by Conventional Commits via `release-please.yml` if enabled (see the workflow's header comment). For repos without release-please, releases are cut manually via `tag-release.yml` when a maintainer judges enough has accumulated.
 - **Security fixes** ship out-of-band on their own PR, fast-tracked through review. See [`SECURITY.md`](./SECURITY.md) for private disclosure.
+
+## Automated triage
+
+Triage scales with labels. The recommended baseline below is small on purpose — every label has to be applied by a human or a bot at some point, so 30 labels nobody applies are worse than 8 labels everyone does.
+
+**Recommended default labels** (adopt as-is unless a project has a strong reason to diverge):
+
+| Label | Meaning | Applied by |
+| --- | --- | --- |
+| `bug` | Something broken in shipped behavior. | Triager / template |
+| `feature` | New behavior request. | Triager / template |
+| `question` | Use Discussions instead — close + redirect. | Triager / template |
+| `dependencies` | Dependabot / dependency-review-related. | Dependabot, `dependency-review.yml` |
+| `security` | Routes through `SECURITY.md` private channel; never opens publicly. | Maintainer |
+| `triage` | New issue, not yet reviewed. | Default on new issues |
+| `from-claude` | Filed by Claude Code (rule 13). | `gh issue create --label` |
+| `out-of-scope` | Surfaced by an upgrade pass but unrelated; opt-out via `DISABLE_OUT_OF_SCOPE_ISSUES=true`. | `gh issue create --label` (rule 13) |
+| `good-first-issue` | Curated low-friction starter issue. | Maintainer |
+
+**Triage rhythm.**
+
+- **New issues land with `triage`.** Maintainers acknowledge within **7 days** — "acknowledge" means triage label removed, replaced by one of `bug` / `feature` / `question`, plus a one-line response explaining the call. Acknowledgement is not a promise to fix.
+- **`question` issues are redirected to Discussions** (when Discussions is enabled — see [`README.md`](../README.md) "GitHub Discussions"). Close the issue with a one-line link rather than answering inline; that keeps the issue tracker for tracked work.
+- **`from-claude` and `out-of-scope` issues are first-class.** They land via `gh issue create` from inside an upgrade pass per `PROMPT.md` rule 13. Treat them like any other triage queue item — they're already structured (title, body, label) so the human cost is minutes per issue.
+- **`security` issues never open publicly.** If one slips in, close immediately, redirect the reporter to the private channels in [`SECURITY.md`](./SECURITY.md), and treat the disclosure as the live one.
+- **Stale handling is opt-in.** `templates/.github/workflows/stale.yml` ships gated on `STALE_ENABLED=true`; defaults are issues 60d → 7d, PRs 90d → 14d. Exempt labels include `pinned`, `security`, `keep-open`, `dependencies` (PRs only), milestoned, and assigned.
+
+**Workflow-summary integration (added in v3).** When `templates/.github/workflows/workflow-summary.yml` is wired into the per-repo CI workflow, its sticky PR comment surfaces lint/test annotations alongside the diff — the comment is the **single source of CI truth** for a PR. Triagers can read the sticky comment instead of clicking through to the workflow run; AI agents can parse the comment's committed-shape Markdown without ad-hoc heuristics.
 
 ## Conflict resolution
 

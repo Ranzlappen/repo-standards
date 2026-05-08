@@ -1,8 +1,10 @@
 # Ranzlappen Repo Standards
 
-[![Standards](https://img.shields.io/badge/standards-v2.1.1-informational)](./VERSION)
+[![Standards](https://img.shields.io/badge/standards-v3.0.0-informational)](./VERSION)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./templates/LICENSE)
 [![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Ranzlappen/repo-standards/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Ranzlappen/repo-standards)
+[![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ff69b4)](./SPONSORS.md)
 
 A portable toolkit for upgrading my repos to a consistent, high-quality baseline. Distilled from the [`website`](https://github.com/Ranzlappen/website) repo, which is the working reference implementation.
 
@@ -16,10 +18,19 @@ This repo answers two questions:
 | File | Purpose |
 | --- | --- |
 | [`VERSION`](./VERSION) | Current standards version (semver). Consumer repos pin a major via git tag (`v1`, `v2`, …). |
+| [`.standards-version`](./.standards-version) | The major version this repo follows itself (dogfood). Read by `PROMPT.md` Step 0. |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Notable changes per release. Keep-a-Changelog format. |
+| [`SPONSORS.md`](./SPONSORS.md) | Thank-you page + what sponsorship funds + what it does **not** buy. Surfaced from the badge block. |
+| [`.github/CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md) | This repo's live Code of Conduct (Contributor Covenant 2.1). The downstream-facing template lives at [`templates/.github/CODE_OF_CONDUCT.md`](./templates/.github/CODE_OF_CONDUCT.md). |
+| [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md) | This repo's live contributor guide. Downstream-facing template at [`templates/.github/CONTRIBUTING.md`](./templates/.github/CONTRIBUTING.md). |
+| [`.github/SECURITY.md`](./.github/SECURITY.md) | Vulnerability-reporting policy + threat model + supply-chain commitments. Downstream-facing template at [`templates/.github/SECURITY.md`](./templates/.github/SECURITY.md). |
+| [`.github/FUNDING.yml`](./.github/FUNDING.yml) | Sponsor-button config. Entries commented until a backing profile is live. |
+| [`.github/CODEOWNERS`](./.github/CODEOWNERS) | Code-owner mapping for review routing. |
 | [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) | The audit Claude Code runs against any repo. Pass/fail items grouped by category. |
 | [`REFACTORING_GUIDE.md`](./REFACTORING_GUIDE.md) | How to split big single-file projects into modules without changing behavior. |
-| [`PROMPT.md`](./PROMPT.md) | The standardized Claude Code prompt. One prompt, applied repo by repo. |
+| [`PROMPT.md`](./PROMPT.md) | The standardized Claude Code prompt — entry-point index pointing at the modular files under [`prompt/`](./prompt/). One prompt, applied repo by repo. |
+| [`prompt/`](./prompt/) | Modular source of the upgrade prompt: Step 0 (version check), the 15 ground rules, Step 1+2 (read & audit + canonical 8-PR sequence), Step 3 (PR description), Step 4 (Wiki seeding). |
+| [`docs/`](./docs/) | Long-form documentation home for *this* repo (ADRs, runbooks, migration guides). Distinct from [`templates/docs/`](./templates/docs/), which is the boilerplate downstream consumers copy. |
 | [`.github/workflows/`](./.github/workflows/) | This repo's own meta-CI: `self-validate.yml` lints docs/templates; `tag-release.yml` is a manual `workflow_dispatch` helper for publishing tags. |
 | [`templates/CLAUDE.md.tmpl`](./templates/CLAUDE.md.tmpl) | Skeleton CLAUDE.md based on the website repo's structure. |
 | [`templates/README.md.tmpl`](./templates/README.md.tmpl) | Skeleton README with the "Quick Reference" pattern. |
@@ -92,6 +103,19 @@ v2.1 is the polish release. It shipped in two waves: an initial cut focused on t
 
 OIDC trust setup lives outside this repo: configure the npm package settings, the PyPI publishing account, or the GHCR token scope before flipping the variable. The workflow file's header comment lists the exact pages.
 
+## Next-level features (v3)
+
+v3 is the polished-rocket elevation: take v2.1's polished foundation and lift it into a fully dogfooded, supply-chain-hardened, smart-adoption-aware standard. Six things changed:
+
+- **Dogfooded community files.** The standards repo now ships its own live `.github/CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`, `FUNDING.yml`, and `CODEOWNERS` at the root (distinct from the downstream-facing boilerplate in `templates/.github/`), plus a [`.standards-version`](./.standards-version) of `3.0.0` so the standards repo passes its own Section 13 audit. The standards repo proves its own checklist before asking consumers to.
+- **Modular prompt.** `PROMPT.md` shrank from ~350 lines to a thin entry-point index over six focused files under [`prompt/`](./prompt/) — Phase 0 (migration planning), Step 0 (version check), the 15 ground rules, the canonical 8-PR sequence, the PR description structure, and the optional Wiki seeding each now live in one searchable file at one stable path.
+- **Supply-chain baseline + workflow-summary system.** New `templates/.github/workflows/dependency-review.yml` (per-PR `high`-severity CVE gate, complementary to `security-scan.yml`'s deeper weekly sweep) and `templates/.github/workflows/workflow-summary.yml` (reusable workflow producing an AI-parsable sticky-comment Markdown summary of CI runs); paired sidecars same schema as github/starter-workflows; OpenSSF Scorecard badge on the root README; signed-releases-with-cosign / Scorecard floor `≥ 7.0` / dependency-review-as-required-status-check codified in `templates/.github/SECURITY.md` and the new "Supply-chain governance" block in `templates/.github/GOVERNANCE.md`.
+- **Expanded quality baseline.** New checklist items for Lighthouse CI on every PR with budgets versioned in `lighthouserc.json`, mandatory branch-protection rules on `main` (admin no-bypass), GitHub Discussions for long-form Q&A, and an Automated triage section in `templates/.github/GOVERNANCE.md` (stale-bot tuning, label scheme, Dependabot auto-merge for patch + minor). Root [`docs/`](./docs/) folder added as the long-form documentation home for the standards repo itself, distinct from `templates/docs/` which remains the boilerplate downstream consumers copy.
+- **Phase 0 migration planning + Dependabot PR-spam mitigation.** A new strategic-planning layer ([`prompt/migration-planning.md`](./prompt/migration-planning.md)) that runs *before* Step 0: profile the target repo, score every checklist item by effort × value × risk, package the must / should / could items into resumable batches sized to fit a single Claude session, surface AI / token / session / fair-use guardrails to the user up front, and audit Dependabot configuration against the v2 spam-mitigation rules (grouping, weekly schedule, `open-pull-requests-limit`, labels, dev/prod split, conventional-commit prefixes, `CODEOWNERS *` routing). The output is the migration roadmap; the canonical 8-PR sequence is one possible shape it takes.
+- **Sponsors page.** [`SPONSORS.md`](./SPONSORS.md) at the root — thank-you page, what funding goes toward, what it does *not* buy. Surfaced from a new "Sponsor" badge above the fold.
+
+The full canonical PR sequence to upgrade a repo from v2 to v3 lives in [`PROMPT.md`](./PROMPT.md) (Phase 0 + Step 2); the matching audit lives in [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) sections 0–13.
+
 ## How to use it (phone-friendly)
 
 **Option A — Claude Code GitHub Action (recommended for mobile).**
@@ -101,6 +125,10 @@ Install the action in each repo once. Then to upgrade a repo, open a new issue a
 In any repo, run `claude` (or open the Claude Code Android app and connect to a `claude remote-control` session on a machine you control), then paste [`PROMPT.md`](./PROMPT.md). Claude works locally and pushes a branch.
 
 The prompt is identical for both. Pick the flow that fits where you are.
+
+### GitHub Discussions
+
+For open-ended Q&A — "should I structure my repo this way?", "does rule 2 apply to my refactor?", "show-and-tell of a downstream upgrade pass" — use [GitHub Discussions](https://github.com/Ranzlappen/repo-standards/discussions) rather than opening an issue. Issues track tracked work (bugs, features, chores); Discussions hold the long-form conversation. Discussions can be enabled on any repo via Settings → Features → ☑ Discussions ([docs](https://docs.github.com/en/discussions/quickstart)).
 
 ## Repo upgrade order (recommended)
 
@@ -132,9 +160,11 @@ This repo is structured as a **GitHub Template repository** — a one-click star
 
 The `templates/` folder is intentionally left in the new repo as a reference; delete it once the consumer no longer needs the originals.
 
-## Community standards
+## Community standards (this repo)
 
-Contributions to this repo are governed by three layered standards: the [GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), and the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) referenced from [`templates/.github/CODE_OF_CONDUCT.md`](./templates/.github/CODE_OF_CONDUCT.md). The same three apply to every downstream repo built from these templates — see [`templates/.github/CONTRIBUTING.md`](./templates/.github/CONTRIBUTING.md) for the contributor-facing version and the reporting routes.
+The standards repo dogfoods its own community files. Live, binding-on-this-repo copies sit at the root under [`.github/`](./.github/); the `templates/.github/` copies are the unconsumed boilerplate every downstream repo adopts.
+
+Contributions to this repo are governed by three layered standards: the [GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), and the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) referenced from [`.github/CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md). The same three apply to every downstream repo built from these templates — see [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md) for the contributor-facing version and the reporting routes, and [`.github/SECURITY.md`](./.github/SECURITY.md) for vulnerability disclosure. Long-form sponsorship doc at [`SPONSORS.md`](./SPONSORS.md).
 
 ## License
 

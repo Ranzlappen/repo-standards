@@ -1,0 +1,24 @@
+# Funding sources surfaced on this repo's "Sponsor this project" button.
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+#
+# This file is the dogfood instance of templates/.github/FUNDING.yml. All
+# entries below are commented; uncomment + fill the one(s) you actually
+# have profiles set up on. An uncommented entry whose backing profile
+# does not exist will render a broken Sponsor button, so leave entries
+# commented until the profile is live.
+#
+# Long-form thank-you doc: ../SPONSORS.md.
+
+# github: [Ranzlappen]
+# patreon: <patreon-handle>
+# open_collective: <collective-name>
+# ko_fi: <ko-fi-handle>
+# tidelift: <platform>/<package>
+# community_bridge: <project-name>
+# liberapay: <liberapay-handle>
+# issuehunt: <issuehunt-handle>
+# lfx_crowdfunding: <project-slug>
+# polar: <polar-handle>
+# buy_me_a_coffee: <bmc-handle>
+# thanks_dev: <thanks-dev-handle>
+# custom: ['<https://your-funding-page>']

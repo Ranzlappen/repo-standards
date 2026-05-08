@@ -1,0 +1,34 @@
+# CODEOWNERS for Ranzlappen Repo Standards
+#
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Patterns are matched in order; the LAST matching pattern wins.
+# This file is the dogfood instance of templates/.github/CODEOWNERS.
+#
+# Combine with branch protection's "Require review from Code Owners"
+# on `main` (see templates/.github/GOVERNANCE.md "Recommended
+# branch-protection rules") for enforcement.
+
+# --- Default owner for everything not matched below ---
+*                       @Ranzlappen
+
+# --- Documentation (cross-reference-heavy; treat with extra care) ---
+/README.md              @Ranzlappen
+/PROMPT.md              @Ranzlappen
+/UPGRADE_CHECKLIST.md   @Ranzlappen
+/REFACTORING_GUIDE.md   @Ranzlappen
+/CHANGELOG.md           @Ranzlappen
+/VERSION                @Ranzlappen
+/.standards-version     @Ranzlappen
+/prompt/                @Ranzlappen
+
+# --- CI / build / dependency configuration ---
+/.github/               @Ranzlappen
+/.github/workflows/     @Ranzlappen
+
+# --- Security-sensitive areas ---
+/.github/SECURITY.md    @Ranzlappen
+/.github/CODEOWNERS     @Ranzlappen
+
+# --- Template surface (changes here ripple downstream) ---
+/templates/             @Ranzlappen

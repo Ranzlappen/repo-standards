@@ -8,6 +8,12 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 
 > **Standards version.** This checklist applies to the version of `repo-standards` recorded in [`VERSION`](./VERSION) at the root of this repo. Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching git tag.
 
+## 0. Migration Planning (Phase 0)
+
+**Phase 0 runs before Step 0.** It produces the tailored, resumable batch roadmap that the rest of the upgrade pass executes. The single audit bullet below verifies the artifact was produced — its absence means the upgrade ran ad-hoc and the rest of this checklist's pass/fail is unreliable.
+
+- [ ] **Phase 0 migration-planning artifact produced** before any other batch landed (per [`PROMPT.md`](./PROMPT.md) Phase 0 / [`prompt/migration-planning.md`](./prompt/migration-planning.md)). Includes: repo profile (stack, project type, size bucket, complexity signals, owner profile), must/should/could/skip scoring table covering every line in this checklist, prioritized batch roadmap respecting the canonical 8-PR sequence's hard ordering, AI / token / session / fair-use guardrails surfaced to the user, and a Dependabot PR-spam-mitigation audit (compliant, or `chore/dependabot-tighten` batch slotted into the roadmap).
+
 ## 1. Documentation
 
 - [ ] **`README.md` exists** at repo root, follows the [README template](./templates/README.md.tmpl).
@@ -51,6 +57,7 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 - [ ] If the repo has multiple sub-projects, CI uses **per-app jobs gated on path filters** (see `website/.github/workflows/ci.yml` for the pattern).
 - [ ] **A `security-scan.yml` workflow exists** with CodeQL + gitleaks, triggered on PRs, push-to-main, and a weekly schedule.
 - [ ] **Reusable workflow available** (`lint-and-test.yml`) for projects that want a single callable lint+test entry point.
+- [ ] **Workflow summary system available** (`workflow-summary.yml`, added in v3) — reusable workflow that produces a structured, AI-parsable Markdown summary (status, jobs table, warnings, errors, timings) emitted to `$GITHUB_STEP_SUMMARY` and optionally posted as a sticky PR comment keyed by an HTML-comment marker. Wire into long CI workflows for observability; the comment shape (headings, table columns, sort order) is committed-to so AI agents can parse it reliably.
 
 ## 4. Project structure
 
@@ -132,13 +139,17 @@ Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 
 - [ ] **Public client-side keys are documented** in `CLAUDE.md` under "Security & Secrets" if the project ships any (e.g. Firebase web config). Documentation explicitly says they're public-by-design and points at the server-side rule that secures the data.
 - [ ] **`.env` is `.gitignore`d**; `.env.example` is committed; documented variables list `<SECURITY_CONTACT_EMAIL>` rotation cadence.
 - [ ] **No secrets, API keys, or unredacted credentials in tracked files** (verified by gitleaks in the security-scan workflow on every PR + push to main + weekly schedule).
-- [ ] **OpenSSF Scorecard job present** in `security-scan.yml` (added in v2.1). Runs weekly + on `branch_protection_rule` changes + on push-to-main, publishes SARIF to the Security tab, and (with `publish_results: true`) makes the score badge available at `https://api.securityscorecards.dev/projects/github.com/<owner>/<repo>` for inclusion in `README.md`.
+- [ ] **OpenSSF Scorecard job present** in `security-scan.yml` (added in v2.1). Runs weekly + on `branch_protection_rule` changes + on push-to-main, publishes SARIF to the Security tab, and (with `publish_results: true`) makes the score badge available at `https://api.securityscorecards.dev/projects/github.com/<owner>/<repo>` for inclusion in `README.md`. **Score floor: 7.0** (regression below floor is a `security` PR per `templates/.github/GOVERNANCE.md` "Supply-chain governance").
+- [ ] **`dependency-review.yml` workflow present** for per-PR supply-chain gating (added in v3). Fails the PR on `high`-severity (or above) CVEs in dependency changes; comments the diff summary on the PR. Pair with `security-scan.yml` for the deeper weekly sweep — the two are complementary, not redundant. Required as a status check on `main` per `templates/.github/GOVERNANCE.md`.
+- [ ] **Releases signed with sigstore (cosign)** (added in v3). Tagged release artifacts carry a `.sig` and the signature verifies in the [Rekor transparency log](https://rekor.sigstore.dev/). OIDC trust setup per `release-please.yml` header comments (npm package settings, PyPI publishing account, or GHCR token scope) lands once before the first signed release. Unsigned releases are flagged on the release page until re-cut.
 
 ## 11. Accessibility, Performance, SEO (web projects only)
 
 Skip this section for non-web projects (CLI tools, Discord bots, libraries) with a one-line note.
 
 - [ ] **Lighthouse baseline** captured for the production URL. Defaults: Performance ≥ 80, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90. Tune per project; don't lower without a recorded reason.
+- [ ] **Lighthouse CI baseline enforced** (added in v3) — automated [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) run on every PR and on push to `main`, blocking on regression below the thresholds above. Results uploaded as a workflow artifact (or to a Lighthouse CI server) so trends are visible across PRs, not just per-run. Wire into `templates/.github/workflows/workflow-summary.yml` so failures surface in the PR comment alongside lint/test annotations.
+- [ ] **Performance budgets versioned in the repo** (added in v3) — `lighthouserc.json` (or `.lighthouserc.js`) at the repo root declaring resource-size budgets, timing budgets, and assertion thresholds. Budgets live in source so they're reviewed in PRs like any other config; CI-side thresholds alone drift silently when someone tunes them via the UI.
 - [ ] **Accessibility audit basics**: every interactive element has an accessible name (button text, `aria-label`, or `alt` attribute), focus order is logical, contrast ratio ≥ 4.5:1 for body text, no keyboard traps. PWAs additionally need to handle the back-button correctly when modals are open.
 - [ ] **Meta tags** present in `<head>`: `<title>`, `<meta name="description">`, `<meta name="viewport" content="width=device-width, initial-scale=1">`, charset, and Open Graph (`og:title`, `og:description`, `og:image`) for shareability.
 - [ ] **`sitemap.xml`** present at site root for any site with more than ~5 distinct pages, and is referenced from `robots.txt`.
@@ -154,20 +165,22 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 - [ ] **Conventional Commits enforced locally** via the `commit-msg` hook in `templates/.pre-commit-config.yaml` (CI re-checks the merge commit).
 - [ ] **Pre-commit installed** by contributors (`pre-commit install`) — documented in `CONTRIBUTING.md`.
 - [ ] **Test failures are blocking**: PR can't merge with red CI. Branch protection on `main` requires the CI workflow to pass.
+- [ ] **Branch-protection rules enforced on `main`** (added in v3) — every recommended rule from `templates/.github/GOVERNANCE.md` "Recommended branch-protection rules" is configured under Settings → Branches → Branch protection rules: required PR approvals (≥ 1) with stale-approval dismissal, required Code Owners review, required status checks (`actionlint`, `lychee`, `VERSION is semver`, `uses-line SHA-pinning lint`, `dependency-review`, project lint/test, CodeQL, Gitleaks), required conversation resolution, required signed commits, required linear history, no force-push, no deletions, **admin no-bypass**. Without admin no-bypass, the rules are advisory.
 - [ ] **Flaky tests are flagged with a label or skip**; chronic flakes get an issue instead of a `// TODO: fix flaky` comment that never gets addressed.
 
 ## 13. Standards Versioning
 
 - [ ] **`.standards-version` file at repo root** containing one line with the major version this repo follows (e.g. `2`). Read by `PROMPT.md` Step 0 to gate upgrade runs.
 - [ ] **Standards-version badge in `README.md`** above the fold:
-  `[![Standards](https://img.shields.io/badge/repo--standards-v2-informational)](https://github.com/Ranzlappen/repo-standards)`.
+  `[![Standards](https://img.shields.io/badge/repo--standards-v3-informational)](https://github.com/Ranzlappen/repo-standards)`.
 - [ ] **`Upgrade-History.md` wiki page** records the migration entry for the most recent upgrade (per section 9 — Wiki).
 - [ ] **`CHANGELOG.md` entry** dated and version-stamped for any change that introduces, removes, or alters a standards-version-relevant requirement (e.g. dropping support for an older Node version).
-- [ ] **Pinned dependency on the standards repo** is at a tag, not `main`. PROMPT.md fetches `VERSION` from `Ranzlappen/repo-standards/main` (always-current); but consumer-side references in CONTRIBUTING.md, badges, etc. point at `v2` (or a specific `v2.0.0`) so a future v3 doesn't silently break docs.
+- [ ] **Pinned dependency on the standards repo** is at a tag, not `main`. PROMPT.md fetches `VERSION` from `Ranzlappen/repo-standards/main` (always-current); but consumer-side references in CONTRIBUTING.md, badges, etc. point at `v3` (or a specific `v3.0.0`) so a future v4 doesn't silently break docs.
 - [ ] **No mixed-version state**: every reference in this repo to "repo-standards" cites the same major. Don't ship a v2 PROMPT result with a v1 README badge.
 - [ ] **GitHub Template repository considered.** If this repo is intended as a starting point for other repos (e.g. `repo-standards` itself, or any internal "starter-x" repo), the **`Settings → General → Template repository`** checkbox is enabled so consumers can use the green "Use this template" button instead of cloning + scrubbing history. For ordinary application repos, leave the checkbox off — they're not templates.
 - [ ] **Operating-mode and out-of-scope opt-out understood (v2.1).** Maintainers know the repo supports both the canonical 8-PR sequence and the single-PR alternative mode (`PROMPT.md` rules 13–14), and the `DISABLE_OUT_OF_SCOPE_ISSUES=true` repo variable is set if the team prefers to keep out-of-scope findings in PR descriptions only (default is auto-file a labeled issue).
 - [ ] **Plan-file hygiene observed (v2.1).** During any AI-driven upgrade pass, the plan file follows the **Plan Management & Clean State Rule** (`PROMPT.md` rule 15 / `CLAUDE.md.tmpl` "Plan Management & Clean State Rule"): plan files are pruned of completed work or replaced with fresh files, never bloated by appending.
+- [ ] **GitHub Discussions enabled if the repo collects long-form questions** (added in v3). Settings → Features → ☑ Discussions. Use Discussions for open-ended Q&A, ideas, and show-and-tell; reserve Issues for tracked work (bugs, features, chores). When a recurring Discussion thread becomes a how-to, graduate it to `README.md` / `CLAUDE.md` / `docs/` rather than letting it live forever in Discussions. Skippable for repos that don't need long-form Q&A — note the skip in the audit.
 
 ---
 
@@ -175,6 +188,7 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 
 A repo is "upgraded" when:
 
+0. Section 0 (Migration Planning) — Phase 0 deliverable produced and confirmed by the user before any batch landed.
 1. All applicable boxes in sections 1–4 are checked.
 2. Section 5 is addressed (refactor or justification).
 3. Section 6 is addressed if applicable (PWA inventory + verification, or noted as N/A with reason).

@@ -1,0 +1,51 @@
+# Dependency review on every PR to main.
+#
+# Fails the PR if a dependency change introduces a vulnerability above
+# `fail-on-severity` or violates the license policy. Comments a structured
+# diff summary on the PR for visibility.
+#
+# Consumes the GitHub Dependency Graph (Settings → Code security and
+# analysis → Dependency graph). Enable that toggle before this workflow
+# can produce useful output.
+#
+# Pair with `security-scan.yml` (CodeQL + gitleaks + Scorecard): this
+# workflow is the per-PR gate; security-scan.yml is the per-push /
+# scheduled deeper sweep.
+
+name: Dependency review
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  # Allow the action to comment the dependency diff on the PR.
+  pull-requests: write
+
+concurrency:
+  group: dependency-review-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-review:
+    name: Dependency review
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+
+      - name: Run dependency-review
+        uses: actions/dependency-review-action@da24556b548a50705dd671f47852072ea4c105d9  # v4
+        with:
+          # Block PRs that introduce high or critical CVEs in any new
+          # dependency. Tune downwards (`moderate`) for stricter projects;
+          # never relax above `high`.
+          fail-on-severity: high
+          # Comment the diff summary on the PR. `on-failure` keeps clean
+          # PRs uncluttered; flip to `always` for high-trust audit trails.
+          comment-summary-in-pr: on-failure
+          # Optional: license-allow-list, license-deny-list, scope (runtime
+          # vs development) all configurable here. Defaults are sensible
+          # for MIT-licensed projects.
