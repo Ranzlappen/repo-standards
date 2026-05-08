@@ -142,6 +142,8 @@ Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 
 Skip this section for non-web projects (CLI tools, Discord bots, libraries) with a one-line note.
 
 - [ ] **Lighthouse baseline** captured for the production URL. Defaults: Performance ≥ 80, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90. Tune per project; don't lower without a recorded reason.
+- [ ] **Lighthouse CI baseline enforced** (added in v3) — automated [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci) run on every PR and on push to `main`, blocking on regression below the thresholds above. Results uploaded as a workflow artifact (or to a Lighthouse CI server) so trends are visible across PRs, not just per-run. Wire into `templates/.github/workflows/workflow-summary.yml` so failures surface in the PR comment alongside lint/test annotations.
+- [ ] **Performance budgets versioned in the repo** (added in v3) — `lighthouserc.json` (or `.lighthouserc.js`) at the repo root declaring resource-size budgets, timing budgets, and assertion thresholds. Budgets live in source so they're reviewed in PRs like any other config; CI-side thresholds alone drift silently when someone tunes them via the UI.
 - [ ] **Accessibility audit basics**: every interactive element has an accessible name (button text, `aria-label`, or `alt` attribute), focus order is logical, contrast ratio ≥ 4.5:1 for body text, no keyboard traps. PWAs additionally need to handle the back-button correctly when modals are open.
 - [ ] **Meta tags** present in `<head>`: `<title>`, `<meta name="description">`, `<meta name="viewport" content="width=device-width, initial-scale=1">`, charset, and Open Graph (`og:title`, `og:description`, `og:image`) for shareability.
 - [ ] **`sitemap.xml`** present at site root for any site with more than ~5 distinct pages, and is referenced from `robots.txt`.
@@ -157,6 +159,7 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 - [ ] **Conventional Commits enforced locally** via the `commit-msg` hook in `templates/.pre-commit-config.yaml` (CI re-checks the merge commit).
 - [ ] **Pre-commit installed** by contributors (`pre-commit install`) — documented in `CONTRIBUTING.md`.
 - [ ] **Test failures are blocking**: PR can't merge with red CI. Branch protection on `main` requires the CI workflow to pass.
+- [ ] **Branch-protection rules enforced on `main`** (added in v3) — every recommended rule from `templates/.github/GOVERNANCE.md` "Recommended branch-protection rules" is configured under Settings → Branches → Branch protection rules: required PR approvals (≥ 1) with stale-approval dismissal, required Code Owners review, required status checks (`actionlint`, `lychee`, `VERSION is semver`, `uses-line SHA-pinning lint`, `dependency-review`, project lint/test, CodeQL, Gitleaks), required conversation resolution, required signed commits, required linear history, no force-push, no deletions, **admin no-bypass**. Without admin no-bypass, the rules are advisory.
 - [ ] **Flaky tests are flagged with a label or skip**; chronic flakes get an issue instead of a `// TODO: fix flaky` comment that never gets addressed.
 
 ## 13. Standards Versioning
@@ -171,6 +174,7 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 - [ ] **GitHub Template repository considered.** If this repo is intended as a starting point for other repos (e.g. `repo-standards` itself, or any internal "starter-x" repo), the **`Settings → General → Template repository`** checkbox is enabled so consumers can use the green "Use this template" button instead of cloning + scrubbing history. For ordinary application repos, leave the checkbox off — they're not templates.
 - [ ] **Operating-mode and out-of-scope opt-out understood (v2.1).** Maintainers know the repo supports both the canonical 8-PR sequence and the single-PR alternative mode (`PROMPT.md` rules 13–14), and the `DISABLE_OUT_OF_SCOPE_ISSUES=true` repo variable is set if the team prefers to keep out-of-scope findings in PR descriptions only (default is auto-file a labeled issue).
 - [ ] **Plan-file hygiene observed (v2.1).** During any AI-driven upgrade pass, the plan file follows the **Plan Management & Clean State Rule** (`PROMPT.md` rule 15 / `CLAUDE.md.tmpl` "Plan Management & Clean State Rule"): plan files are pruned of completed work or replaced with fresh files, never bloated by appending.
+- [ ] **GitHub Discussions enabled if the repo collects long-form questions** (added in v3). Settings → Features → ☑ Discussions. Use Discussions for open-ended Q&A, ideas, and show-and-tell; reserve Issues for tracked work (bugs, features, chores). When a recurring Discussion thread becomes a how-to, graduate it to `README.md` / `CLAUDE.md` / `docs/` rather than letting it live forever in Discussions. Skippable for repos that don't need long-form Q&A — note the skip in the audit.
 
 ---
 

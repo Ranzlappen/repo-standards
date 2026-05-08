@@ -81,6 +81,34 @@ A regression on any of the **live** primitives above is a security finding; rout
 - **Release cadence**: Driven by Conventional Commits via `release-please.yml` if enabled (see the workflow's header comment). For repos without release-please, releases are cut manually via `tag-release.yml` when a maintainer judges enough has accumulated.
 - **Security fixes** ship out-of-band on their own PR, fast-tracked through review. See [`SECURITY.md`](./SECURITY.md) for private disclosure.
 
+## Automated triage
+
+Triage scales with labels. The recommended baseline below is small on purpose — every label has to be applied by a human or a bot at some point, so 30 labels nobody applies are worse than 8 labels everyone does.
+
+**Recommended default labels** (adopt as-is unless a project has a strong reason to diverge):
+
+| Label | Meaning | Applied by |
+| --- | --- | --- |
+| `bug` | Something broken in shipped behavior. | Triager / template |
+| `feature` | New behavior request. | Triager / template |
+| `question` | Use Discussions instead — close + redirect. | Triager / template |
+| `dependencies` | Dependabot / dependency-review-related. | Dependabot, `dependency-review.yml` |
+| `security` | Routes through `SECURITY.md` private channel; never opens publicly. | Maintainer |
+| `triage` | New issue, not yet reviewed. | Default on new issues |
+| `from-claude` | Filed by Claude Code (rule 13). | `gh issue create --label` |
+| `out-of-scope` | Surfaced by an upgrade pass but unrelated; opt-out via `DISABLE_OUT_OF_SCOPE_ISSUES=true`. | `gh issue create --label` (rule 13) |
+| `good-first-issue` | Curated low-friction starter issue. | Maintainer |
+
+**Triage rhythm.**
+
+- **New issues land with `triage`.** Maintainers acknowledge within **7 days** — "acknowledge" means triage label removed, replaced by one of `bug` / `feature` / `question`, plus a one-line response explaining the call. Acknowledgement is not a promise to fix.
+- **`question` issues are redirected to Discussions** (when Discussions is enabled — see [`README.md`](../README.md) "GitHub Discussions"). Close the issue with a one-line link rather than answering inline; that keeps the issue tracker for tracked work.
+- **`from-claude` and `out-of-scope` issues are first-class.** They land via `gh issue create` from inside an upgrade pass per `PROMPT.md` rule 13. Treat them like any other triage queue item — they're already structured (title, body, label) so the human cost is minutes per issue.
+- **`security` issues never open publicly.** If one slips in, close immediately, redirect the reporter to the private channels in [`SECURITY.md`](./SECURITY.md), and treat the disclosure as the live one.
+- **Stale handling is opt-in.** `templates/.github/workflows/stale.yml` ships gated on `STALE_ENABLED=true`; defaults are issues 60d → 7d, PRs 90d → 14d. Exempt labels include `pinned`, `security`, `keep-open`, `dependencies` (PRs only), milestoned, and assigned.
+
+**Workflow-summary integration (added in v3).** When `templates/.github/workflows/workflow-summary.yml` is wired into the per-repo CI workflow, its sticky PR comment surfaces lint/test annotations alongside the diff — the comment is the **single source of CI truth** for a PR. Triagers can read the sticky comment instead of clicking through to the workflow run; AI agents can parse the comment's committed-shape Markdown without ad-hoc heuristics.
+
 ## Conflict resolution
 
 Code-of-conduct concerns route to the contact in [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md). Repo-process concerns (this document, branch protection, lifecycle) route to the maintainer list in [`CODEOWNERS`](./CODEOWNERS) via a private email or issue tagged `governance`.

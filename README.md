@@ -28,7 +28,9 @@ This repo answers two questions:
 | [`.github/CODEOWNERS`](./.github/CODEOWNERS) | Code-owner mapping for review routing. |
 | [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) | The audit Claude Code runs against any repo. Pass/fail items grouped by category. |
 | [`REFACTORING_GUIDE.md`](./REFACTORING_GUIDE.md) | How to split big single-file projects into modules without changing behavior. |
-| [`PROMPT.md`](./PROMPT.md) | The standardized Claude Code prompt. One prompt, applied repo by repo. |
+| [`PROMPT.md`](./PROMPT.md) | The standardized Claude Code prompt — entry-point index pointing at the modular files under [`prompt/`](./prompt/). One prompt, applied repo by repo. |
+| [`prompt/`](./prompt/) | Modular source of the upgrade prompt: Step 0 (version check), the 15 ground rules, Step 1+2 (read & audit + canonical 8-PR sequence), Step 3 (PR description), Step 4 (Wiki seeding). |
+| [`docs/`](./docs/) | Long-form documentation home for *this* repo (ADRs, runbooks, migration guides). Distinct from [`templates/docs/`](./templates/docs/), which is the boilerplate downstream consumers copy. |
 | [`.github/workflows/`](./.github/workflows/) | This repo's own meta-CI: `self-validate.yml` lints docs/templates; `tag-release.yml` is a manual `workflow_dispatch` helper for publishing tags. |
 | [`templates/CLAUDE.md.tmpl`](./templates/CLAUDE.md.tmpl) | Skeleton CLAUDE.md based on the website repo's structure. |
 | [`templates/README.md.tmpl`](./templates/README.md.tmpl) | Skeleton README with the "Quick Reference" pattern. |
@@ -110,6 +112,10 @@ Install the action in each repo once. Then to upgrade a repo, open a new issue a
 In any repo, run `claude` (or open the Claude Code Android app and connect to a `claude remote-control` session on a machine you control), then paste [`PROMPT.md`](./PROMPT.md). Claude works locally and pushes a branch.
 
 The prompt is identical for both. Pick the flow that fits where you are.
+
+### GitHub Discussions
+
+For open-ended Q&A — "should I structure my repo this way?", "does rule 2 apply to my refactor?", "show-and-tell of a downstream upgrade pass" — use [GitHub Discussions](https://github.com/Ranzlappen/repo-standards/discussions) rather than opening an issue. Issues track tracked work (bugs, features, chores); Discussions hold the long-form conversation. Discussions can be enabled on any repo via Settings → Features → ☑ Discussions ([docs](https://docs.github.com/en/discussions/quickstart)).
 
 ## Repo upgrade order (recommended)
 
