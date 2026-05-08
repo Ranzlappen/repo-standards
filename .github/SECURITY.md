@@ -43,14 +43,21 @@ This repository ships **documentation, prompts, and template files** — no exec
 
 ## Supply-chain commitments
 
-The repo aspires to and tracks against the following supply-chain primitives. Where a primitive is "in flight" it is on the v3 → v3.x roadmap; where "live" it is enforced by CI on this branch.
+This repo tracks against the following supply-chain primitives. Status legend: **live** = enforced by CI on `main`; **in flight** = wired but waiting on an external trust setup or a future major; **aspirational** = on the long-term roadmap.
 
-- **SHA-pinning of every `uses:` line** — live (hard-failed by `validate-sha-pinning`).
-- **OpenSSF Scorecard ≥ 7.0** — in flight (Scorecard runs in `templates/.github/workflows/security-scan.yml`; root-level adoption tracked by the new badge added in v3).
-- **Dependency review on every PR to `main`** — added in v3 via `templates/.github/workflows/dependency-review.yml`; root-level adoption is best-effort because this repo has no runtime dependencies.
-- **Signed releases via [sigstore](https://www.sigstore.dev/) / cosign** — in flight; release-please artifacts will carry `.sig` files and a transparency-log entry once the publishing OIDC trust is configured. See `templates/.github/workflows/release-please.yml` header comments.
-- **SLSA build provenance** — aspirational target Level 3 for tagged releases. The `release-please.yml` template's GHCR publish path already emits provenance + SBOM; npm/PyPI publish paths use OIDC trusted publishing with `--provenance` where the registry supports it.
-- **Reproducible builds** — N/A for a docs/templates repo; downstream consumers' build pipelines are responsible for reproducibility.
+| Primitive | Status | Mechanism |
+| --- | --- | --- |
+| **SHA-pinning of every `uses:` line** | live | Hard-failed by [`validate-sha-pinning`](./workflows/self-validate.yml) — any 40-char-SHA mismatch exits 1 with `::error`. Major-version pins (`@v6`) and floating refs (`@main`) are rejected. |
+| **OpenSSF Scorecard score floor ≥ 7.0** | live | [Scorecard badge](https://securityscorecards.dev/viewer/?uri=github.com/Ranzlappen/repo-standards) on the README; `scorecard` job in `templates/.github/workflows/security-scan.yml` runs weekly + on `branch_protection_rule` changes + on push-to-main. SARIF lands in the Security tab. |
+| **Dependency review on every PR to `main`** | live | `templates/.github/workflows/dependency-review.yml` — fails on `high`-severity CVEs, comments diff summary on the PR. (Best-effort for this repo, which has no runtime deps; binding on every consumer.) |
+| **Workflow-property sidecar pairing** | live | Hard-failed by `validate-workflow-properties` — every workflow template ships a `*.properties.json` sidecar with `name` / `description` / `iconName` / `categories` / `filePatterns`; orphans are rejected in either direction. |
+| **CodeQL on every language present** | live (downstream) | `templates/.github/workflows/security-scan.yml` runs CodeQL on the matching language matrix on PR + push + weekly. |
+| **Gitleaks full-history secret scan** | live (downstream) | Same workflow, same triggers, separate job. |
+| **Signed releases via [sigstore](https://www.sigstore.dev/) / cosign** | in flight | Release-please artifacts will carry `.sig` files + transparency-log entries once the publishing OIDC trust is configured per registry. See `templates/.github/workflows/release-please.yml` header comments for the npm / PyPI / GHCR setup pages. |
+| **SLSA build provenance — target Level 3** | in flight | The `release-please.yml` GHCR publish path already emits provenance + SBOM; npm and PyPI publish paths use OIDC trusted publishing with `--provenance` where the registry supports it. Level-3 attestation lands when sigstore signing above is live. |
+| **Reproducible builds** | aspirational | N/A for a docs/templates repo; downstream consumers' build pipelines are responsible for reproducibility. |
+
+The Scorecard score is the single rolled-up health metric — a regression below 7.0 is a separate `security` PR, not folded into routine work. See [`templates/.github/GOVERNANCE.md`](../templates/.github/GOVERNANCE.md) "Supply-chain governance" for the score-floor and required-checks policy.
 
 ## Out of scope
 

@@ -51,6 +51,7 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 - [ ] If the repo has multiple sub-projects, CI uses **per-app jobs gated on path filters** (see `website/.github/workflows/ci.yml` for the pattern).
 - [ ] **A `security-scan.yml` workflow exists** with CodeQL + gitleaks, triggered on PRs, push-to-main, and a weekly schedule.
 - [ ] **Reusable workflow available** (`lint-and-test.yml`) for projects that want a single callable lint+test entry point.
+- [ ] **Workflow summary system available** (`workflow-summary.yml`, added in v3) — reusable workflow that produces a structured, AI-parsable Markdown summary (status, jobs table, warnings, errors, timings) emitted to `$GITHUB_STEP_SUMMARY` and optionally posted as a sticky PR comment keyed by an HTML-comment marker. Wire into long CI workflows for observability; the comment shape (headings, table columns, sort order) is committed-to so AI agents can parse it reliably.
 
 ## 4. Project structure
 
@@ -132,7 +133,9 @@ Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 
 - [ ] **Public client-side keys are documented** in `CLAUDE.md` under "Security & Secrets" if the project ships any (e.g. Firebase web config). Documentation explicitly says they're public-by-design and points at the server-side rule that secures the data.
 - [ ] **`.env` is `.gitignore`d**; `.env.example` is committed; documented variables list `<SECURITY_CONTACT_EMAIL>` rotation cadence.
 - [ ] **No secrets, API keys, or unredacted credentials in tracked files** (verified by gitleaks in the security-scan workflow on every PR + push to main + weekly schedule).
-- [ ] **OpenSSF Scorecard job present** in `security-scan.yml` (added in v2.1). Runs weekly + on `branch_protection_rule` changes + on push-to-main, publishes SARIF to the Security tab, and (with `publish_results: true`) makes the score badge available at `https://api.securityscorecards.dev/projects/github.com/<owner>/<repo>` for inclusion in `README.md`.
+- [ ] **OpenSSF Scorecard job present** in `security-scan.yml` (added in v2.1). Runs weekly + on `branch_protection_rule` changes + on push-to-main, publishes SARIF to the Security tab, and (with `publish_results: true`) makes the score badge available at `https://api.securityscorecards.dev/projects/github.com/<owner>/<repo>` for inclusion in `README.md`. **Score floor: 7.0** (regression below floor is a `security` PR per `templates/.github/GOVERNANCE.md` "Supply-chain governance").
+- [ ] **`dependency-review.yml` workflow present** for per-PR supply-chain gating (added in v3). Fails the PR on `high`-severity (or above) CVEs in dependency changes; comments the diff summary on the PR. Pair with `security-scan.yml` for the deeper weekly sweep — the two are complementary, not redundant. Required as a status check on `main` per `templates/.github/GOVERNANCE.md`.
+- [ ] **Releases signed with sigstore (cosign)** (added in v3). Tagged release artifacts carry a `.sig` and the signature verifies in the [Rekor transparency log](https://rekor.sigstore.dev/). OIDC trust setup per `release-please.yml` header comments (npm package settings, PyPI publishing account, or GHCR token scope) lands once before the first signed release. Unsigned releases are flagged on the release page until re-cut.
 
 ## 11. Accessibility, Performance, SEO (web projects only)
 

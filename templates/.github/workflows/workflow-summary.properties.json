@@ -1,0 +1,7 @@
+{
+  "name": "Workflow summary (reusable)",
+  "description": "Reusable workflow_call entry point that produces a structured, AI-parsable Markdown summary (status, jobs table, warnings, errors, timings) for a workflow run. Emits to $GITHUB_STEP_SUMMARY and optionally posts a sticky PR comment keyed by an HTML-comment marker.",
+  "iconName": "report",
+  "categories": ["Reusable", "Observability"],
+  "filePatterns": []
+}

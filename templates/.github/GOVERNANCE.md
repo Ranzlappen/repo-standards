@@ -62,6 +62,19 @@ Configure under **Settings → Branches → Branch protection rules → Add rule
 
 For tag patterns (`v*`), add a second rule that mirrors the above plus restricts who can push tags. `auto-tag.yml` and `tag-release.yml` only run from `main`, so tag pushes are still gated.
 
+## Supply-chain governance
+
+The repo's supply-chain primitives — SHA-pinning, Scorecard, dependency review, signed releases — are policy-bound, not best-effort. The matrix in [`SECURITY.md`](./SECURITY.md) "Supply-chain commitments" is the source of truth; this section is the maintainer-facing policy that pins the floor.
+
+- **OpenSSF Scorecard floor: 7.0.** A score below 7.0 (read from [securityscorecards.dev](https://securityscorecards.dev/) or the SARIF in the Security tab) is treated as a regression. Open a `security` PR to remediate within 30 days. If 30 days pass without a fix, record an explicit waiver in [`SECURITY.md`](./SECURITY.md) under the relevant primitive's row, with the reason and the next review date — never silently fall under floor.
+- **`dependency-review.yml` is required on every PR to `main`.** Branch protection's required-status-checks list includes the dependency-review job. A PR that introduces a `high`-or-above CVE blocks merge until the CVE is resolved upstream (preferred), pinned to a patched range (acceptable), or explicitly waived in the PR description with a CVE-ID and a justification (last resort).
+- **CodeQL is required on every language present in the repo.** Matrix in `templates/.github/workflows/security-scan.yml` matches the languages actually checked in. Adding a new language is a `security` PR that updates the matrix in the same commit as the first source file.
+- **Signed releases via sigstore / cosign.** Once the publishing OIDC trust is configured (npm package settings, PyPI publishing account, or GHCR token scope per `release-please.yml` header), every tagged release artifact carries a `.sig`. Releases without a signature are flagged on the release page and should be re-cut after the signing step lands.
+- **Dependabot's role.** Dependabot opens the PRs; `dependency-review.yml` gates them; a maintainer reviews and merges. Dependabot **does not** auto-merge in this repo (or in downstream repos using these templates by default) — auto-merge bypasses the human "is this minor pin actually safe" check.
+- **Waivers are public.** Any time a primitive is bypassed, the bypass lives in `SECURITY.md` with the reason and the review date. Private waivers create surprises; public waivers create accountability.
+
+A regression on any of the **live** primitives above is a security finding; route it through [`SECURITY.md`](./SECURITY.md)'s private-reporting channel rather than opening a public issue.
+
 ## Triage and release rhythm
 
 - **Triage cadence**: Maintainers aim to acknowledge new issues within 7 days. "Acknowledge" means triage label + a one-line response, not a fix.

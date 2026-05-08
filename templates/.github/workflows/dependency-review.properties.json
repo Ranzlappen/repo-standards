@@ -1,0 +1,7 @@
+{
+  "name": "Dependency review",
+  "description": "Per-PR supply-chain gate. Fails the PR if a dependency change introduces a high-severity (or above) CVE. Comments the diff summary on the PR. Consumes the GitHub Dependency Graph.",
+  "iconName": "package",
+  "categories": ["Security", "Supply chain"],
+  "filePatterns": ["package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "requirements*.txt", "pyproject.toml", "poetry.lock", "Pipfile.lock", "go.mod", "go.sum", "Gemfile", "Gemfile.lock", "Cargo.toml", "Cargo.lock"]
+}

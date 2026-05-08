@@ -58,6 +58,70 @@ The `scorecard` job in [`security-scan.yml`](../.github/workflows/security-scan.
 
 Replace `<OWNER>/<REPO>`. The first run after enabling Scorecard takes ~10 minutes to publish before the badge resolves.
 
+## Workflow summary system
+
+`templates/.github/workflows/workflow-summary.yml` is a reusable workflow that produces a structured, AI-parsable Markdown summary of a CI run — status, per-job durations, warnings, errors, annotations — emitted to `$GITHUB_STEP_SUMMARY` and optionally posted as a sticky PR comment keyed by an HTML-comment marker (so repeat runs update the same comment instead of stacking).
+
+The Markdown shape is committed to: identical headings, identical table columns, sorted annotations. Humans skim it; AI agents (Claude reviewing CI failures, Copilot suggesting fixes, internal triage bots) parse it without ad-hoc heuristics.
+
+**Wire into a per-repo workflow:**
+
+```yaml
+name: CI
+on: [pull_request]
+
+jobs:
+  lint-test:
+    uses: ./.github/workflows/lint-and-test.yml
+    with:
+      language: node
+
+  summarize:
+    needs: [lint-test]
+    if: ${{ always() }}
+    uses: ./.github/workflows/workflow-summary.yml
+    with:
+      workflow-name: CI
+      post-pr-comment: true
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+      checks: read
+```
+
+`if: ${{ always() }}` is critical — the summary should fire even when the upstream jobs fail, otherwise the PR comment never updates with the failure detail. The required `permissions:` block declares `pull-requests: write` (for the comment) and `checks: read` (to fetch annotations); leave them off and the workflow short-circuits the relevant step.
+
+**Output shape:**
+
+```markdown
+## CI — run #42
+
+**Status:** ❌ failure
+**Total duration:** 3m 12s
+**Jobs:** 2
+**Warnings:** 1
+**Errors:** 3
+
+### Jobs
+
+| Job | Status | Duration | Annotations |
+| --- | --- | --- | --- |
+| lint-test | ❌ failure | 1m 47s | 4 |
+| summarize | ✅ success | 0s | 0 |
+
+### Warnings (1)
+
+- `src/foo.ts:12` — unused import _(in job: lint-test)_
+
+### Errors (3)
+
+- `src/bar.ts:7` — missing semicolon _(in job: lint-test)_
+- ...
+```
+
+The trailing `<sub>` tag in the actual output names the workflow that generated the summary, so a stale or hand-edited comment is distinguishable from an automated one.
+
 ## When to graduate from option 1 → 2 → 3
 
 - Stay on **plain Markdown** while there are <10 doc files and no search.
