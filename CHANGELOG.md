@@ -6,6 +6,11 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+### Added
+
+- `templates/.github/PULL_REQUEST_TEMPLATE.md` "Behavior-preservation evidence" sub-block — five tickable buckets (UI / URLs / Storage / Deployment shape / External dependencies) for refactoring PRs to record before/after evidence per `PROMPT.md` rule 2. Section is opt-out via the HTML comment for non-refactor PRs.
+- `UPGRADE_CHECKLIST.md` Section 4 — new bullet auditing that any refactor PR opened during an upgrade pass enumerates rule-2 evidence in its Test plan. PWA repos satisfy the Storage and External buckets via Section 6 below.
+
 ### Fixed
 
 - `PROMPT.md` rule 1 — replaced the legacy `chore/upgrade-standards` single-branch instruction with a reference to Step 2's canonical 8-PR sequence, resolving the internal contradiction with rule 3 and Step 2.
@@ -15,6 +20,9 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 - `PROMPT.md` Step 2 hard-vs-practical ordering — unpacked the dense one-liner (`1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8`) into a bulleted dependency list and a single-row practical-execution sequence. Same content, easier to scan.
 - `README.md` "Repo upgrade order (recommended)" — opened with a reference to PROMPT.md Step 2's canonical 8-PR sequence; trailing sentence now says "first downstream upgrade" to acknowledge the standards repo itself was the first v2 application.
+- `PROMPT.md` rule 2 — strengthened the "behavior preservation" rule from a one-line statement into five enumerated observable-behavior buckets (UI, URLs, Storage, Deployment shape, External dependencies) with burden-of-proof on the refactor and an explicit fallback to "Refactoring opportunities" when proof isn't possible. Cross-links the **PWA Refactor Addendum** in `REFACTORING_GUIDE.md` as the PWA evidence path.
+- `REFACTORING_GUIDE.md` — opening note in the PWA Refactor Addendum names `pwa-inventory.md` (Step 1) as the rule-2 evidence artifact for PWA refactors and tells non-PWA refactors to enumerate touched buckets directly in PR 4's Test plan.
+- `PROMPT.md` rule 11 — split into (a) drift-detection (the existing CLAUDE.md.tmpl block) and (b) mechanical verification with five enumerated checks: files exist, YAML/JSON parses, links resolve, line-count delta matches the plan, no template placeholders remain in tracked files outside `templates/`. Output destination specified. Resolves the prior incoherence between rule 9's parenthetical, rule 11's hand-wave, and the template's drift block.
 
 ## [2.0.0] — 2026-05-08
 
