@@ -1,0 +1,78 @@
+# Security scans: CodeQL static analysis + gitleaks secret scan.
+#
+# Runs on:
+#   - Every PR (catch issues before merge).
+#   - Every push to main (catch issues that bypassed PR review).
+#   - Weekly schedule (catch issues from newly-disclosed CVEs).
+#
+# Tune `language` matrix below to match the repo's actual languages.
+# CodeQL supports: c-cpp, csharp, go, java-kotlin, javascript-typescript,
+# python, ruby, swift. Mention every one your repo uses.
+
+name: Security scan
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Weekly Mondays 06:00 UTC. Adjust to a low-traffic time for the project.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Required by CodeQL to upload SARIF results to the Security tab.
+  security-events: write
+
+concurrency:
+  # PR runs cancel in progress; main and schedule runs queue to avoid races.
+  group: security-scan-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # Replace this list with the languages this repo actually contains.
+        language: ['javascript-typescript']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@52485aec7be33610227643b0fe83936b8b5f061a  # v3
+        with:
+          languages: ${{ matrix.language }}
+          # Use the security-extended query suite for additional rules.
+          # Drop to 'security-and-quality' or remove to use defaults.
+          queries: security-extended
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@52485aec7be33610227643b0fe83936b8b5f061a  # v3
+        with:
+          category: '/language:${{ matrix.language }}'
+
+  gitleaks:
+    name: Gitleaks secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+        with:
+          # Full history so gitleaks can scan past commits, not just the diff.
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc  # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional license key for organisation-tier features. Leave unset
+          # for personal repos and the action runs in free mode.
+          # GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}

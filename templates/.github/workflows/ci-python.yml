@@ -21,31 +21,46 @@ concurrency:
   group: ci-${{ github.head_ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6
         with:
           python-version: '3.12'
           cache: 'pip'
+          # Cache key includes the dev-requirements file so ruff/pytest
+          # versions are pinned and re-used across runs.
+          cache-dependency-path: |
+            requirements*.txt
+            pyproject.toml
 
-      - name: Install dependencies
+      - name: Install dependencies (incl. lint/test tools)
+        # Putting ruff/pytest in requirements-dev.txt (or [project.optional-
+        # dependencies].dev in pyproject.toml) means they're installed once
+        # and cached. Avoid the previous `pip install ruff` per-step which
+        # was uncached and unpinned.
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          if [ -f requirements-dev.txt ]; then
+            pip install -r requirements-dev.txt
+          else
+            # Fallback: install pinned versions if the project hasn't
+            # adopted requirements-dev.txt yet.
+            pip install 'ruff>=0.6,<1.0' 'pytest>=8.0,<9.0'
+          fi
 
       - name: Lint with ruff
-        run: |
-          pip install ruff
-          ruff check .
+        run: ruff check .
 
       - name: Test with pytest
-        run: |
-          pip install pytest
-          pytest -q
+        run: pytest -q

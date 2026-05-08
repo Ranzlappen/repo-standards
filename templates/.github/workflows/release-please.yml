@@ -1,0 +1,61 @@
+# Release Please — automated release PRs based on Conventional Commits.
+#
+# This workflow watches main, parses commit messages since the last release,
+# determines the next version (major / minor / patch from feat / fix /
+# BREAKING CHANGE), and either:
+#   - Opens / updates a "release-please" PR with the new CHANGELOG.md entry
+#     and version bumps, OR
+#   - When that PR is merged, creates the GitHub Release and tag.
+#
+# Reference: https://github.com/googleapis/release-please-action
+#
+# DISABLED BY DEFAULT. To enable in a downstream repo:
+#   1. Decide whether release-please owns versioning. If you already cut
+#      releases manually via tag-release.yml or auto-tag.yml, pick ONE
+#      tool — running both fights over CHANGELOG.md and tags.
+#   2. Choose a release-type that matches the project shape (see below).
+#   3. Add a `release-please-config.json` and `.release-please-manifest.json`
+#      at repo root (release-please generates initial templates on first
+#      run if they're missing).
+#   4. Enable the gate by creating a repository variable named
+#      `RELEASE_PLEASE_ENABLED` set to `true` (Settings → Secrets and
+#      variables → Actions → Variables tab → New repository variable).
+#      Until that variable is set, the job below short-circuits.
+
+name: Release Please
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Gated on a repository variable so the workflow ships in a
+    # short-circuit state. Set vars.RELEASE_PLEASE_ENABLED to "true" in the
+    # repo's Actions Variables to activate.
+    if: ${{ vars.RELEASE_PLEASE_ENABLED == 'true' }}
+    steps:
+      - name: Run release-please
+        uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5  # v4
+        with:
+          # Common release-types:
+          #   simple   — generic; updates CHANGELOG.md and a version file.
+          #   node     — bumps package.json + lockfile.
+          #   python   — bumps pyproject.toml or __init__.py.
+          #   go       — module-aware Go release.
+          #   java     — Maven / Gradle.
+          # Pick what fits; "simple" is a safe default if unsure.
+          release-type: simple
+          # Default branch to release from.
+          target-branch: main

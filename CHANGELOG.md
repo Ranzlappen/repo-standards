@@ -6,6 +6,29 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+### Added — PR 4: CI hardening
+
+- `templates/.github/workflows/lint-and-test.yml` — reusable `workflow_call` workflow with `language` input (node | python | static-html | mixed). Single entry point for lint+test across stacks.
+- `templates/.github/workflows/security-scan.yml` — CodeQL static analysis (matrix on language, security-extended query suite) + Gitleaks full-history secret scan. Triggers on PR, push to main, and weekly Monday 06:00 UTC schedule.
+- `templates/.github/workflows/release-please.yml` — Conventional-Commits-driven release-please integration. Disabled by default (`if: false`); maintainer enables explicitly.
+
+### Changed — PR 4: existing workflows hardened
+
+Every existing workflow now declares a least-privilege `permissions:` block, has every `uses:` line pinned to a 40-char commit SHA (with major-version trailing comment), and sets `timeout-minutes` on each job. Hardened workflows:
+
+- `templates/.github/workflows/ci-node.yml` (timeout 15).
+- `templates/.github/workflows/ci-python.yml` (timeout 15; lint/test tools now cached via `requirements-dev.txt`, no more inline `pip install`).
+- `templates/.github/workflows/ci-static-html.yml` (timeout 10).
+- `templates/.github/workflows/ci-android.yml` (timeout 30).
+- `templates/.github/workflows/pages-deploy.yml` (timeout 15; permissions already correct, only SHA-pinning + timeout added).
+- `.github/workflows/self-validate.yml` — SHA-pinned all `uses:` lines, **flipped the SHA-pinning lint job from soft warn to hard fail** (any non-SHA pin is now an `::error` and the job exits 1).
+- `.github/workflows/tag-release.yml` — SHA-pinned `actions/checkout`.
+- `.github/workflows/auto-tag.yml` — SHA-pinned `actions/checkout`.
+
+### Changed — PR 4: checklist
+
+- `UPGRADE_CHECKLIST.md` Section 3 (CI / GitHub Actions) tightened with the v2 requirements: workflow-scope `permissions:`, 40-char SHA-pin + trailing major-version comment, `timeout-minutes` per job (with default-by-stack values), pinned+cached lint/test tools, mandatory `security-scan.yml`, and reusable-workflow availability.
+
 ### Added — PR 3: wiki templates and Wiki seeding phase
 
 - `templates/wiki/Home.md` — landing page with task-oriented "where to look" table.
