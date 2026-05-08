@@ -188,6 +188,21 @@ pushes to the same branch and re-triggers integrity workflows; mark
 ready-for-review only at completion. Per-change ritual (plain-English plan →
 edit → self-check → summary) still applies to every commit.
 
+## Plan Management & Clean State Rule
+
+**Plan Management & Clean State Rule (critical safety net).** When the
+user asks you to create, update, or refresh a plan (or when you enter
+plan mode multiple times in a long session):
+
+* Always start a completely fresh plan file, OR
+* Actively delete / remove / mark as completed all sections that have
+  already been shipped and merged.
+* Never append new sections to an old plan file that already contains
+  finished work.
+* Keep the plan file concise and focused only on remaining work.
+
+This prevents plan bloat and redundant entries in long Claude sessions.
+
 ## Post-task self-check
 
 After every turn that changes code, scan for things that should be codified
