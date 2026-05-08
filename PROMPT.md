@@ -6,10 +6,13 @@ The same prompt works in both flows.
 
 ## Modular structure
 
-The actual rules, sequences, and step-by-step content live as five focused files under [`prompt/`](./prompt/). `PROMPT.md` (this file) is the entry-point index — every cross-reference in `README.md`, `UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, and `templates/CLAUDE.md.tmpl` cites "`PROMPT.md` rule N" or "`PROMPT.md` Step N", and those references land here and click through to the modular file.
+The actual rules, sequences, and step-by-step content live as six focused files under [`prompt/`](./prompt/). `PROMPT.md` (this file) is the entry-point index — every cross-reference in `README.md`, `UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, and `templates/CLAUDE.md.tmpl` cites "`PROMPT.md` rule N" or "`PROMPT.md` Step N" (or "`PROMPT.md` Phase 0"), and those references land here and click through to the modular file.
+
+The numbered files (`00`–`04`) are the canonical Step sequence. The unnumbered [`prompt/migration-planning.md`](./prompt/migration-planning.md) is **Phase 0** — the strategic-planning layer that runs *before* Step 0 and produces the tailored migration roadmap the rest of the flow executes.
 
 | File | What's in it |
 | --- | --- |
+| [`prompt/migration-planning.md`](./prompt/migration-planning.md) | **Phase 0** — produce the tailored migration roadmap (repo profile + must/should/could/skip scoring + batch plan + AI-budget guardrails + Dependabot audit) before the version check. |
 | [`prompt/00-version-check.md`](./prompt/00-version-check.md) | **Step 0** — refuse on major mismatch; the gate that keeps v3 rules off a v2 repo and vice versa. |
 | [`prompt/01-ground-rules.md`](./prompt/01-ground-rules.md) | The **15 non-negotiable rules**: branching, behavior preservation, phased PRs, tiny commits, post-task self-check, plan-file hygiene, etc. |
 | [`prompt/02-canonical-pr-sequence.md`](./prompt/02-canonical-pr-sequence.md) | **Step 1 + Step 2** — read & audit, then plan against the canonical 8-PR sequence with hard ordering and practical execution. |
@@ -30,6 +33,7 @@ Before doing anything else, fetch and read these files from that repo:
   - REFACTORING_GUIDE.md (includes the mandatory PWA Refactor Addendum)
   - templates/CLAUDE.md.tmpl
   - templates/README.md.tmpl
+  - prompt/migration-planning.md
   - prompt/00-version-check.md
   - prompt/01-ground-rules.md
   - prompt/02-canonical-pr-sequence.md
@@ -39,7 +43,12 @@ Before doing anything else, fetch and read these files from that repo:
 Then audit THIS repository against UPGRADE_CHECKLIST.md and produce one or more
 pull requests that bring it into compliance.
 
-Follow prompt/00-version-check.md first. On a major mismatch, refuse and
+Run Phase 0 first per prompt/migration-planning.md — produce the repo profile,
+the must/should/could/skip scoring of UPGRADE_CHECKLIST.md, the tailored batch
+roadmap with AI-budget guardrails, and the Dependabot mitigation status. WAIT
+for user confirmation of the Phase 0 deliverable before invoking Step 0.
+
+Then follow prompt/00-version-check.md. On a major mismatch, refuse and
 tell the user.
 
 Then follow prompt/01-ground-rules.md (the 15 non-negotiable rules — they
@@ -61,7 +70,7 @@ audit reveals something that should be added to UPGRADE_CHECKLIST.md or
 the templates themselves, mention that too — it's a separate PR against
 the standards repo.
 
-Begin with Step 0 in prompt/00-version-check.md.
+Begin with Phase 0 in prompt/migration-planning.md.
 ```
 
 ---

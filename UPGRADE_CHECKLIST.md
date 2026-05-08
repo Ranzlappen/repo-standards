@@ -8,6 +8,12 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 
 > **Standards version.** This checklist applies to the version of `repo-standards` recorded in [`VERSION`](./VERSION) at the root of this repo. Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching git tag.
 
+## 0. Migration Planning (Phase 0)
+
+**Phase 0 runs before Step 0.** It produces the tailored, resumable batch roadmap that the rest of the upgrade pass executes. The single audit bullet below verifies the artifact was produced — its absence means the upgrade ran ad-hoc and the rest of this checklist's pass/fail is unreliable.
+
+- [ ] **Phase 0 migration-planning artifact produced** before any other batch landed (per [`PROMPT.md`](./PROMPT.md) Phase 0 / [`prompt/migration-planning.md`](./prompt/migration-planning.md)). Includes: repo profile (stack, project type, size bucket, complexity signals, owner profile), must/should/could/skip scoring table covering every line in this checklist, prioritized batch roadmap respecting the canonical 8-PR sequence's hard ordering, AI / token / session / fair-use guardrails surfaced to the user, and a Dependabot PR-spam-mitigation audit (compliant, or `chore/dependabot-tighten` batch slotted into the roadmap).
+
 ## 1. Documentation
 
 - [ ] **`README.md` exists** at repo root, follows the [README template](./templates/README.md.tmpl).
@@ -182,6 +188,7 @@ Skip this section for non-web projects (CLI tools, Discord bots, libraries) with
 
 A repo is "upgraded" when:
 
+0. Section 0 (Migration Planning) — Phase 0 deliverable produced and confirmed by the user before any batch landed.
 1. All applicable boxes in sections 1–4 are checked.
 2. Section 5 is addressed (refactor or justification).
 3. Section 6 is addressed if applicable (PWA inventory + verification, or noted as N/A with reason).
