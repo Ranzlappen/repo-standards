@@ -54,6 +54,15 @@ What v2 adds on top of v1, in five sentences:
 
 The full canonical PR sequence to upgrade a repo from v1 to v2 lives in [`PROMPT.md`](./PROMPT.md) Step 2; the matching audit lives in [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) sections 1–13.
 
+## Next-level features (v2.1)
+
+v2.1 is a polish release. What it adds on top of v2.0:
+
+- **Rule-2 evidence chain.** PROMPT.md rule 2 ("behavior preservation") now enumerates five observable-behavior buckets — UI, URLs, Storage, Deployment shape, External dependencies — and puts the burden of proof on the refactor. REFACTORING_GUIDE.md names `pwa-inventory.md` as the rule-2 evidence artifact for PWA refactors; the shared PR template gains a tickable **Behavior-preservation evidence** sub-block for non-PWA refactors; UPGRADE_CHECKLIST.md Section 4 audits that any refactor PR opened during an upgrade pass carried that evidence.
+- **Self-check canonicalized.** PROMPT.md rule 11 splits the post-task self-check into (a) drift-detection (the existing CLAUDE.md.tmpl block) and (b) mechanical verification with five enumerated checks: files exist, YAML/JSON parses, links resolve, line-count delta matches the plan, no template placeholders remain in tracked files outside `templates/`. Resolves the prior ambiguity between rule 9's parenthetical, rule 11's hand-wave, and the template's drift block.
+
+The full v2.1 change list lives in [`CHANGELOG.md`](./CHANGELOG.md) under `[2.1.0] — 2026-05-08`.
+
 ## How to use it (phone-friendly)
 
 **Option A — Claude Code GitHub Action (recommended for mobile).**
