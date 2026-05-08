@@ -99,6 +99,25 @@ Each repo upgrade follows the canonical 8-PR sequence in [`PROMPT.md`](./PROMPT.
 
 After the first downstream upgrade, expect to tweak the templates here based on what you learn. That's the point of having the standards in their own repo: change once, re-run.
 
+## Use as a GitHub Template repository
+
+This repo is structured as a **GitHub Template repository** — a one-click starter for new repos. Once enabled (`Settings → General → Template repository → ☑ Template repository`), the repo page gains a green **"Use this template"** button alongside `Code`. Clicking it creates a new repository pre-populated with this repo's tracked files but with a fresh git history (no commit log carried over).
+
+**When to use it:** spinning up a brand-new project that should ship with the v2.1 baseline (community files, workflow templates, dependabot config, pre-commit hooks, governance, AI-tooling sidecars, etc.) on day one — instead of running [`PROMPT.md`](./PROMPT.md) against an empty repo and waiting for the 8-PR sequence to complete.
+
+**When to keep using `PROMPT.md` instead:** for **existing** repos. The template flow is a clean-slate clone; the upgrade flow is for repos with code, history, and behavior that must be preserved (per [`PROMPT.md`](./PROMPT.md) rule 2).
+
+**What downstream consumers do after "Use this template":**
+
+1. Rename `templates/CLAUDE.md.tmpl` → `CLAUDE.md` at the repo root, fill in the placeholders.
+2. Rename `templates/README.md.tmpl` → `README.md` at the repo root, fill in the placeholders.
+3. Move workflow templates from `templates/.github/workflows/` to `.github/workflows/` and delete the ones that don't apply.
+4. Move community files from `templates/.github/` to `.github/`.
+5. Run `pre-commit install` once locally (if pre-commit is part of the chosen toolchain).
+6. Open the first PR — `self-validate.yml` should be green out of the gate.
+
+The `templates/` folder is intentionally left in the new repo as a reference; delete it once the consumer no longer needs the originals.
+
 ## License
 
 MIT.
