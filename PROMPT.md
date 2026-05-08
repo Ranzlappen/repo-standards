@@ -180,8 +180,13 @@ after PR N merges.
 | 7 | `chore/v2-dependabot-tighten` | `dependabot.yml` v2 expectations: limits, conventional-commit prefixes, labels, npm/pip dev-vs-prod split. |
 | 8 | `chore/v2-readme-and-tag` | Root README "Next-level features (v2)" + standards-version badge; bump VERSION to `2.0.0`; cut CHANGELOG; tag `v2.0.0` and `v2`. |
 
-**Hard ordering**: 1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8.
-**Practical execution**: 1, 2, 3, 4, 7, 5, 6, 8.
+**Hard ordering** (what must come before what):
+- PR 1 first.
+- PRs 2, 3, and 7 can run in parallel after PR 1.
+- PR 4 needs PR 2 done first.
+- Then PR 5 → PR 6 → PR 8, strictly sequential.
+
+**Practical execution** (one PR at a time): PR 1 → 2 → 3 → 4 → 7 → 5 → 6 → 8.
 
 Skip any PR whose scope is empty for this repo (e.g. no PWA code → PR 4's
 PWA-relevant subsections drop out; no Python code → ruff/pytest configs
