@@ -8,23 +8,47 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [2.1.0] — 2026-05-08
 
+The complete v2.1 polish cut. Two waves: the original "rule-2 evidence
+chain + rule-11 split" pass that landed first (now grouped inside this
+entry) and the v2.1 complete final polish that added nine new feature
+areas (Phases A–K). Consumer repos pin to `v2.1` (or a specific
+`v2.1.0`) by referencing the matching git tag.
+
 ### Added
 
-- `templates/.github/PULL_REQUEST_TEMPLATE.md` "Behavior-preservation evidence" sub-block — five tickable buckets (UI / URLs / Storage / Deployment shape / External dependencies) for refactoring PRs to record before/after evidence per `PROMPT.md` rule 2. Section is opt-out via the HTML comment for non-refactor PRs.
-- `UPGRADE_CHECKLIST.md` Section 4 — new bullet auditing that any refactor PR opened during an upgrade pass enumerates rule-2 evidence in its Test plan. PWA repos satisfy the Storage and External buckets via Section 6 below.
-
-### Fixed
-
-- `PROMPT.md` rule 1 — replaced the legacy `chore/upgrade-standards` single-branch instruction with a reference to Step 2's canonical 8-PR sequence, resolving the internal contradiction with rule 3 and Step 2.
-- `PROMPT.md` rule 3 — replaced the v1-era 4-PR list (Docs / Hygiene / CI / Refactor) with a reference to Step 2's canonical 8-PR sequence, so phased-PR guidance lives in exactly one place.
+- `templates/.github/GOVERNANCE.md` — sustainable solo-or-small-team OSS governance template covering descriptive (not hierarchical) roles, lazy-consensus decision-making with a 72h window + 7-day tiebreaker, contribution lifecycle, and **recommended branch-protection rules** with the exact GitHub UI checkboxes that match v2.0's required status checks. Cross-linked from `templates/.github/CONTRIBUTING.md` and root `README.md`. (Phase C)
+- `templates/.cursorrules` — Cursor IDE pointer file that defers to `CLAUDE.md` as architecture source of truth, surfaces the rule-2 non-negotiable triple, codifies Conventional Commits + tiny-commit rhythm, and forward-references the AI Team Playbook. (Phase D)
+- `templates/ai/AI_TEAM_PLAYBOOK.md` — multi-AI coordination doc (Claude Code / Cursor / GitHub Copilot / Codex) with source-of-truth hierarchy, per-tool scope table, universal conventions, conflict-resolution defaults, and per-tool ignore-file mechanisms. (Phase D)
+- `templates/.github/workflows/release-please.yml` — three opt-in post-release publish jobs gated on per-target repo variables: `PUBLISH_NPM_ENABLED` (npm OIDC trusted publishing with `--provenance`), `PUBLISH_PYPI_ENABLED` (PyPI OIDC trusted publishing), `PUBLISH_GHCR_ENABLED` (multi-arch container push to ghcr.io with provenance + SBOM). Each job conditional on (a) its own enable variable AND (b) release-please actually creating a release this run. Existing `RELEASE_PLEASE_ENABLED` gate kept on the upstream job. (Phase B)
+- `templates/.github/workflows/security-scan.yml` — new `scorecard` job using `ossf/scorecard-action`. Triggers on weekly schedule, push-to-main, `branch_protection_rule` events, and manual dispatch (skipped on PRs to avoid noise). Publishes results to securityscorecards.dev and uploads SARIF to the Security tab. Workflow-scope event also gains `branch_protection_rule:` so the score reflects the live config. (Phase F)
+- `templates/.github/workflows/stale.yml` — opt-in housekeeping workflow (gated on `STALE_ENABLED=true`). Defaults: issues 60d → 7d, PRs 90d → 14d. Exempts pinned, security, keep-open, dependencies (PRs only), milestoned, and assigned items. 100 ops/run cap, oldest-first. (Phase H)
+- `templates/.github/workflows/*.properties.json` — companion metadata sidecar for **every** workflow template (9 files: ci-android, ci-node, ci-python, ci-static-html, lint-and-test, pages-deploy, release-please, security-scan, stale). Each carries `name`, `description`, `iconName`, `categories`, `filePatterns` — same schema as github/starter-workflows so internal catalogs and AI agents pick them up. (Phase E)
+- `.github/workflows/self-validate.yml` — new `validate-workflow-properties` job hard-fails if any workflow lacks its `*.properties.json` sidecar (or vice versa, or if the sidecar is malformed JSON). Both directions enforced with `::error` annotations. (Phase E)
+- `templates/.github/PULL_REQUEST_TEMPLATE.md` "Behavior-preservation evidence" sub-block — five tickable buckets (UI / URLs / Storage / Deployment shape / External dependencies) for refactoring PRs to record before/after evidence per `PROMPT.md` rule 2. Section is opt-out via the HTML comment for non-refactor PRs. (Original v2.1 wave)
+- `UPGRADE_CHECKLIST.md` Section 4 — new bullet auditing that any refactor PR opened during an upgrade pass enumerates rule-2 evidence in its Test plan. PWA repos satisfy the Storage and External buckets via Section 6. (Original v2.1 wave)
+- `UPGRADE_CHECKLIST.md` Section 4 — new bullet auditing the "Repo-specific risks / edge-cases" subsection introduced by rule 2's non-negotiable repo-tailoring clause. (Phase A)
+- `UPGRADE_CHECKLIST.md` Section 10 — new bullet auditing the OpenSSF Scorecard job and badge URL pattern. (Phase F)
+- `UPGRADE_CHECKLIST.md` Section 13 — new bullets auditing (a) the GitHub Template repository feature, (b) operating-mode duality (canonical 8-PR sequence vs. single-PR alternative), and (c) the `DISABLE_OUT_OF_SCOPE_ISSUES=true` opt-out. (Phases G, K)
+- `README.md` (root) — "Release & publish automation matrix" subsection (4-row table mapping triggers × repo variables × actions); "Use as a GitHub Template repository" subsection (when to use it, when to keep `PROMPT.md`, 6-step consumer onboarding); "Community standards" subsection naming the GitHub Community Guidelines + Acceptable Use Policies + Contributor Covenant 2.1 as binding on contributions. (Phases B, G, I)
+- `templates/docs/README.md` — "Release & publish automation" subsection mirroring the root README matrix; "OpenSSF Scorecard badge" subsection with copy-pasteable markdown snippet. (Phases B, F)
+- `templates/CLAUDE.md.tmpl` — new top-level sections "Behavior preservation (non-negotiable)", "AI readiness", "Out-of-scope / Unrelated Findings (opt-out)", and "Alternative Operating Mode: Single Feature Branch / Single PR". Existing Conventional Commits + Testing blocks tightened to keep template within the ~200-line target. (Phases A, D, K)
+- `templates/README.md.tmpl` — new subsections "Operating modes", "AI tooling", "Behavior preservation (non-negotiable)", "Template-repo origin (if applicable)", "Community standards". (Phases A, D, G, I, K)
+- `templates/.github/CONTRIBUTING.md` — "Governance" link in Quick links; "Community standards" section naming the three layered standards + reporting routes. (Phases C, I)
 
 ### Changed
 
-- `PROMPT.md` Step 2 hard-vs-practical ordering — unpacked the dense one-liner (`1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8`) into a bulleted dependency list and a single-row practical-execution sequence. Same content, easier to scan.
-- `README.md` "Repo upgrade order (recommended)" — opened with a reference to PROMPT.md Step 2's canonical 8-PR sequence; trailing sentence now says "first downstream upgrade" to acknowledge the standards repo itself was the first v2 application.
-- `PROMPT.md` rule 2 — strengthened the "behavior preservation" rule from a one-line statement into five enumerated observable-behavior buckets (UI, URLs, Storage, Deployment shape, External dependencies) with burden-of-proof on the refactor and an explicit fallback to "Refactoring opportunities" when proof isn't possible. Cross-links the **PWA Refactor Addendum** in `REFACTORING_GUIDE.md` as the PWA evidence path.
-- `REFACTORING_GUIDE.md` — opening note in the PWA Refactor Addendum names `pwa-inventory.md` (Step 1) as the rule-2 evidence artifact for PWA refactors and tells non-PWA refactors to enumerate touched buckets directly in PR 4's Test plan.
-- `PROMPT.md` rule 11 — split into (a) drift-detection (the existing CLAUDE.md.tmpl block) and (b) mechanical verification with five enumerated checks: files exist, YAML/JSON parses, links resolve, line-count delta matches the plan, no template placeholders remain in tracked files outside `templates/`. Output destination specified. Resolves the prior incoherence between rule 9's parenthetical, rule 11's hand-wave, and the template's drift block.
+- `PROMPT.md` rule 2 — strengthened the "behavior preservation" rule from a one-line statement into five enumerated observable-behavior buckets (UI, URLs, Storage, Deployment shape, External dependencies) with burden-of-proof on the refactor and an explicit fallback to "Refactoring opportunities" when proof isn't possible. Cross-links the **PWA Refactor Addendum** in `REFACTORING_GUIDE.md` as the PWA evidence path. (Original v2.1 wave) **Then v2.1 complete polish:** prepended the **non-negotiable** triple — keep 100% of original functionality, analyze the target repo *before* editing, and flag a "Repo-specific risks / edge-cases" subsection in every PR description and post-task self-check. (Phase A)
+- `REFACTORING_GUIDE.md` — opening note in the PWA Refactor Addendum names `pwa-inventory.md` (Step 1) as the rule-2 evidence artifact for PWA refactors and tells non-PWA refactors to enumerate touched buckets directly in PR 4's Test plan. (Original v2.1 wave) Then a top-of-file "Rule-2 anchor" cross-reference surfaces the non-negotiable triple inline. (Phase A)
+- `PROMPT.md` rule 11 — split into (a) drift-detection (the existing CLAUDE.md.tmpl block) and (b) mechanical verification with five enumerated checks: files exist, YAML/JSON parses, links resolve, line-count delta matches the plan, no template placeholders remain in tracked files outside `templates/`. Output destination specified. Resolves the prior incoherence between rule 9's parenthetical, rule 11's hand-wave, and the template's drift block. (Original v2.1 wave)
+- `PROMPT.md` — added rules 13 (out-of-scope auto-issue, opt-out via `DISABLE_OUT_OF_SCOPE_ISSUES=true`) and 14 (single-PR alternative operating mode for focused work that would otherwise produce ≤3 PRs). (Phase K)
+- `PROMPT.md` Step 2 hard-vs-practical ordering — unpacked the dense one-liner (`1 → (2, 3, 7 in parallel; 4 needs 2) → 5 → 6 → 8`) into a bulleted dependency list and a single-row practical-execution sequence. (Original v2.1 wave)
+- `README.md` "Repo upgrade order (recommended)" — opened with a reference to PROMPT.md Step 2's canonical 8-PR sequence; trailing sentence now says "first downstream upgrade" to acknowledge the standards repo itself was the first v2 application. (Original v2.1 wave)
+- `templates/CLAUDE.md.tmpl` Post-task self-check — extended to mandate the "Repo-specific risks / edge-cases" subsection and tightened the auto-implement vs prompt-first decision block. (Phases A, K)
+
+### Fixed
+
+- `PROMPT.md` rule 1 — replaced the legacy `chore/upgrade-standards` single-branch instruction with a reference to Step 2's canonical 8-PR sequence, resolving the internal contradiction with rule 3 and Step 2. (Original v2.1 wave)
+- `PROMPT.md` rule 3 — replaced the v1-era 4-PR list (Docs / Hygiene / CI / Refactor) with a reference to Step 2's canonical 8-PR sequence, so phased-PR guidance lives in exactly one place. (Original v2.1 wave)
 
 ## [2.0.0] — 2026-05-08
 
