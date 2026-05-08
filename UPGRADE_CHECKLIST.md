@@ -121,6 +121,48 @@ Wiki content is optional. A repo without a wiki is not "downgraded" — it just 
 
 Wiki seeding is performed manually via the GitHub web UI per `PROMPT.md` Step 4 — the upgrade flow does not push to `<repo>.wiki.git` automatically.
 
+## 10. Security
+
+- [ ] **CodeQL is enabled** for the repo's primary language(s). For projects using the v2 templates, this means `templates/.github/workflows/security-scan.yml` is copied in and the language matrix matches what's in the repo.
+- [ ] **Secret scanning is on** (Settings → Code security and analysis → Secret scanning) with push protection enabled.
+- [ ] **Dependabot security alerts** are enabled (Settings → Code security and analysis → Dependabot alerts + Dependabot security updates).
+- [ ] **`SECURITY.md` exists** at `.github/SECURITY.md` (or repo root) with a private-reporting channel — GitHub private vulnerability reporting preferred, email fallback.
+- [ ] **Public client-side keys are documented** in `CLAUDE.md` under "Security & Secrets" if the project ships any (e.g. Firebase web config). Documentation explicitly says they're public-by-design and points at the server-side rule that secures the data.
+- [ ] **`.env` is `.gitignore`d**; `.env.example` is committed; documented variables list `<SECURITY_CONTACT_EMAIL>` rotation cadence.
+- [ ] **No secrets, API keys, or unredacted credentials in tracked files** (verified by gitleaks in the security-scan workflow on every PR + push to main + weekly schedule).
+
+## 11. Accessibility, Performance, SEO (web projects only)
+
+Skip this section for non-web projects (CLI tools, Discord bots, libraries) with a one-line note.
+
+- [ ] **Lighthouse baseline** captured for the production URL. Defaults: Performance ≥ 80, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90. Tune per project; don't lower without a recorded reason.
+- [ ] **Accessibility audit basics**: every interactive element has an accessible name (button text, `aria-label`, or `alt` attribute), focus order is logical, contrast ratio ≥ 4.5:1 for body text, no keyboard traps. PWAs additionally need to handle the back-button correctly when modals are open.
+- [ ] **Meta tags** present in `<head>`: `<title>`, `<meta name="description">`, `<meta name="viewport" content="width=device-width, initial-scale=1">`, charset, and Open Graph (`og:title`, `og:description`, `og:image`) for shareability.
+- [ ] **`sitemap.xml`** present at site root for any site with more than ~5 distinct pages, and is referenced from `robots.txt`.
+- [ ] **`robots.txt`** present at site root, explicit about which paths bots should and shouldn't crawl.
+- [ ] **PWA manifest icons resolve** (every `icons[].src` exists). Lighthouse's installability audit catches this; running it locally before merge is the cheapest gate.
+
+## 12. Testing & Quality
+
+- [ ] **At least a smoke test exists** for any project with business logic. "Does the entry point start without crashing?" is a valid smoke test for the smallest projects; richer behavior gets richer tests.
+- [ ] **Test command is documented in `CLAUDE.md`** under "Build & Development" (or the project's equivalent), so a new contributor can run tests without guessing.
+- [ ] **Coverage thresholds set** for projects with `pyproject.toml`/pytest or `vitest.config.ts`. Defaults: lines / statements / functions ≥ 80%, branches ≥ 75%. Tune per project; don't lower without a recorded reason.
+- [ ] **Lint runs in CI** on every PR. Defaults: ruff for Python, ESLint for JS/TS, ktlint or detekt for Kotlin, html-validate for static HTML. Failures are blocking.
+- [ ] **Conventional Commits enforced locally** via the `commit-msg` hook in `templates/.pre-commit-config.yaml` (CI re-checks the merge commit).
+- [ ] **Pre-commit installed** by contributors (`pre-commit install`) — documented in `CONTRIBUTING.md`.
+- [ ] **Test failures are blocking**: PR can't merge with red CI. Branch protection on `main` requires the CI workflow to pass.
+- [ ] **Flaky tests are flagged with a label or skip**; chronic flakes get an issue instead of a `// TODO: fix flaky` comment that never gets addressed.
+
+## 13. Standards Versioning
+
+- [ ] **`.standards-version` file at repo root** containing one line with the major version this repo follows (e.g. `2`). Read by `PROMPT.md` Step 0 to gate upgrade runs.
+- [ ] **Standards-version badge in `README.md`** above the fold:
+  `[![Standards](https://img.shields.io/badge/repo--standards-v2-informational)](https://github.com/Ranzlappen/repo-standards)`.
+- [ ] **`Upgrade-History.md` wiki page** records the migration entry for the most recent upgrade (per section 9 — Wiki).
+- [ ] **`CHANGELOG.md` entry** dated and version-stamped for any change that introduces, removes, or alters a standards-version-relevant requirement (e.g. dropping support for an older Node version).
+- [ ] **Pinned dependency on the standards repo** is at a tag, not `main`. PROMPT.md fetches `VERSION` from `Ranzlappen/repo-standards/main` (always-current); but consumer-side references in CONTRIBUTING.md, badges, etc. point at `v2` (or a specific `v2.0.0`) so a future v3 doesn't silently break docs.
+- [ ] **No mixed-version state**: every reference in this repo to "repo-standards" cites the same major. Don't ship a v2 PROMPT result with a v1 README badge.
+
 ---
 
 ## How to score a repo
@@ -132,5 +174,10 @@ A repo is "upgraded" when:
 3. Section 6 is addressed if applicable (PWA inventory + verification, or noted as N/A with reason).
 4. Section 7 is addressed (tests exist or are explicitly deferred with a note).
 5. Section 8 produced a refactoring-opportunities list, even if empty.
+6. Section 9 (Wiki) is addressed if the wiki is populated, or skipped with a one-line note.
+7. Section 10 (Security) — all items checked. CodeQL + secret scanning + Dependabot alerts are non-negotiable for v2 compliance.
+8. Section 11 (A11y/Perf/SEO) is addressed for web projects, or skipped with a one-line reason for non-web projects.
+9. Section 12 (Testing & Quality) — at minimum, smoke tests + lint in CI + Conventional Commits enforced.
+10. Section 13 (Standards Versioning) — `.standards-version` file present, README badge present, no mixed-version state.
 
 The upgrade PR description should include this checklist with each item explicitly marked `✓`, `—` (not applicable, with reason), or `⚠️` (deferred, with reason).
