@@ -174,5 +174,10 @@ A repo is "upgraded" when:
 3. Section 6 is addressed if applicable (PWA inventory + verification, or noted as N/A with reason).
 4. Section 7 is addressed (tests exist or are explicitly deferred with a note).
 5. Section 8 produced a refactoring-opportunities list, even if empty.
+6. Section 9 (Wiki) is addressed if the wiki is populated, or skipped with a one-line note.
+7. Section 10 (Security) — all items checked. CodeQL + secret scanning + Dependabot alerts are non-negotiable for v2 compliance.
+8. Section 11 (A11y/Perf/SEO) is addressed for web projects, or skipped with a one-line reason for non-web projects.
+9. Section 12 (Testing & Quality) — at minimum, smoke tests + lint in CI + Conventional Commits enforced.
+10. Section 13 (Standards Versioning) — `.standards-version` file present, README badge present, no mixed-version state.
 
 The upgrade PR description should include this checklist with each item explicitly marked `✓`, `—` (not applicable, with reason), or `⚠️` (deferred, with reason).
