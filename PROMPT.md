@@ -24,8 +24,10 @@ pull requests that bring it into compliance.
 
 ## Ground rules (non-negotiable)
 
-1. **Branch and PR.** Never commit directly to main. Create a branch named
-   `chore/upgrade-standards` and open a PR with the checklist in the description.
+1. **Branch and PR.** Never commit directly to main. Each PR uses the branch
+   it's assigned in Step 2's canonical 8-PR sequence (`chore/v2-versioning-meta`,
+   `chore/v2-community-and-templates`, …). Every PR description carries the
+   relevant slice of the checklist.
 
 2. **Behavior preservation.** Refactoring may not change observable behavior.
    This includes UI, animations, storage keys, URLs, deployment shape, and
