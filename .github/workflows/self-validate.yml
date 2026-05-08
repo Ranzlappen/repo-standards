@@ -1,0 +1,105 @@
+name: Self-validate standards
+
+# Validates the standards repo's own contents on every PR or push that
+# touches docs / templates / workflows / VERSION / CHANGELOG.
+#
+# Checks:
+#   - actionlint on every YAML in templates/.github/workflows/ and on this repo's
+#     own .github/workflows/.
+#   - lychee --offline on every Markdown file (no broken internal links).
+#   - VERSION parses as semver.
+#   - SHA-pinning lint on `uses:` lines (soft warn now; PR 4 makes it hard fail).
+
+on:
+  pull_request:
+    paths:
+      - 'templates/**'
+      - '.github/workflows/**'
+      - 'PROMPT.md'
+      - 'UPGRADE_CHECKLIST.md'
+      - 'REFACTORING_GUIDE.md'
+      - 'README.md'
+      - 'VERSION'
+      - 'CHANGELOG.md'
+  push:
+    branches: [main]
+    paths:
+      - 'templates/**'
+      - '.github/workflows/**'
+      - 'PROMPT.md'
+      - 'UPGRADE_CHECKLIST.md'
+      - 'REFACTORING_GUIDE.md'
+      - 'README.md'
+      - 'VERSION'
+      - 'CHANGELOG.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: self-validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-yaml:
+    name: actionlint (workflows)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run actionlint
+        uses: raven-actions/actionlint@v2
+        with:
+          files: |
+            .github/workflows/*.yml
+            templates/.github/workflows/*.yml
+
+  validate-markdown-links:
+    name: lychee (offline link check)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lychee link check
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress --include-fragments './**/*.md'
+          fail: true
+
+  validate-version:
+    name: VERSION is semver
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert VERSION matches SemVer
+        run: |
+          VERSION_STR="$(tr -d '[:space:]' < VERSION)"
+          echo "VERSION=$VERSION_STR"
+          python3 -c "import re,sys; v='${VERSION_STR}'; \
+            assert re.match(r'^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?(\+[A-Za-z0-9.-]+)?$', v), f'not semver: {v}'; \
+            print('semver ok:', v)"
+
+  validate-sha-pinning:
+    name: uses-line SHA-pinning lint (soft warn)
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan workflow uses for non-SHA refs
+        run: |
+          set -e
+          shopt -s globstar nullglob
+          FAIL=0
+          for f in .github/workflows/*.yml templates/.github/workflows/*.yml; do
+            [ -f "$f" ] || continue
+            while IFS= read -r line; do
+              ref="${line##*@}"
+              # Soft warn if not 40-char hex SHA. Hard fail enabled in PR 4.
+              if ! echo "$ref" | grep -Eq '^[0-9a-f]{40}([[:space:]]|$)'; then
+                echo "::warning file=$f::uses pin is not a 40-char SHA: $line"
+              fi
+            done < <(grep -nE '^[[:space:]]*-?[[:space:]]*uses:[[:space:]]+[^[:space:]]+@[^[:space:]]+' "$f" || true)
+          done
+          exit $FAIL

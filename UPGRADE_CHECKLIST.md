@@ -6,6 +6,8 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 
 ---
 
+> **Standards version.** This checklist applies to the version of `repo-standards` recorded in [`VERSION`](./VERSION) at the root of this repo. Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching git tag.
+
 ## 1. Documentation
 
 - [ ] **`README.md` exists** at repo root, follows the [README template](./templates/README.md.tmpl).
