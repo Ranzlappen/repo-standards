@@ -6,12 +6,35 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [2.1.1] — 2026-05-08
+
+Documentation-only patch closing three loose ends from the v2.1.0
+release wave. No template, workflow, or rule semantics changed.
+
+### Fixed
+
+- Root `README.md` standards badge URL bumped from `standards-v2.0.0`
+  to `standards-v2.1.1` so the front-door badge matches `VERSION`. The
+  badge had been missed during the v2.1.0 cut; `self-validate.yml`'s
+  `validate-version` job only checks that `VERSION` parses as semver,
+  not that downstream references stay in sync.
+- Root `README.md` "v2.1 — Complete Final Polish" bullet list extended
+  with a Phase-L entry (Plan Management & Clean State Rule) so the
+  README enumerates the same set of phases as the `[2.1.0]` body in
+  this changelog. The opening paragraph of the `[2.1.0]` entry was
+  also corrected from "Phases A–K" to "Phases A–L" for the same
+  reason.
+- `templates/CLAUDE.md.tmpl` "Plan Management & Clean State Rule"
+  section — dropped the redundant first sentence that repeated the
+  section heading verbatim; tightened lead to `**Critical safety
+  net.**`. No change to the bullets or to the closing rationale.
+
 ## [2.1.0] — 2026-05-08
 
 The complete v2.1 polish cut. Two waves: the original "rule-2 evidence
 chain + rule-11 split" pass that landed first (now grouped inside this
 entry) and the v2.1 complete final polish that added nine new feature
-areas (Phases A–K). Consumer repos pin to `v2.1` (or a specific
+areas (Phases A–L). Consumer repos pin to `v2.1` (or a specific
 `v2.1.0`) by referencing the matching git tag.
 
 ### Added
@@ -149,7 +172,8 @@ Every existing workflow now declares a least-privilege `permissions:` block, has
 - `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner.
 - `.github/workflows/auto-tag.yml` — push-to-main + VERSION-changed automated tagger (creates `vX.Y.Z` and force-updates `vMAJOR` for non-prereleases).
 
-[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v2.1.1...HEAD
+[2.1.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.1
 [2.1.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.0
 [2.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.0.0
 [1.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v1.0.0
