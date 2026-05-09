@@ -64,7 +64,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@7fd177fa680c9881b53cdab4d346d32574c9f7f4  # v3
+        uses: github/codeql-action/init@68bde559dea0fdcac2102bfdf6230c5f70eb485e  # v4.35.4
         with:
           languages: ${{ matrix.language }}
           # Use the security-extended query suite for additional rules.
@@ -72,7 +72,7 @@ jobs:
           queries: security-extended
 
       - name: Analyze
-        uses: github/codeql-action/analyze@7fd177fa680c9881b53cdab4d346d32574c9f7f4  # v3
+        uses: github/codeql-action/analyze@68bde559dea0fdcac2102bfdf6230c5f70eb485e  # v4.35.4
         with:
           category: '/language:${{ matrix.language }}'
 
@@ -129,7 +129,7 @@ jobs:
           publish_results: true
 
       - name: Upload SARIF results
-        uses: github/codeql-action/upload-sarif@7fd177fa680c9881b53cdab4d346d32574c9f7f4  # v3
+        uses: github/codeql-action/upload-sarif@68bde559dea0fdcac2102bfdf6230c5f70eb485e  # v4.35.4
         with:
           sarif_file: results.sarif
           category: ossf-scorecard
