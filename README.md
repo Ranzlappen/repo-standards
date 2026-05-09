@@ -40,7 +40,7 @@ This repo answers two questions:
 | [`PROMPT.md`](./PROMPT.md) | The standardized Claude Code prompt — entry-point index pointing at the modular files under [`prompt/`](./prompt/). One prompt, applied repo by repo. |
 | [`prompt/`](./prompt/) | Modular source of the upgrade prompt: Step 0 (version check), the 15 ground rules, Step 1+2 (read & audit + canonical 8-PR sequence), Step 3 (PR description), Step 4 (Wiki seeding). |
 | [`docs/`](./docs/) | Long-form documentation home for *this* repo (ADRs, runbooks, migration guides). Distinct from [`templates/docs/`](./templates/docs/), which is the boilerplate downstream consumers copy. |
-| [`.github/workflows/`](./.github/workflows/) | This repo's own live workflows: `self-validate.yml` (lints docs/templates), `auto-tag.yml` (creates `vMAJOR.MINOR.PATCH` + `vMAJOR` tags on `VERSION` change), `tag-release.yml` (manual `workflow_dispatch` tag helper), `security-scan.yml` (CodeQL + Gitleaks + OpenSSF Scorecard publishing). |
+| [`.github/workflows/`](./.github/workflows/) | This repo's own live workflows: `self-validate.yml` (lints docs/templates), `auto-tag.yml` (creates `vMAJOR.MINOR.PATCH` + `vMAJOR` tags on `VERSION` change), `tag-release.yml` (manual `workflow_dispatch` tag helper), `security-scan.yml` (CodeQL + Gitleaks + OpenSSF Scorecard publishing), `dependency-review.yml` (per-PR supply-chain gate, `fail-on-severity: high`). |
 | [`templates/CLAUDE.md.tmpl`](./templates/CLAUDE.md.tmpl) | Skeleton CLAUDE.md based on the website repo's structure. |
 | [`templates/README.md.tmpl`](./templates/README.md.tmpl) | Skeleton README with the "Quick Reference" pattern. |
 | [`templates/CHANGELOG.md.tmpl`](./templates/CHANGELOG.md.tmpl) | Keep-a-Changelog skeleton for downstream repos. |
