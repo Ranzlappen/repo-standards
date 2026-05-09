@@ -37,7 +37,7 @@ jobs:
         id: audit
         run: |
           set -o pipefail
-          bash scripts/dogfood-audit.sh | tee audit-output.txt
+          python3 scripts/dogfood-audit.py | tee audit-output.txt
 
       - name: Append audit output to job summary
         if: ${{ always() }}
