@@ -155,3 +155,17 @@ jobs:
             fi
           done
           exit $FAIL
+
+  summarize:
+    name: Workflow summary
+    needs: [validate-yaml, validate-markdown-links, validate-version, validate-sha-pinning, validate-workflow-properties]
+    if: ${{ always() }}
+    uses: ./.github/workflows/workflow-summary.yml
+    with:
+      workflow-name: Self-validate
+      post-pr-comment: true
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+      checks: read
