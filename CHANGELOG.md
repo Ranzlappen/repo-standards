@@ -8,20 +8,32 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [3.0.1] — 2026-05-08
 
-Final master upgrade prompt + README polish. Surface-only release: refines
-the canonical "copy this" pasteable block in `PROMPT.md` to the v3.0.1
-master prompt (fetch-list at the top, defers to the modular files for the
-ground rules, Phase 0 vs Step 0 disambiguated, closing line points at
-Phase 0); adds a prominent README quick-start section above the fold
-naming the one-step instruction; bumps `VERSION` and `.standards-version`
-to `3.0.1`. No semantic change to any rule, workflow template,
+Polish + full dogfood completion + self-audit. Started as a
+surface-only patch refining the canonical "copy this" pasteable block
+in `PROMPT.md` and adding a README quick-start section, then expanded
+to close every remaining v3.0.0 dogfood gap surfaced post-merge: the
+standards repo now ships its own live `LICENSE`, `.github/dependabot.yml`,
+and the four supply-chain / observability / audit workflows
+(`security-scan.yml`, `dependency-review.yml`, `workflow-summary.yml`,
+`dogfood-audit.yml`). New `scripts/dogfood-audit.sh` asserts the repo
+passes 31 of its own UPGRADE_CHECKLIST invariants on every PR + push
+to main + weekly schedule. No semantic change to any template, rule,
 governance doc, or checklist item — `prompt/00-version-check.md` still
 expects major `3` and consumer repos pinned to the `v3` major-tag keep
-working unchanged.
+working unchanged. Detailed walkthrough for the post-merge maintainer
+sequence lives in `README.md` under "Post-merge finalization".
 
 ### Added
 
 - Root `README.md` "Upgrade any repo to v3.0.1 — the one-step instruction" section, anchored between the badge block and the project tagline. Names the master-prompt-copy-paste flow as the entire setup story for the GitHub Action / direct Claude Code session, and points at `PROMPT.md`. Surfaces v3.0.1 above the fold.
+- Root `LICENSE` (MIT, `Copyright (c) 2026 Ranzlappen`) — closes the v3.0.0 dogfood gap on `UPGRADE_CHECKLIST.md` Section 1's "LICENSE exists" audit. The downstream-facing boilerplate at `templates/LICENSE` keeps `<YEAR>` / `<COPYRIGHT_HOLDER>` placeholders for consumers to fill in. README's License badge link bumped from `./templates/LICENSE` to `./LICENSE`. New "What's in here" row + expanded `## License` section pointing at both copies.
+- Root `.github/dependabot.yml` — dogfooded dependabot config covering only the `github-actions` ecosystem (the standards repo has no `package.json` / `pyproject.toml` / `Gemfile` / `build.gradle`). Settings carried verbatim from `templates/.github/dependabot.yml` lines 14–34: weekly schedule, `open-pull-requests-limit: 10`, labels `[dependencies, github-actions]`, conventional-commit `prefix: "chore(deps)"` with `include: "scope"`, `groups` rolling minor + patch into one PR per week. New "What's in here" row.
+- Root `.github/workflows/security-scan.yml` — adapted from `templates/.github/workflows/security-scan.yml` with one tweak: CodeQL `matrix.language` set to `['actions']` (instead of the template default `['javascript-typescript']`) since this repo's "code" is its workflow templates — CodeQL's GitHub Actions analysis (GA since 2024) is the meaningful dogfood. Triggers Scorecard publishing to `https://api.securityscorecards.dev/projects/github.com/Ranzlappen/repo-standards` on the first push to `main`, resolving the OpenSSF Scorecard badge URL referenced in `README.md` since v3.0.0. No sidecar (live root workflows aren't enforced by self-validate's properties-pairing check).
+- Root `.github/workflows/dependency-review.yml` — verbatim copy of `templates/.github/workflows/dependency-review.yml`. Per-PR supply-chain gate; triggers on `pull_request` to `main`; runs `actions/dependency-review-action` with `fail-on-severity: high` and `comment-summary-in-pr: on-failure`. No-op today (no dependency manifests in this repo) but self-activates the moment any are added. Pairs with `security-scan.yml` (deeper weekly sweep — complementary, not redundant).
+- Root `.github/workflows/workflow-summary.yml` — verbatim copy of `templates/.github/workflows/workflow-summary.yml`. `workflow_call`-shaped reusable workflow that pulls jobs + annotations + timings via the GitHub REST API, writes a structured AI-parsable Markdown summary to `$GITHUB_STEP_SUMMARY`, and (when `post-pr-comment: true`) posts a sticky PR comment keyed by an HTML-comment marker. Wired into `self-validate.yml` via a new `summarize:` job — every self-validate PR run now produces a sticky comment with status, total duration, per-job table, sorted warnings + errors. Markdown shape is committed-to so AI agents can parse it reliably.
+- Root `.github/workflows/dogfood-audit.yml` + `scripts/dogfood-audit.sh` — new self-compliance audit layer (genuinely new functionality; no template counterpart for downstream consumers). The 95-line POSIX bash script runs six assertion groups: (1) root `LICENSE` exists with MIT first line and no placeholders, (2) `VERSION` + `.standards-version` exist with aligned majors and `VERSION` parses as semver, (3) all 7 root community files present, (4) all 7 live workflows present, (5) README badges resolve (Standards/License/OpenSSF Scorecard URL formats correct), (6) all 6 modular `prompt/*.md` files present + `PROMPT.md` master prompt names a v3.x version. Prints PASS/FAIL per assertion + summary; exits 1 on any FAIL. Workflow runs on PR + push to main + weekly schedule + manual dispatch; tee'd output uploaded to `$GITHUB_STEP_SUMMARY`. Local run on this commit's tree: 31 PASS / 0 FAIL.
+- Root `README.md` "Post-merge finalization (maintainer only)" section — five-step walkthrough the maintainer follows once PRs #16 and #17 land (auto-tag verification, security-scan / dogfood-audit / dependency-review / workflow-summary verification, ~10-min wait for OpenSSF Scorecard badge to resolve, one-time GitHub Settings polish for branch protection + Dependency Graph + Secret scanning + Discussions, optional follow-ups).
+- README "What's in here" rows for `LICENSE`, `.github/dependabot.yml`, and `scripts/dogfood-audit.sh`; live-workflows row description rewritten to enumerate all 7 live workflows.
 
 ### Changed
 
@@ -29,6 +41,10 @@ working unchanged.
 - `VERSION` bumped from `3.0.0` to `3.0.1`.
 - `.standards-version` bumped from `3.0.0` to `3.0.1` (kept aligned with `VERSION`).
 - Root `README.md` standards badge bumped from `v3.0.0` to `v3.0.1`.
+- Root `README.md` License badge link bumped from `./templates/LICENSE` to `./LICENSE` so the badge resolves to the live root file.
+- Root `README.md` `## License` section expanded from the bare `MIT.` to a sentence pointing at both `./LICENSE` (live) and `./templates/LICENSE` (boilerplate).
+- `.github/workflows/self-validate.yml` — new `summarize:` job appended at the bottom that depends on the existing five validation jobs (with `if: ${{ always() }}` so it runs even when validation fails) and calls `./.github/workflows/workflow-summary.yml`. Permissions scoped to `contents: read`, `actions: read`, `pull-requests: write`, `checks: read`. Real dogfood — every self-validate PR run posts a structured sticky workflow-summary comment.
+- Root `README.md` "What's in here" `.github/workflows/` row description rewritten to enumerate all 7 live workflows now present (`auto-tag`, `self-validate`, `tag-release`, `security-scan`, `dependency-review`, `workflow-summary`, `dogfood-audit`).
 
 ## [3.0.0] — 2026-05-08
 
