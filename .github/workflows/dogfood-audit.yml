@@ -1,0 +1,51 @@
+# Dogfood audit — assert this repo passes its own UPGRADE_CHECKLIST.
+#
+# Runs scripts/dogfood-audit.sh on every PR + push to main + weekly
+# schedule + manual dispatch. The script prints PASS / FAIL per
+# invariant and exits non-zero on any FAIL; the workflow exposes that
+# exit code as the job result and uploads stdout to the job summary.
+
+name: Dogfood audit
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Weekly Mondays 06:30 UTC, 30 min after security-scan to spread load.
+    - cron: '30 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dogfood-audit-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  audit:
+    name: Self-compliance audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6
+
+      - name: Run dogfood-audit
+        id: audit
+        run: |
+          set -o pipefail
+          bash scripts/dogfood-audit.sh | tee audit-output.txt
+
+      - name: Append audit output to job summary
+        if: ${{ always() }}
+        run: |
+          {
+            echo "## Dogfood audit"
+            echo
+            echo '```'
+            cat audit-output.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
