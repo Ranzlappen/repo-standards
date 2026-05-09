@@ -21,8 +21,12 @@ on:
     - cron: '0 6 * * 1'
   workflow_dispatch:
   # OpenSSF Scorecard re-runs whenever a branch protection rule changes,
-  # so the score reflects the current setup, not a stale snapshot.
+  # so the score reflects the current setup, not a stale snapshot. Both
+  # the legacy `branch_protection_rule` event (Settings → Branches) AND
+  # the newer `repository_ruleset` event (Settings → Rules → Rulesets)
+  # trigger a re-score, since most repos now use Rulesets.
   branch_protection_rule:
+  repository_ruleset:
 
 permissions:
   contents: read
@@ -93,7 +97,7 @@ jobs:
     # Only runs on schedule, branch_protection_rule changes, or manual
     # dispatch. Skipping on every PR avoids noise — the score is meaningful
     # weekly and on real config changes, not on every code edit.
-    if: ${{ github.event_name == 'schedule' || github.event_name == 'branch_protection_rule' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'branch_protection_rule' || github.event_name == 'repository_ruleset' || github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
