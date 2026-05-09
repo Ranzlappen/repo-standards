@@ -25,14 +25,32 @@ in UPGRADE_CHECKLIST.md:
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+_argparser = argparse.ArgumentParser(
+    description="Assert this repo passes its own UPGRADE_CHECKLIST. Exits 1 on any FAIL.",
+)
+_argparser.add_argument(
+    "-v",
+    "--verbose",
+    action="store_true",
+    help="emit the underlying check (file path / regex pattern) before each PASS/FAIL line",
+)
+ARGS = _argparser.parse_args()
+VERBOSE = ARGS.verbose
+
 passes = 0
 fails = 0
+
+
+def trace(msg: str) -> None:
+    if VERBOSE:
+        print(f"  [verbose] {msg}")
 
 
 def ok(msg: str) -> None:
@@ -50,6 +68,7 @@ def ng(msg: str) -> None:
 def assert_file(path: str, label: str | None = None) -> bool:
     p = ROOT / path
     label = label or path
+    trace(f"is_file({p})")
     if p.is_file():
         ok(f"{label} exists")
         return True
@@ -59,6 +78,7 @@ def assert_file(path: str, label: str | None = None) -> bool:
 
 def assert_grep(pattern: str, path: str, label: str) -> bool:
     p = ROOT / path
+    trace(f"grep r{pattern!r} against {p}")
     if not p.is_file():
         ng(f"{label} (file missing: {path})")
         return False
