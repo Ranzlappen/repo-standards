@@ -6,6 +6,21 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.0.2] — 2026-05-09
+
+Hotfix release. Fixes one bug in v3.0.1's shipped `security-scan.yml` (live and template) that caused the OpenSSF Scorecard sub-job to fail with `"workflow verification failed: global perm is set to write"` on first activation. Without this fix, `api.securityscorecards.dev` refuses to publish results, the README OpenSSF Scorecard badge never resolves to a numeric score, and downstream consumers adopting the template hit the same failure. No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3` and consumer repos pinned to the `v3` major-tag pick up this fix on their next workflow run.
+
+### Fixed
+
+- `.github/workflows/security-scan.yml` (live root) and `templates/.github/workflows/security-scan.yml` (downstream-facing) — workflow-scope `permissions:` block trimmed from `{contents: read, security-events: write}` to `{contents: read}` only. The `security-events: write` permission previously declared at workflow scope is now declared at the **CodeQL job scope**, where it's actually needed for the SARIF upload step. The OpenSSF Scorecard signing server (`api.securityscorecards.dev`) verifies the workflow against `ossf/scorecard-action`'s [workflow-restrictions policy](https://github.com/ossf/scorecard-action#workflow-restrictions) and returns HTTP 400 for any workflow holding `*: write` permissions at workflow scope (treats them as "global" and refuses to sign the results bundle). Both files now satisfy the policy: only `contents: read` at workflow scope; all `*: write` scopes are job-scoped (CodeQL job: `security-events: write`; Scorecard job: `security-events: write` + `id-token: write`). Verified against the policy via `python -c "import yaml; ..."` plus a re-run of the live workflow on the v3.0.2 push to `main`.
+- Added a multi-line comment under both files' workflow-scope `permissions:` block citing the Scorecard verification rule and the upstream policy URL, so future edits don't reintroduce the regression.
+
+### Changed
+
+- `VERSION` bumped from `3.0.1` to `3.0.2`.
+- `.standards-version` bumped from `3.0.1` to `3.0.2` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.0.1` to `v3.0.2`.
+
 ## [3.0.1] — 2026-05-08
 
 Polish + full dogfood completion + self-audit. Started as a

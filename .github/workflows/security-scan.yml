@@ -30,8 +30,12 @@ on:
 
 permissions:
   contents: read
-  # Required by CodeQL to upload SARIF results to the Security tab.
-  security-events: write
+  # Job-level permissions blocks below grant write scopes (security-events,
+  # id-token) where needed. Workflow-scope MUST stay `contents: read` only —
+  # the OpenSSF Scorecard signing server rejects results signed by a workflow
+  # that holds any `*: write` permission at workflow scope (its verifier
+  # treats workflow-scope writes as "global" and refuses to sign).
+  # See: https://github.com/ossf/scorecard-action#workflow-restrictions
 
 concurrency:
   # PR runs cancel in progress; main and schedule runs queue to avoid races.
@@ -43,6 +47,10 @@ jobs:
     name: CodeQL (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
+      # Required to upload SARIF results to the Security tab.
+      security-events: write
     strategy:
       fail-fast: false
       matrix:
