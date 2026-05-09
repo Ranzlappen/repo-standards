@@ -177,25 +177,24 @@ The standards repo dogfoods its own community files. Live, binding-on-this-repo 
 
 Contributions to this repo are governed by three layered standards: the [GitHub Community Guidelines](https://docs.github.com/en/site-policy/github-terms/github-community-guidelines), the [GitHub Acceptable Use Policies](https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies), and the [Contributor Covenant 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) referenced from [`.github/CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md). The same three apply to every downstream repo built from these templates — see [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md) for the contributor-facing version and the reporting routes, and [`.github/SECURITY.md`](./.github/SECURITY.md) for vulnerability disclosure. Long-form sponsorship doc at [`SPONSORS.md`](./SPONSORS.md).
 
-## Post-merge finalization (maintainer only)
+## Release finalization (maintainer only)
 
-Once PR #17 merges to `main`, a short one-time finalization sequence completes the v3.0.1 release. Walk through it from top to bottom:
+A short one-time finalization sequence completes the v3.0.1 release. Walk through it from top to bottom — the `dependency-review.yml` workflow runs on every PR to `main`, so its enabling toggle has to be flipped **before** the dogfood-completion PR can land green.
 
-1. **Merge PR #16 first** (`v3.0.0 — Polished Rocket Elevation`). Then verify in the [Actions tab](https://github.com/Ranzlappen/repo-standards/actions):
+1. **Pre-merge prerequisite — enable Dependency Graph.** GitHub web UI → **Settings → Code security and analysis** → enable Dependency graph, Dependabot security updates, Secret scanning + push protection. The Dependency graph toggle is the one that gates `dependency-review.yml`'s PR check; without it, the action fails with `"Dependency review is not supported on this repository"` and blocks the merge. Re-run the failed `Dependency review` check on the open PR after enabling — it should turn green.
+2. **Merge the v3.0.0 release PR** (`v3.0.0 — Polished Rocket Elevation`). Verify in the [Actions tab](https://github.com/Ranzlappen/repo-standards/actions):
    - `auto-tag.yml` ran on push to `main` → tags `v3.0.0` and `v3` created/updated. Confirm on the [Tags page](https://github.com/Ranzlappen/repo-standards/tags).
-   - README state: `Standards: v3.0.0` until #17 lands (expected). OpenSSF Scorecard badge still "invalid repo path" until #17 installs `security-scan.yml` (expected).
-2. **Merge PR #17** (this PR). Verify in the Actions tab:
+3. **Merge the v3.0.1 release PR.** Verify in the Actions tab:
    - `auto-tag.yml` re-runs → `v3.0.1` tag created, `v3` force-updated to `v3.0.1`.
    - `security-scan.yml` runs on the push to `main` → CodeQL on actions code (green), Gitleaks (green), Scorecard publishes results to `https://api.securityscorecards.dev/projects/github.com/Ranzlappen/repo-standards`.
-   - `dogfood-audit.yml` runs → all 31 assertions PASS, summary uploaded to the job-summary tab.
-   - `dependency-review.yml` is installed and will fire on future PRs.
-   - `self-validate.yml`'s new `summarize:` job posted a structured workflow-summary comment on PR #17 itself (visible in the PR conversation).
-3. **Wait ~10 minutes**, then refresh `README.md` on github.com. The OpenSSF Scorecard badge should resolve to a numeric score (typically 6.0–8.5 depending on which Scorecard checks pass — branch protection, signed releases, code-review coverage, dependency-pinning, etc.).
-4. **One-time repo-settings polish** (GitHub web UI, takes ~2 minutes):
-   - **Settings → Code security and analysis** → enable Dependency graph (required for `dependency-review.yml` to produce useful output), Dependabot security updates, Secret scanning + push protection.
+   - `dogfood-audit.yml` runs → all 33 assertions PASS, summary uploaded to the job-summary tab.
+   - `dependency-review.yml` ran green on the PR check itself (per step 1) and stays installed for future PRs.
+   - `self-validate.yml`'s `summarize:` job posted a structured workflow-summary comment on the PR (visible in the PR conversation).
+4. **Wait ~10 minutes**, then refresh `README.md` on github.com. The OpenSSF Scorecard badge should resolve to a numeric score (typically 6.0–8.5 depending on which Scorecard checks pass — branch protection, signed releases, code-review coverage, dependency-pinning, etc.).
+5. **Post-merge repo-settings polish** (GitHub web UI, takes ~2 minutes; needs the v3.0.1 workflows to have run on `main` at least once so the named status checks exist for the protection rule to require):
    - **Settings → Branches → Branch protection rules on `main`** matching `templates/.github/GOVERNANCE.md` "Recommended branch-protection rules" — required PR approvals (≥1) with stale-approval dismissal, required Code Owners review, required status checks (`actionlint`, `lychee`, `VERSION is semver`, `uses-line SHA-pinning lint`, `dependency-review`, `dogfood-audit`, CodeQL, Gitleaks), required conversation resolution, signed commits, linear history, no force-push, no deletions, **admin no-bypass**.
    - **Settings → General → Features** → ☑ Discussions (per `UPGRADE_CHECKLIST.md` Section 13).
-5. **Optional follow-ups** (not part of v3.0.1; cut as separate small PRs when ready):
+6. **Optional follow-ups** (not part of v3.0.1; cut as separate small PRs when ready):
    - Author `templates/wiki/Migration-v2-to-v3.md` per-repo entries as downstream consumers complete v2 → v3 upgrades (the file ships as a stub today).
    - Author `templates/ACKNOWLEDGMENTS.md` if you want consumers to ship one — no template exists today.
    - Wire `workflow-summary.yml` into other live workflows (`security-scan.yml`, `dogfood-audit.yml`) for end-to-end observability across all CI.
