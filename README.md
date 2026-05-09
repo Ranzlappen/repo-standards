@@ -1,7 +1,7 @@
 # Ranzlappen Repo Standards
 
 [![Standards](https://img.shields.io/badge/standards-v3.0.1-informational)](./VERSION)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./templates/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Ranzlappen/repo-standards/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Ranzlappen/repo-standards)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-ff69b4)](./SPONSORS.md)
@@ -29,6 +29,7 @@ This repo answers two questions:
 | [`.standards-version`](./.standards-version) | The major version this repo follows itself (dogfood). Read by `PROMPT.md` Step 0. |
 | [`CHANGELOG.md`](./CHANGELOG.md) | Notable changes per release. Keep-a-Changelog format. |
 | [`SPONSORS.md`](./SPONSORS.md) | Thank-you page + what sponsorship funds + what it does **not** buy. Surfaced from the badge block. |
+| [`LICENSE`](./LICENSE) | This repo's own MIT license (live, distinct from the downstream-facing boilerplate at [`templates/LICENSE`](./templates/LICENSE) which keeps `<YEAR>` / `<COPYRIGHT_HOLDER>` placeholders for consumers to fill in). |
 | [`.github/CODE_OF_CONDUCT.md`](./.github/CODE_OF_CONDUCT.md) | This repo's live Code of Conduct (Contributor Covenant 2.1). The downstream-facing template lives at [`templates/.github/CODE_OF_CONDUCT.md`](./templates/.github/CODE_OF_CONDUCT.md). |
 | [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md) | This repo's live contributor guide. Downstream-facing template at [`templates/.github/CONTRIBUTING.md`](./templates/.github/CONTRIBUTING.md). |
 | [`.github/SECURITY.md`](./.github/SECURITY.md) | Vulnerability-reporting policy + threat model + supply-chain commitments. Downstream-facing template at [`templates/.github/SECURITY.md`](./templates/.github/SECURITY.md). |
@@ -176,4 +177,4 @@ Contributions to this repo are governed by three layered standards: the [GitHub 
 
 ## License
 
-MIT.
+MIT — see [`LICENSE`](./LICENSE) at the repo root for the full text and copyright line. The downstream-facing boilerplate copy lives at [`templates/LICENSE`](./templates/LICENSE) with `<YEAR>` / `<COPYRIGHT_HOLDER>` placeholders for consumers to fill in.
