@@ -156,10 +156,12 @@ section("[7/8] Placeholder hygiene (rule 11 mechanical verification)")
 # Patterns explicitly enumerated in prompt/01-ground-rules.md rule 11.
 PLACEHOLDER_PATTERNS = [r"<PROJECT_NAME>", r"<OWNER>", r"<REPO>", r"<TODO>"]
 # Files where these patterns appear in *normative* contexts (rule definitions,
-# substitution instructions) and are intentional, not leakage.
+# substitution instructions, release notes that quote the rule by name) and
+# are intentional, not leakage.
 ALLOWED_NORMATIVE_FILES = {
     "prompt/01-ground-rules.md",  # rule 11 enumerates these patterns by name
     "prompt/04-wiki-seeding.md",  # Step 4 substitution instruction
+    "CHANGELOG.md",  # release notes quote the rule-11 patterns by name
 }
 EXCLUDED_DIRS = {"templates", ".git", "node_modules"}
 leaks: list[str] = []
