@@ -1,0 +1,212 @@
+# Reusable workflow that produces a structured, AI-parsable Markdown
+# summary of a workflow run.
+#
+# Pulls jobs + annotations + timings via the GitHub REST API, writes to
+# $GITHUB_STEP_SUMMARY, and (optionally) posts the same Markdown as a
+# sticky PR comment keyed by an HTML-comment marker so repeat runs
+# update the same comment instead of stacking.
+#
+# The Markdown shape is committed to: identical headings, identical
+# table columns, sorted annotations, no emoji-only signals — readers
+# (humans and AI agents alike) can rely on the structure.
+#
+# Call from a per-repo workflow with:
+#
+#   jobs:
+#     ci:
+#       uses: ./.github/workflows/lint-and-test.yml
+#       with: { language: node }
+#     summarize:
+#       needs: [ci]
+#       if: ${{ always() }}
+#       uses: ./.github/workflows/workflow-summary.yml
+#       with:
+#         workflow-name: CI
+#         post-pr-comment: true
+#       permissions:
+#         contents: read
+#         actions: read
+#         pull-requests: write
+#         checks: read
+
+name: Workflow summary
+
+on:
+  workflow_call:
+    inputs:
+      workflow-name:
+        description: 'Display name shown in the summary header'
+        required: true
+        type: string
+      run-id:
+        description: 'Run ID to summarize. Defaults to the calling run.'
+        required: false
+        type: string
+        default: ''
+      post-pr-comment:
+        description: 'Also post the summary as a sticky PR comment'
+        required: false
+        type: boolean
+        default: false
+      pr-number:
+        description: 'PR number to comment on. Defaults to the triggering PR.'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+  actions: read
+  checks: read
+  pull-requests: write
+
+jobs:
+  summarize:
+    name: Summarize ${{ inputs.workflow-name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate and emit summary
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7
+        with:
+          script: |
+            const workflowName = `${{ inputs.workflow-name }}`;
+            const inputRunId = `${{ inputs.run-id }}`;
+            const runId = inputRunId ? Number(inputRunId) : context.runId;
+            const post = `${{ inputs.post-pr-comment }}` === 'true';
+            const inputPr = `${{ inputs.pr-number }}`;
+
+            const { data: jobsData } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: runId,
+              per_page: 100,
+            });
+            const jobs = jobsData.jobs || [];
+
+            const fmt = (sec) => sec >= 60
+              ? `${Math.floor(sec / 60)}m ${sec % 60}s`
+              : `${sec}s`;
+
+            let totalSec = 0;
+            const rows = [];
+            const warnings = [];
+            const errors = [];
+
+            for (const job of jobs) {
+              const start = job.started_at ? new Date(job.started_at) : null;
+              const end = job.completed_at ? new Date(job.completed_at) : null;
+              const sec = start && end ? Math.max(0, Math.round((end - start) / 1000)) : 0;
+              totalSec += sec;
+
+              const conclusion = job.conclusion || job.status || 'pending';
+              const icon = conclusion === 'success' ? '✅'
+                : conclusion === 'failure' ? '❌'
+                : conclusion === 'skipped' ? '⏭'
+                : conclusion === 'cancelled' ? '🚫'
+                : '⚠️';
+
+              let annCount = 0;
+              try {
+                const { data: anns } = await github.rest.checks.listAnnotations({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  check_run_id: job.id,
+                  per_page: 100,
+                });
+                annCount = anns.length;
+                for (const a of anns) {
+                  const loc = a.path ? `${a.path}:${a.start_line || '?'}` : '(no file)';
+                  const msg = (a.message || '').split('\n')[0];
+                  const entry = `- \`${loc}\` — ${msg} _(in job: ${job.name})_`;
+                  if (a.annotation_level === 'failure') {
+                    errors.push(entry);
+                  } else {
+                    warnings.push(entry);
+                  }
+                }
+              } catch (e) {
+                core.info(`Could not fetch annotations for job ${job.name}: ${e.message}`);
+              }
+
+              rows.push(`| ${job.name} | ${icon} ${conclusion} | ${fmt(sec)} | ${annCount} |`);
+            }
+
+            warnings.sort();
+            errors.sort();
+
+            const allSuccess = jobs.length > 0 && jobs.every(j => j.conclusion === 'success');
+            const anyFailure = jobs.some(j => j.conclusion === 'failure');
+            const overallIcon = allSuccess ? '✅' : anyFailure ? '❌' : '⚠️';
+            const overallStatus = allSuccess ? 'success' : anyFailure ? 'failure' : 'partial';
+
+            const lines = [];
+            lines.push(`## ${workflowName} — run #${context.runNumber}`);
+            lines.push('');
+            lines.push(`**Status:** ${overallIcon} ${overallStatus}  `);
+            lines.push(`**Total duration:** ${fmt(totalSec)}  `);
+            lines.push(`**Jobs:** ${jobs.length}  `);
+            lines.push(`**Warnings:** ${warnings.length}  `);
+            lines.push(`**Errors:** ${errors.length}  `);
+            lines.push('');
+            lines.push('### Jobs');
+            lines.push('');
+            lines.push('| Job | Status | Duration | Annotations |');
+            lines.push('| --- | --- | --- | --- |');
+            lines.push(...rows);
+            lines.push('');
+            lines.push(`### Warnings (${warnings.length})`);
+            lines.push('');
+            lines.push(warnings.length ? warnings.join('\n') : '_None._');
+            lines.push('');
+            lines.push(`### Errors (${errors.length})`);
+            lines.push('');
+            lines.push(errors.length ? errors.join('\n') : '_None._');
+            lines.push('');
+            lines.push(`<sub>Generated by \`templates/.github/workflows/workflow-summary.yml\`. The structure (headings, table columns, sort order) is stable so AI agents can parse this comment reliably.</sub>`);
+
+            const summary = lines.join('\n');
+
+            await core.summary.addRaw(summary).write();
+            core.setOutput('summary', summary);
+
+            if (!post) {
+              core.info('post-pr-comment is false; skipping PR comment.');
+              return;
+            }
+
+            const prNumber = inputPr
+              ? Number(inputPr)
+              : (context.payload.pull_request && context.payload.pull_request.number);
+            if (!prNumber) {
+              core.info('post-pr-comment requested but no PR number resolved; skipping.');
+              return;
+            }
+
+            const marker = `<!-- workflow-summary:${workflowName} -->`;
+            const body = `${marker}\n${summary}`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+            const existing = comments.find(c => c.body && c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+              core.info(`Updated existing summary comment ${existing.id} on PR #${prNumber}.`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+              core.info(`Created new summary comment on PR #${prNumber}.`);
+            }
