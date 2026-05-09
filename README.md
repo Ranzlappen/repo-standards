@@ -45,6 +45,7 @@ This repo answers two questions:
 | [`templates/README.md.tmpl`](./templates/README.md.tmpl) | Skeleton README with the "Quick Reference" pattern. |
 | [`templates/CHANGELOG.md.tmpl`](./templates/CHANGELOG.md.tmpl) | Keep-a-Changelog skeleton for downstream repos. |
 | [`templates/.github/`](./templates/.github/) | Community files: PR template, issue forms (bug / feature / question / upgrade-request), CODE_OF_CONDUCT, CONTRIBUTING, GOVERNANCE, SECURITY, FUNDING, CODEOWNERS. |
+| [`.github/dependabot.yml`](./.github/dependabot.yml) | This repo's own live dependabot config (github-actions ecosystem only — no app code). The downstream-facing boilerplate with full ecosystem coverage lives at [`templates/.github/dependabot.yml`](./templates/.github/dependabot.yml). |
 | [`templates/.github/dependabot.yml`](./templates/.github/dependabot.yml) | Weekly dependency updates, sensible groupings. |
 | [`templates/.github/workflows/`](./templates/.github/workflows/) | CI starters for Node, Python, static HTML, and Android. |
 | [`templates/.editorconfig`](./templates/.editorconfig) | Cross-editor whitespace + encoding rules. |

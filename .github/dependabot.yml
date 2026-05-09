@@ -1,0 +1,25 @@
+# Live dependabot config for the repo-standards repo itself (dogfood).
+#
+# This repo has no application code — only Markdown, YAML workflow templates,
+# and shell scripts. The only dependency surface is the GitHub Actions used
+# in .github/workflows/. The downstream-facing boilerplate at
+# templates/.github/dependabot.yml ships full ecosystem coverage (npm, pip,
+# bundler, gradle) for consumers; this file keeps only what applies here.
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+    groups:
+      actions-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
