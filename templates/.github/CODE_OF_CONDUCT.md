@@ -7,11 +7,12 @@
 Concerns may be reported privately to **<CONTACT_EMAIL>**. Reports are read by the project maintainers and treated confidentially.
 
 <!--
-Downstream repos may inline the full Contributor Covenant text in
-place of the link above. The Covenant itself is published under
-the Creative Commons Attribution 4.0 license, so inlining is fine
-provided attribution is preserved.
-
-To inline:
-  curl -sSfL https://www.contributor-covenant.org/version/2/1/code_of_conduct.txt
+This stub is the maintenance-free default — the link in the first
+paragraph auto-tracks any minor revision the Contributor Covenant
+publishes. If you'd rather vendor the full text into your repo for
+self-containment and discoverability, copy `CODE_OF_CONDUCT-full.md`
+from this same templates/.github/ directory in place of this file.
+The two variants are equivalent in normative force; the full-text
+variant trades ~120 extra lines for survival of the canonical URL
+ever moving.
 -->
