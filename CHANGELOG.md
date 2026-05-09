@@ -6,6 +6,40 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.0.4] — 2026-05-09
+
+Cleanup release. Closes the Node 20 deprecation deadline (every action with a Node-20 build has been bumped to its Node-24 successor via the dependabot run that fired on first activation of `dependabot.yml`), resolves the long-standing CoC-inlining decision (Issue #4) by shipping an opt-in full-text variant alongside the existing stub, and wires `security-scan.yml` to fire OpenSSF Scorecard on `repository_ruleset` events so the new GitHub Rulesets feature auto-rescores branch protection (the legacy `branch_protection_rule` event covered the older Branch protection rules but not Rulesets). No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3`, consumers pinned to the `v3` major-tag pick up everything in this release on their next workflow run.
+
+### Added
+
+- `templates/.github/CODE_OF_CONDUCT-full.md` — opt-in Code-of-Conduct variant that vendors the full Contributor Covenant 2.1 text inline (CC BY 4.0, attribution preserved). Drop-in replacement for the existing minimal-stub `templates/.github/CODE_OF_CONDUCT.md`; the two are equivalent in normative force. Trades ~120 lines of size for self-containment + discoverability + survival of the canonical URL ever moving. Closes #4 (option A from the issue's three resolution paths).
+- `repository_ruleset:` trigger added to `.github/workflows/security-scan.yml` (live root) and `templates/.github/workflows/security-scan.yml` alongside the existing `branch_protection_rule:` trigger. Both events now fire the OpenSSF Scorecard sub-job's run-trigger guard, so Settings → Rules → Rulesets edits auto-rescore in addition to legacy Settings → Branches → Branch protection rule edits.
+- `-v` / `--verbose` flag on `scripts/dogfood-audit.py` (`argparse`-driven). When set, each `assert_file` and `assert_grep` call emits a `[verbose] is_file(/repo/path/...)` or `[verbose] grep r"<pattern>" against /repo/path/...` line before its PASS/FAIL line. Default output unchanged. `.github/workflows/dogfood-audit.yml` now passes `-v` so CI runs always emit verbose output for trivially-diffable `$GITHUB_STEP_SUMMARY` blobs.
+- README "What's in here" row pointing at `templates/.github/CODE_OF_CONDUCT-full.md`.
+
+### Changed
+
+- `templates/.github/CODE_OF_CONDUCT.md` (the stub) — trailing HTML-comment hint at "future option C inline-fetcher script" replaced with a one-line pointer at the now-shipped `CODE_OF_CONDUCT-full.md` alternative. Stub itself unchanged so existing v3.x consumers don't see a surprise diff on next sync.
+- `PROMPT.md` master prompt banner bumped from `repo-standards v3.0.1` → `repo-standards v3.0.4` (line 27, inside the pasteable fence). Surface only — the audit's [6] regex matches any `v3.x.y` so functional checks pass either way.
+- 6 GitHub-Actions dependency bumps via dependabot (PRs #21, #22, #23, #24, #25, #26 — all merged before this release PR). Cumulative diff:
+  - `actions/checkout` 4.3.1 → 6.0.2 (live + every template that uses it; closes Node 20 deprecation).
+  - `actions/github-script` 7.0.1 → 9.0.0 (`workflow-summary.yml` live + template; closes Node 20 deprecation).
+  - `github/codeql-action` 3.35.4 → 4.35.4 — all three sub-actions (`init`, `analyze`, `upload-sarif`) re-pinned in `security-scan.yml` live + template (closes Node 20 deprecation; the v3.0.3 imposter-SHA fix lands cleanly on the new v4 SHA `68bde559dea0fdcac2102bfdf6230c5f70eb485e`).
+  - `actions/dependency-review-action` 4.7.1 → 5.0.0 (live `dependency-review.yml` + template; the `fail-on-severity` and `comment-summary-in-pr` inputs survive the major bump, no breaking-change for our usage).
+  - `gitleaks/gitleaks-action` SHA bump within `v2` (live `security-scan.yml` + template; minor/patch).
+  - `ossf/scorecard-action` 2.4.0 → 2.4.3 (live `security-scan.yml` + template; bundles upstream Scorecard v5.3.0).
+- `VERSION` bumped from `3.0.3` to `3.0.4`.
+- `.standards-version` bumped from `3.0.3` to `3.0.4` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.0.3` to `v3.0.4`.
+- Root `README.md` "Upgrade any repo to vX" headline + body bumped from `v3.0.1` to `v3.0.4` (had been left at v3.0.1 through the v3.0.2 + v3.0.3 hotfixes; brought current here).
+
+### Migration notes
+
+- **Node 20 deprecation deadline (2026-06-02):** GitHub is forcing all Node-20-built actions to Node-24 by this date. Every Node-20 action shipped in v3.0.x is now bumped to its Node-24 successor. **No consumer action required** — repos pinned to `v3` (the moving major-tag) automatically pick up the new SHAs on their next workflow run. Repos pinned to a specific patch version (`v3.0.0`–`v3.0.3`) continue working but will emit Node-20 deprecation warnings; bumping the pin to `v3` (or `v3.0.4`) clears them.
+- **Major-version map** (for consumers maintaining their own pinned forks): `actions/checkout` v4 → v6, `actions/github-script` v7 → v9, `github/codeql-action` v3 → v4, `actions/dependency-review-action` v4 → v5. The `actions/setup-node` and `actions/setup-python` template references in `templates/.github/workflows/release-please.yml` were already on Node-24-compatible majors and do not need updating.
+- **GitHub Rulesets users:** `security-scan.yml` (live + template) now fires OpenSSF Scorecard on `repository_ruleset` events as well as `branch_protection_rule`. If your repo uses Rulesets (Settings → Rules → Rulesets) instead of legacy Branch protection rules, edits to the active ruleset now auto-rescore Scorecard's branch-protection check. Repos using only the legacy Branch protection rules keep their existing behavior unchanged.
+- **No breaking changes** for downstream consumers in v3.0.4. The CoC-stub default behavior is unchanged; the full-text variant is purely additive. The audit script's verbose flag is opt-in and default output is identical to v3.0.3. Workflow trigger additions (`repository_ruleset:`) are additive — repos that don't use Rulesets simply never fire that event.
+
 ## [3.0.3] — 2026-05-09
 
 Hotfix on top of v3.0.2. The `github/codeql-action/{init,analyze,upload-sarif}` SHA pinned in `security-scan.yml` (live root + template) — `52485aec7be33610227643b0fe83936b8b5f061a` — does not exist on `github/codeql-action`. The Scorecard signing server's [imposter-commit check](https://github.com/ossf/scorecard-action#workflow-restrictions) (`api.securityscorecards.dev`) returns HTTP 400 with `"workflow verification failed: imposter commit: 52485aec... does not belong to github/codeql-action/upload-sarif"`, so even with v3.0.2's permission scoping fix, Scorecard still refuses to publish results. Re-pin all three usages to the current `v3` major-tag commit (`7fd177fa680c9881b53cdab4d346d32574c9f7f4` = `github/codeql-action@v3.35.4`, May 8 2026). No other change.
