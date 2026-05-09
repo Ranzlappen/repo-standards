@@ -6,6 +6,20 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.0.3] — 2026-05-09
+
+Hotfix on top of v3.0.2. The `github/codeql-action/{init,analyze,upload-sarif}` SHA pinned in `security-scan.yml` (live root + template) — `52485aec7be33610227643b0fe83936b8b5f061a` — does not exist on `github/codeql-action`. The Scorecard signing server's [imposter-commit check](https://github.com/ossf/scorecard-action#workflow-restrictions) (`api.securityscorecards.dev`) returns HTTP 400 with `"workflow verification failed: imposter commit: 52485aec... does not belong to github/codeql-action/upload-sarif"`, so even with v3.0.2's permission scoping fix, Scorecard still refuses to publish results. Re-pin all three usages to the current `v3` major-tag commit (`7fd177fa680c9881b53cdab4d346d32574c9f7f4` = `github/codeql-action@v3.35.4`, May 8 2026). No other change.
+
+### Fixed
+
+- `.github/workflows/security-scan.yml` (live root) and `templates/.github/workflows/security-scan.yml` (downstream-facing) — three `github/codeql-action/{init,analyze,upload-sarif}` `uses:` lines re-pinned from the bogus `52485aec7be33610227643b0fe83936b8b5f061a` (404 on `github.com/github/codeql-action/commit/...`) to `7fd177fa680c9881b53cdab4d346d32574c9f7f4` (= `v3` / `v3.35.4` HEAD as of 2026-05-08, validated against `https://github.com/github/codeql-action/tags`). Six replacements total (3 per file × 2 files). The bogus SHA almost certainly entered when the templates were authored — possibly a copy-paste error or a stale SHA from a draft. Fix verified by re-running the live `security-scan.yml` against the v3.0.3 tree on push to `main` after this PR merges (Scorecard sub-job's webapp publish must succeed without HTTP 400).
+
+### Changed
+
+- `VERSION` bumped from `3.0.2` to `3.0.3`.
+- `.standards-version` bumped from `3.0.2` to `3.0.3` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.0.2` to `v3.0.3`.
+
 ## [3.0.2] — 2026-05-09
 
 Hotfix release. Fixes one bug in v3.0.1's shipped `security-scan.yml` (live and template) that caused the OpenSSF Scorecard sub-job to fail with `"workflow verification failed: global perm is set to write"` on first activation. Without this fix, `api.securityscorecards.dev` refuses to publish results, the README OpenSSF Scorecard badge never resolves to a numeric score, and downstream consumers adopting the template hit the same failure. No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3` and consumer repos pinned to the `v3` major-tag pick up this fix on their next workflow run.
