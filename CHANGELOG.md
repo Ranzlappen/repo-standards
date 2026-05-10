@@ -16,6 +16,7 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 - `prompt/01-ground-rules.md` preamble: step range citation updated from "Step (0–4)" to "Step (0–5)" to reflect the new Step 5. Rule range remains 1–16 — no rule additions or renumbering in this entry; rule 16 (Conflict / Assumption Failure Protocol) shipped separately in v3.0.5.
 - `prompt/04-wiki-seeding.md`: cross-references the Step 5 debrief as the source of the `Upgrade-History` entry's Headline / Scope / Notes blocks. Single source of truth when both Step 4 and Step 5 are taken.
 - `scripts/dogfood-audit.py`: section `[6/8]` enumeration adds `"05-migration-debrief"`; module docstring bumped from "all 6 prompt/*.md" to "all 7"; total audit count moves from 33 → 34 PASS.
+- Surface-reference cleanup pass across narrative docs that v3.0.5's rule-16 addition + PR #35's Step-5 addition both missed: `README.md` (rows 41 + 123), `docs/README.md` (rows 13 + 42), and `prompt/02-canonical-pr-sequence.md` (line 5). All five sites bumped from "15 ground rules" → "16 ground rules" and, where they enumerated the canonical Step sequence, extended through Step 5 (Migration debrief). `02-canonical-pr-sequence.md`'s "especially relevant" callout adds rule 16 alongside the existing rules 9/11/12 since rule 16 is itself an execution-time / per-commit rule. Surface-only — no behaviour, audit, or rule-numbering change.
 
 ### Fixed
 
