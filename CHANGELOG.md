@@ -6,6 +6,25 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+### Added
+
+- `prompt/05-migration-debrief.md` — new mandatory **Step 5** of the canonical Claude Code upgrade flow. Produces a single Markdown debrief at the end of every migration pass: shipped PRs, deferred scope with reasons, out-of-scope issues filed, follow-ups, and `.standards-version` delta. Roll-up of information already produced during the pass (per-PR descriptions from Step 3, self-checks from rule 11, auto-issues from rule 13, Phase 0 scoring table) — explicitly not a re-audit. Skipped only on explicit user signal. Indexed in `PROMPT.md`'s modular-structure table; covered by the dogfood audit's `[6/8] Modular prompt files` section.
+
+### Changed
+
+- `PROMPT.md` modular-structure table extended from 6 → 7 prompt files; "six focused files" → "seven focused files"; step range `(00–04)` → `(00–05)`; embedded prompt-to-paste fetch list adds `prompt/05-migration-debrief.md`; "After Phase 0 confirms" closing paragraph names Step 5 with the mandatory-by-default qualifier.
+- `prompt/01-ground-rules.md` preamble: rule range citation updated from "Step (0–4)" to "Step (0–5)". No rule additions or renumbering — leaves rule 16 free for the in-flight `chore/v3.0.5-token-permissions` Conflict / Assumption Failure Protocol work.
+- `prompt/04-wiki-seeding.md`: cross-references the Step 5 debrief as the source of the `Upgrade-History` entry's Headline / Scope / Notes blocks. Single source of truth when both Step 4 and Step 5 are taken.
+- `scripts/dogfood-audit.py`: section `[6/8]` enumeration adds `"05-migration-debrief"`; module docstring bumped from "all 6 prompt/*.md" to "all 7"; total audit count moves from 33 → 34 PASS.
+
+### Fixed
+
+- `templates/.github/workflows/security-scan.yml` and `templates/.github/workflows/ci-static-html.yml`: `gitleaks/gitleaks-action` pin converged on the commit-SHA form (`ff98106e4c7b2bc287b24eaf42907196329070c7`) the live `.github/workflows/security-scan.yml` already uses; both templates previously pinned the equivalent annotated-tag-object SHA (`dcedce43c6f43de0b836d1fe38946645c9c638dc`). GitHub recommends commit-SHA pins for actions; this is notation cleanup with zero behaviour change. (Shipped on this branch as commit `495dc66`.)
+
+### Tracked separately
+
+- Issue [#33](https://github.com/Ranzlappen/repo-standards/issues/33) — re-evaluate `gitleaks-action` Node-20 deprecation after the 2026-06-02 GitHub Actions runner cutover. Deferred replacement plan preserved inline in the issue body for reactive execution if the forced Node-24 migration breaks the action; high-confidence prediction is no-op (action is a thin wrapper around the `gitleaks` Go binary).
+
 ## [3.0.4] — 2026-05-09
 
 Cleanup release. Closes the Node 20 deprecation deadline (every action with a Node-20 build has been bumped to its Node-24 successor via the dependabot run that fired on first activation of `dependabot.yml`), resolves the long-standing CoC-inlining decision (Issue #4) by shipping an opt-in full-text variant alongside the existing stub, and documents the GitHub Rulesets vs. legacy Branch-protection-rule gap in `security-scan.yml`. No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3`, consumers pinned to the `v3` major-tag pick up everything in this release on their next workflow run.
