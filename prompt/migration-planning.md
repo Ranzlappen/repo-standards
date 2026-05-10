@@ -150,4 +150,19 @@ Phase 0 produces a single Markdown document containing:
 
 **In the direct Claude Code flow:** post this as the first response in the session. Wait for the user to confirm before invoking Step 0.
 
+**What counts as confirmation (both flows):** clicking the **"Approve plan mode"** button — or replying with "yes", "approved", "proceed", "confirmed", "go ahead", a 👍 reaction on the plan comment, or similar — counts as explicit confirmation.
+
 After confirmation, hand off to [`prompt/00-version-check.md`](./00-version-check.md) and proceed through the canonical flow.
+
+---
+
+## 7. Conflict / Assumption Failure Protocol (execution-phase reminder)
+
+The roadmap Phase 0 produces is a *prediction*. Reality during execution will sometimes contradict it — a file the plan assumed exists doesn't, a CI check gates the merge in an unexpected way, a `git push` is rejected, an audit uncovers behavior the profiling missed.
+
+When that happens, the protocol is **non-negotiable** (rule 16 in [`prompt/01-ground-rules.md`](./01-ground-rules.md)):
+
+> **Conflict / Assumption Failure Protocol** (critical safety rule)
+> If at any point during execution you discover that an assumption in the Phase 0 plan or any later step was wrong, or you encounter an unexpected problem, **do not make any self-decided compromises or adjustments**. Immediately stop, clearly state the exact issue and the assumption that failed, propose 2–3 concrete options with trade-offs, and wait for my explicit confirmation before proceeding. Never silently alter the plan, skip steps, or decide on a workaround yourself.
+
+This protocol overrides every other rule when they conflict (including rule 8 "Default to autonomy"). The Phase 0 deliverable should explicitly acknowledge that this protocol is in effect — add one line to the **Guardrails acknowledgement** in Section 6 confirming "Conflict / assumption-failure protocol acknowledged: any plan deviation stops for explicit confirmation."

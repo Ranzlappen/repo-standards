@@ -13,17 +13,42 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 ### Changed
 
 - `PROMPT.md` modular-structure table extended from 6 → 7 prompt files; "six focused files" → "seven focused files"; step range `(00–04)` → `(00–05)`; embedded prompt-to-paste fetch list adds `prompt/05-migration-debrief.md`; "After Phase 0 confirms" closing paragraph names Step 5 with the mandatory-by-default qualifier.
-- `prompt/01-ground-rules.md` preamble: rule range citation updated from "Step (0–4)" to "Step (0–5)". No rule additions or renumbering — leaves rule 16 free for the in-flight `chore/v3.0.5-token-permissions` Conflict / Assumption Failure Protocol work.
+- `prompt/01-ground-rules.md` preamble: step range citation updated from "Step (0–4)" to "Step (0–5)" to reflect the new Step 5. Rule range remains 1–16 — no rule additions or renumbering in this entry; rule 16 (Conflict / Assumption Failure Protocol) shipped separately in v3.0.5.
 - `prompt/04-wiki-seeding.md`: cross-references the Step 5 debrief as the source of the `Upgrade-History` entry's Headline / Scope / Notes blocks. Single source of truth when both Step 4 and Step 5 are taken.
 - `scripts/dogfood-audit.py`: section `[6/8]` enumeration adds `"05-migration-debrief"`; module docstring bumped from "all 6 prompt/*.md" to "all 7"; total audit count moves from 33 → 34 PASS.
 
 ### Fixed
 
-- `templates/.github/workflows/security-scan.yml` and `templates/.github/workflows/ci-static-html.yml`: `gitleaks/gitleaks-action` pin converged on the commit-SHA form (`ff98106e4c7b2bc287b24eaf42907196329070c7`) the live `.github/workflows/security-scan.yml` already uses; both templates previously pinned the equivalent annotated-tag-object SHA (`dcedce43c6f43de0b836d1fe38946645c9c638dc`). GitHub recommends commit-SHA pins for actions; this is notation cleanup with zero behaviour change. (Shipped on this branch as commit `495dc66`.)
+- `templates/.github/workflows/security-scan.yml` and `templates/.github/workflows/ci-static-html.yml`: `gitleaks/gitleaks-action` pin converged on the commit-SHA form (`ff98106e4c7b2bc287b24eaf42907196329070c7`) the live `.github/workflows/security-scan.yml` already uses; both templates previously pinned the equivalent annotated-tag-object SHA (`dcedce43c6f43de0b836d1fe38946645c9c638dc`). GitHub recommends commit-SHA pins for actions; this is notation cleanup with zero behaviour change.
 
 ### Tracked separately
 
 - Issue [#33](https://github.com/Ranzlappen/repo-standards/issues/33) — re-evaluate `gitleaks-action` Node-20 deprecation after the 2026-06-02 GitHub Actions runner cutover. Deferred replacement plan preserved inline in the issue body for reactive execution if the forced Node-24 migration breaks the action; high-confidence prediction is no-op (action is a thin wrapper around the `gitleaks` Go binary).
+
+## [3.0.5] — 2026-05-09
+
+Hotfix on top of v3.0.4. Lifts the live OpenSSF Scorecard score from `5.9 / 10` (below the repo's stated `≥ 7.0` floor in `templates/.github/SECURITY.md` + `templates/.github/GOVERNANCE.md`) by fixing the `Token-Permissions` regression (currently scoring `0 / 10`). Two live-root workflows — `auto-tag.yml` and `tag-release.yml` — declared `permissions: contents: write` at workflow scope. Scorecard's [Token-Permissions check](https://github.com/ossf/scorecard/blob/main/docs/checks.md#token-permissions) flags any non-`read` workflow-scope permission as a violation; the fix is to scope the `contents: write` to the only job in each workflow that actually needs it (the tag-create + tag-push step). No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3`; consumers pinned to the `v3` major-tag pick up everything in this release on their next workflow run.
+
+### Fixed
+
+- `.github/workflows/auto-tag.yml` (live root only — no template counterpart) — workflow-scope `permissions: contents: write` re-scoped to `permissions: contents: read`. The `auto-tag:` job now declares `permissions: contents: write` job-locally where it actually executes `git tag -a` + `git push origin <tag>` + the `git push --force origin v<MAJOR>` for the moving major-version pointer. Closes the OpenSSF Scorecard `Token-Permissions` regression flagged at https://api.scorecard.dev/projects/github.com/Ranzlappen/repo-standards.
+- `.github/workflows/tag-release.yml` (live root only — no template counterpart) — same shape: workflow-scope `permissions: contents: write` re-scoped to `permissions: contents: read`; the `tag:` job now declares `permissions: contents: write` job-locally where it executes `git tag -a` + `git push origin <tag>` (with optional `--force` per workflow_dispatch input).
+
+### Changed
+
+- `VERSION` bumped from `3.0.4` to `3.0.5`.
+- `.standards-version` bumped from `3.0.4` to `3.0.5` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.0.4` to `v3.0.5`.
+- Root `README.md` "Upgrade any repo to vX" headline + body bumped from `v3.0.4` to `v3.0.5`.
+- `PROMPT.md` master prompt banner bumped from `repo-standards v3.0.4` → `repo-standards v3.0.5` (line 27).
+- Confirmation-language polish across the prompt surface: `PROMPT.md` (Phase 0 master block), `prompt/01-ground-rules.md` (rule 12), `prompt/migration-planning.md` (Section 6 output artifact), `prompt/02-canonical-pr-sequence.md` (Step 1–2 PR-open gate), `templates/.github/ISSUE_TEMPLATE/upgrade_request.md` (step 3), and `templates/wiki/Migration-v2-to-v3.md` (Phase 0 step) now explicitly state that clicking the "Approve plan mode" UI button — or replying with "yes", "approved", "proceed", "confirmed", "go ahead", or (in GitHub-issue contexts) a 👍 reaction on Claude's plan comment — counts as the explicit confirmation those gates require. Reduces plan-mode stalls in Claude Code on the web where the agent previously treated UI-button approval as ambiguous.
+- New **rule 16 — Conflict / Assumption Failure Protocol** added to `prompt/01-ground-rules.md`, with mirrored entries in `PROMPT.md`'s master headlines (new headline #2, existing #2-7 renumbered to #3-8) and `prompt/migration-planning.md` (new Section 7 execution-phase reminder). When any Phase 0 assumption fails or an unexpected problem hits mid-execution, Claude must stop, state the failure, propose 2–3 options with trade-offs, and wait for explicit confirmation — never silently alter the plan, skip steps, or self-decide a workaround. Critical-safety rule; overrides every other rule (including rule 8 "Default to autonomy") when they conflict. Append-only addition (rule numbering 1–15 unchanged) so existing `PROMPT.md rule N` cross-references in `UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, `templates/CLAUDE.md.tmpl`, and `README.md` stay valid.
+
+### Migration notes
+
+- **No consumer action required.** The two re-scoped workflows are live-root only (`.github/workflows/auto-tag.yml` and `.github/workflows/tag-release.yml`), not part of the downstream-facing `templates/.github/workflows/` set. Downstream consumers don't ship these workflows; this is purely a self-compliance lift on the standards repo itself.
+- **Live OpenSSF Scorecard score** before this release: `5.9 / 10` (verified live at `https://api.scorecard.dev/projects/github.com/Ranzlappen/repo-standards`). Two further low-scoring checks remain — `Branch-Protection` (currently `3 / 10`) and `Code-Review` (currently `0 / 10`) — but both require GitHub Settings → Rules → Rulesets edits the maintainer performs separately (require ≥1 approval + dismiss stale + require branches up-to-date + uncheck "Allow administrators to bypass"). With those UI fixes in place + this release's Token-Permissions fix + a fresh Scorecard run, the aggregate is expected to lift from `5.9` to `≥ 7.5`.
+- **Deliberately skipped checks** (signal-to-effort ratio is poor for a templates repo): `CII-Best-Practices` (binary check requires multi-page questionnaire on `bestpractices.coreinfrastructure.org`; not pursued), `Fuzzing` and `Packaging` (both inherent to the repo type — templates repo, not a shipped library). `Signed-Releases` is deferred to the first artifact-shipping release (likely v3.1+ if a consumer ships a built artifact through `templates/.github/workflows/release-please.yml`'s opt-in npm/PyPI/GHCR jobs). `Contributors` and `Maintained` clear naturally over time.
 
 ## [3.0.4] — 2026-05-09
 
@@ -372,7 +397,11 @@ Every existing workflow now declares a least-privilege `permissions:` block, has
 - `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner.
 - `.github/workflows/auto-tag.yml` — push-to-main + VERSION-changed automated tagger (creates `vX.Y.Z` and force-updates `vMAJOR` for non-prereleases).
 
-[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v3.0.5...HEAD
+[3.0.5]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.5
+[3.0.4]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.4
+[3.0.3]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.3
+[3.0.2]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.2
 [3.0.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.1
 [3.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.0
 [2.1.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.1

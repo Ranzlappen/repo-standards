@@ -1,10 +1,11 @@
 # Ground rules — non-negotiable
 
-The **15 non-negotiable ground rules** of the canonical Claude Code upgrade flow indexed by [`PROMPT.md`](../PROMPT.md). They apply to every commit, every PR, and every Step (0–5) of the flow.
+The **16 non-negotiable ground rules** of the canonical Claude Code upgrade flow indexed by [`PROMPT.md`](../PROMPT.md). They apply to every commit, every PR, and every Step (0–5) of the flow.
 
 - Rules **1–8** cover branching, behavior preservation, phased PRs, templates as starting points, length discipline, single-file projects, PWA detection, and default-to-autonomy.
 - Rules **9–12** codify the tiny-commit / Conventional Commits / mandatory-self-check / no-PR-without-confirmation rhythm — the same rhythm this repo's own v2 and v3 upgrade passes followed end to end.
 - Rules **13–15** cover out-of-scope auto-issuing (with opt-out), the single-feature-branch / single-PR alternative operating mode, and plan-file hygiene (the Plan Management & Clean State Rule).
+- Rule **16** is the **Conflict / Assumption Failure Protocol** — the critical-safety rule that overrides every other rule when an assumption fails or an unexpected problem hits mid-execution.
 
 Every cross-reference elsewhere in the repo (`UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, `templates/CLAUDE.md.tmpl`, `templates/README.md.tmpl`) cites "`PROMPT.md` rule N" — those numbers map to the rules below.
 
@@ -144,8 +145,11 @@ Every cross-reference elsewhere in the repo (`UPGRADE_CHECKLIST.md`, `REFACTORIN
 12. **No PR opens without explicit user confirmation.** After the last
     commit of a category lands on the working branch, stop and ask the
     user to confirm before calling `mcp__github__create_pull_request` (or
-    its CLI equivalent). Drafts are okay if the user explicitly asks. PR
-    sequencing is sequential: PR N must merge before PR N+1 opens.
+    its CLI equivalent). Clicking the **"Approve plan mode"** button — or
+    replying with "yes", "approved", "proceed", "confirmed", "go ahead",
+    or similar — counts as explicit confirmation. Drafts are okay if the
+    user explicitly asks. PR sequencing is sequential: PR N must merge
+    before PR N+1 opens.
 
 13. **Out-of-scope findings auto-file an issue (opt-out).** When the
     upgrade pass surfaces something unrelated to the current task or PR,
@@ -174,3 +178,24 @@ Every cross-reference elsewhere in the repo (`UPGRADE_CHECKLIST.md`, `REFACTORIN
     to an old plan that already contains shipped work — that's how plan
     bloat happens. Keep plan files concise and focused on the remaining
     scope.
+
+16. **Conflict / Assumption Failure Protocol (critical safety rule).**
+    If at any point during execution you discover that an assumption
+    in the Phase 0 plan or any later step was wrong, or you encounter
+    an unexpected problem, **do not make any self-decided compromises
+    or adjustments**. Immediately stop, clearly state the exact issue
+    and the assumption that failed, propose 2–3 concrete options with
+    trade-offs, and wait for my explicit confirmation before proceeding.
+    Never silently alter the plan, skip steps, or decide on a
+    workaround yourself.
+
+    This rule **overrides every other rule in this file** when they
+    conflict. Examples of triggers: a file the plan assumed exists
+    doesn't; a CI check the plan didn't anticipate gates the merge;
+    a `git push` is rejected and the workaround changes the PR
+    boundary; a refactor uncovers behavior the Phase 0 audit missed;
+    a tool returns a permissions error the plan didn't budget for.
+    In all such cases: stop, surface the failure, propose options,
+    wait. Clicking the **"Approve plan mode"** button — or replying
+    with "yes", "approved", "proceed", "confirmed", "go ahead", or
+    similar (per rule 12) — counts as explicit confirmation.

@@ -56,4 +56,6 @@ PWA-relevant subsections drop out; no Python code → ruff/pytest configs
 in PR 2 are skipped).
 
 WAIT for user confirmation before opening any PR. The plan is the
-deliverable for this step.
+deliverable for this step. Clicking the **"Approve plan mode"** button —
+or replying with "yes", "approved", "proceed", "confirmed", "go ahead",
+or similar — counts as explicit confirmation.
