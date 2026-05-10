@@ -1,6 +1,6 @@
 # Ranzlappen Repo Standards
 
-[![Standards](https://img.shields.io/badge/standards-v3.0.5-informational)](./VERSION)
+[![Standards](https://img.shields.io/badge/standards-v3.1.0-informational)](./VERSION)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Self-validate](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml/badge.svg)](https://github.com/Ranzlappen/repo-standards/actions/workflows/self-validate.yml)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/Ranzlappen/repo-standards/badge)](https://securityscorecards.dev/viewer/?uri=github.com/Ranzlappen/repo-standards)
@@ -8,9 +8,9 @@
 
 ---
 
-## Upgrade any repo to v3.0.5 — the one-step instruction
+## Upgrade any repo to v3.1.0 — the one-step instruction
 
-To upgrade any repository to **repo-standards v3.0.5**, copy the master prompt from [`PROMPT.md`](./PROMPT.md) and paste it into a fresh Claude Code session opened in your target repo. Claude runs **Phase 0** (migration planning) first, waits for your confirmation, then executes the canonical 8-PR sequence. No other setup required.
+To upgrade any repository to **repo-standards v3.1.0**, copy the master prompt from [`PROMPT.md`](./PROMPT.md) and paste it into a fresh Claude Code session opened in your target repo. Claude runs **Phase 0** (migration planning) first, waits for your confirmation, then executes the canonical 8-PR sequence. No other setup required.
 
 ---
 

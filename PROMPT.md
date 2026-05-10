@@ -25,7 +25,7 @@ The numbered files (`00`–`05`) are the canonical Step sequence. The unnumbered
 ## Prompt to paste
 
 ```
-You are upgrading this repository to **repo-standards v3.0.5** — the
+You are upgrading this repository to **repo-standards v3.1.0** — the
 self-dogfooding, AI-first standards toolkit at
 https://github.com/Ranzlappen/repo-standards.
 
