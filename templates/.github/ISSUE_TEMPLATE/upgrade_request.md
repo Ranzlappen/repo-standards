@@ -31,7 +31,9 @@ authoritative spec for what to do. The summary of expectations:
    plan comment on this issue with: one-sentence project summary,
    detected stack, checklist results (✓ / — / ⚠️), proposed phased
    PR sequence.
-3. WAIT for confirmation in this issue before opening any PR.
+3. WAIT for confirmation in this issue before opening any PR. Replying
+   with "approved", "yes", "proceed", "confirmed", "go ahead", or a 👍
+   reaction on Claude's plan comment counts as explicit confirmation.
 4. Open PRs in the order PROMPT.md specifies. One small change per
    commit; conventional commits; tiny PRs; mandatory post-task
    self-check after every edit.
