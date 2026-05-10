@@ -22,6 +22,7 @@ Hotfix on top of v3.0.4. Lifts the live OpenSSF Scorecard score from `5.9 / 10` 
 - Root `README.md` standards badge bumped from `v3.0.4` to `v3.0.5`.
 - Root `README.md` "Upgrade any repo to vX" headline + body bumped from `v3.0.4` to `v3.0.5`.
 - `PROMPT.md` master prompt banner bumped from `repo-standards v3.0.4` → `repo-standards v3.0.5` (line 27).
+- Confirmation-language polish across the prompt surface: `PROMPT.md` (Phase 0 master block), `prompt/01-ground-rules.md` (rule 12), `prompt/migration-planning.md` (Section 6 output artifact), `prompt/02-canonical-pr-sequence.md` (Step 1–2 PR-open gate), `templates/.github/ISSUE_TEMPLATE/upgrade_request.md` (step 3), and `templates/wiki/Migration-v2-to-v3.md` (Phase 0 step) now explicitly state that clicking the "Approve plan mode" UI button — or replying with "yes", "approved", "proceed", "confirmed", "go ahead", or (in GitHub-issue contexts) a 👍 reaction on Claude's plan comment — counts as the explicit confirmation those gates require. Reduces plan-mode stalls in Claude Code on the web where the agent previously treated UI-button approval as ambiguous.
 
 ### Migration notes
 
