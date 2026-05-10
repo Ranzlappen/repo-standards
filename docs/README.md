@@ -39,7 +39,7 @@ Examples that *don't* belong here:
 
 - One-off Q&A → use [GitHub Discussions](https://github.com/Ranzlappen/repo-standards/discussions).
 - Bug reports / feature requests → use [Issues](https://github.com/Ranzlappen/repo-standards/issues).
-- The 15 ground rules / the canonical 8-PR sequence / the audit checklist → those have their own dedicated files at the root, don't duplicate.
+- The 16 ground rules / the canonical 8-PR sequence / the audit checklist → those have their own dedicated files at the root, don't duplicate.
 
 ## Anything in `docs/` that's also valuable cold should still be linked from `README.md`
 
