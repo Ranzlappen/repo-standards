@@ -150,4 +150,6 @@ Phase 0 produces a single Markdown document containing:
 
 **In the direct Claude Code flow:** post this as the first response in the session. Wait for the user to confirm before invoking Step 0.
 
+**What counts as confirmation (both flows):** clicking the **"Approve plan mode"** button — or replying with "yes", "approved", "proceed", "confirmed", "go ahead", a 👍 reaction on the plan comment, or similar — counts as explicit confirmation.
+
 After confirmation, hand off to [`prompt/00-version-check.md`](./00-version-check.md) and proceed through the canonical flow.
