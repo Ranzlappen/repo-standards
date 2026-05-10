@@ -14,7 +14,7 @@ The numbered files (`00`–`04`) are the canonical Step sequence. The unnumbered
 | --- | --- |
 | [`prompt/migration-planning.md`](./prompt/migration-planning.md) | **Phase 0** — produce the tailored migration roadmap (repo profile + must/should/could/skip scoring + batch plan + AI-budget guardrails + Dependabot audit) before the version check. |
 | [`prompt/00-version-check.md`](./prompt/00-version-check.md) | **Step 0** — refuse on major mismatch; the gate that keeps v3 rules off a v2 repo and vice versa. |
-| [`prompt/01-ground-rules.md`](./prompt/01-ground-rules.md) | The **15 non-negotiable rules**: branching, behavior preservation, phased PRs, tiny commits, post-task self-check, plan-file hygiene, etc. |
+| [`prompt/01-ground-rules.md`](./prompt/01-ground-rules.md) | The **16 non-negotiable rules**: branching, behavior preservation, phased PRs, tiny commits, post-task self-check, plan-file hygiene, conflict / assumption-failure protocol, etc. |
 | [`prompt/02-canonical-pr-sequence.md`](./prompt/02-canonical-pr-sequence.md) | **Step 1 + Step 2** — read & audit, then plan against the canonical 8-PR sequence with hard ordering and practical execution. |
 | [`prompt/03-pr-description.md`](./prompt/03-pr-description.md) | **Step 3** — required PR description structure (Summary / Checklist coverage / Refactoring opportunities / Test plan). |
 | [`prompt/04-wiki-seeding.md`](./prompt/04-wiki-seeding.md) | **Step 4** — optional, opt-in Wiki seeding via the GitHub web UI. |
@@ -65,7 +65,7 @@ similar — counts as explicit confirmation.
 
 ## Non-negotiable ground rules (apply to every response)
 
-The full 15 rules live in prompt/01-ground-rules.md. Headlines:
+The full 16 rules live in prompt/01-ground-rules.md. Headlines:
 
 1. Behavior preservation (rule 2). Keep 100% of original functionality,
    user flows, UI, storage keys, URLs, deployment shape, observable
@@ -73,21 +73,28 @@ The full 15 rules live in prompt/01-ground-rules.md. Headlines:
    "Repo-specific risks / edge-cases" subsection in every PR description
    and post-task self-check ("None observed" acceptable; heading
    mandatory).
-2. Tiny commits (rule 9). One file (or one inseparable pair) per
+2. Conflict / assumption failure protocol (rule 16). If any
+   assumption from the Phase 0 plan or a later step proves wrong,
+   or an unexpected problem hits mid-execution, STOP. Don't
+   self-decide a workaround, don't silently alter the plan, don't
+   skip steps. State the failed assumption + the exact issue,
+   propose 2–3 concrete options with trade-offs, and wait for
+   explicit confirmation before continuing.
+3. Tiny commits (rule 9). One file (or one inseparable pair) per
    response, one Conventional Commit per change.
-3. Post-task self-check (rule 11). Mandatory after every code-change
+4. Post-task self-check (rule 11). Mandatory after every code-change
    commit — both drift-detection (per templates/CLAUDE.md.tmpl) and
    mechanical verification (files exist, YAML/JSON parses, links
    resolve, line-count delta matches the plan, no template placeholders
    remain in tracked files outside templates/).
-4. Plan-file hygiene (rule 15). Never bloat plans with completed work
+5. Plan-file hygiene (rule 15). Never bloat plans with completed work
    — start fresh or actively prune.
-5. Out-of-scope findings (rule 13). Auto-file a labeled GitHub issue by
+6. Out-of-scope findings (rule 13). Auto-file a labeled GitHub issue by
    default; opt out via the repo variable
    DISABLE_OUT_OF_SCOPE_ISSUES=true.
-6. No PR opens without explicit user confirmation (rule 12).
+7. No PR opens without explicit user confirmation (rule 12).
    Conventional Commits only.
-7. Operating mode default = canonical 8-PR sequence (rule 14). The
+8. Operating mode default = canonical 8-PR sequence (rule 14). The
    single-PR alternative mode is opt-in for focused work that would
    otherwise produce ≤3 PRs.
 
