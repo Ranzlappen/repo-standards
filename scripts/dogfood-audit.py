@@ -15,7 +15,7 @@ in UPGRADE_CHECKLIST.md:
   [3] Root community files — all 7 dogfooded files present.
   [4] Live workflows — all 7 workflows present at .github/workflows/.
   [5] README badges — Standards / License / OpenSSF Scorecard URLs valid.
-  [6] Modular prompt files — all 6 prompt/*.md present + master prompt.
+  [6] Modular prompt files — all 7 prompt/*.md present + master prompt.
   [7] Placeholder hygiene — no <PROJECT_NAME>, <OWNER>, <REPO>, <TODO>
       leakage in tracked files outside templates/ (per ground rule 11
       mechanical verification).
@@ -168,6 +168,7 @@ for p in [
     "02-canonical-pr-sequence",
     "03-pr-description",
     "04-wiki-seeding",
+    "05-migration-debrief",
 ]:
     assert_file(f"prompt/{p}.md")
 assert_grep(r"repo-standards v\d+\.\d+\.\d+", "PROMPT.md", "PROMPT.md master prompt names a v3.x version")

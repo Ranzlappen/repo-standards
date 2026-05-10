@@ -6,6 +6,25 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+### Added
+
+- `prompt/05-migration-debrief.md` — new mandatory **Step 5** of the canonical Claude Code upgrade flow. Produces a single Markdown debrief at the end of every migration pass: shipped PRs, deferred scope with reasons, out-of-scope issues filed, follow-ups, and `.standards-version` delta. Roll-up of information already produced during the pass (per-PR descriptions from Step 3, self-checks from rule 11, auto-issues from rule 13, Phase 0 scoring table) — explicitly not a re-audit. Skipped only on explicit user signal. Indexed in `PROMPT.md`'s modular-structure table; covered by the dogfood audit's `[6/8] Modular prompt files` section.
+
+### Changed
+
+- `PROMPT.md` modular-structure table extended from 6 → 7 prompt files; "six focused files" → "seven focused files"; step range `(00–04)` → `(00–05)`; embedded prompt-to-paste fetch list adds `prompt/05-migration-debrief.md`; "After Phase 0 confirms" closing paragraph names Step 5 with the mandatory-by-default qualifier.
+- `prompt/01-ground-rules.md` preamble: step range citation updated from "Step (0–4)" to "Step (0–5)" to reflect the new Step 5. Rule range remains 1–16 — no rule additions or renumbering in this entry; rule 16 (Conflict / Assumption Failure Protocol) shipped separately in v3.0.5.
+- `prompt/04-wiki-seeding.md`: cross-references the Step 5 debrief as the source of the `Upgrade-History` entry's Headline / Scope / Notes blocks. Single source of truth when both Step 4 and Step 5 are taken.
+- `scripts/dogfood-audit.py`: section `[6/8]` enumeration adds `"05-migration-debrief"`; module docstring bumped from "all 6 prompt/*.md" to "all 7"; total audit count moves from 33 → 34 PASS.
+
+### Fixed
+
+- `templates/.github/workflows/security-scan.yml` and `templates/.github/workflows/ci-static-html.yml`: `gitleaks/gitleaks-action` pin converged on the commit-SHA form (`ff98106e4c7b2bc287b24eaf42907196329070c7`) the live `.github/workflows/security-scan.yml` already uses; both templates previously pinned the equivalent annotated-tag-object SHA (`dcedce43c6f43de0b836d1fe38946645c9c638dc`). GitHub recommends commit-SHA pins for actions; this is notation cleanup with zero behaviour change.
+
+### Tracked separately
+
+- Issue [#33](https://github.com/Ranzlappen/repo-standards/issues/33) — re-evaluate `gitleaks-action` Node-20 deprecation after the 2026-06-02 GitHub Actions runner cutover. Deferred replacement plan preserved inline in the issue body for reactive execution if the forced Node-24 migration breaks the action; high-confidence prediction is no-op (action is a thin wrapper around the `gitleaks` Go binary).
+
 ## [3.0.5] — 2026-05-09
 
 Hotfix on top of v3.0.4. Lifts the live OpenSSF Scorecard score from `5.9 / 10` (below the repo's stated `≥ 7.0` floor in `templates/.github/SECURITY.md` + `templates/.github/GOVERNANCE.md`) by fixing the `Token-Permissions` regression (currently scoring `0 / 10`). Two live-root workflows — `auto-tag.yml` and `tag-release.yml` — declared `permissions: contents: write` at workflow scope. Scorecard's [Token-Permissions check](https://github.com/ossf/scorecard/blob/main/docs/checks.md#token-permissions) flags any non-`read` workflow-scope permission as a violation; the fix is to scope the `contents: write` to the only job in each workflow that actually needs it (the tag-create + tag-push step). No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3`; consumers pinned to the `v3` major-tag pick up everything in this release on their next workflow run.

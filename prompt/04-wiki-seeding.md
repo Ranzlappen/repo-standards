@@ -25,7 +25,10 @@ similar). If they do:
    scope.
 5. Update the `Upgrade-History` page with the entry for this upgrade as
    the first content the user pastes, so the wiki has a real first entry
-   from the start.
+   from the start. The entry's Headline / Scope / Notes blocks come from
+   the Step 5 debrief produced in [`prompt/05-migration-debrief.md`](./05-migration-debrief.md);
+   Step 5 produces them whether or not Step 4 was taken, so when both
+   apply, reuse them verbatim instead of re-deriving.
 
 This phase is purely additive: skipping it never blocks the rest of the
 upgrade.

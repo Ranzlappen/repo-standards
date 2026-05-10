@@ -6,9 +6,9 @@ The same prompt works in both flows.
 
 ## Modular structure
 
-The actual rules, sequences, and step-by-step content live as six focused files under [`prompt/`](./prompt/). `PROMPT.md` (this file) is the entry-point index — every cross-reference in `README.md`, `UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, and `templates/CLAUDE.md.tmpl` cites "`PROMPT.md` rule N" or "`PROMPT.md` Step N" (or "`PROMPT.md` Phase 0"), and those references land here and click through to the modular file.
+The actual rules, sequences, and step-by-step content live as seven focused files under [`prompt/`](./prompt/). `PROMPT.md` (this file) is the entry-point index — every cross-reference in `README.md`, `UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, and `templates/CLAUDE.md.tmpl` cites "`PROMPT.md` rule N" or "`PROMPT.md` Step N" (or "`PROMPT.md` Phase 0"), and those references land here and click through to the modular file.
 
-The numbered files (`00`–`04`) are the canonical Step sequence. The unnumbered [`prompt/migration-planning.md`](./prompt/migration-planning.md) is **Phase 0** — the strategic-planning layer that runs *before* Step 0 and produces the tailored migration roadmap the rest of the flow executes.
+The numbered files (`00`–`05`) are the canonical Step sequence. The unnumbered [`prompt/migration-planning.md`](./prompt/migration-planning.md) is **Phase 0** — the strategic-planning layer that runs *before* Step 0 and produces the tailored migration roadmap the rest of the flow executes.
 
 | File | What's in it |
 | --- | --- |
@@ -18,6 +18,7 @@ The numbered files (`00`–`04`) are the canonical Step sequence. The unnumbered
 | [`prompt/02-canonical-pr-sequence.md`](./prompt/02-canonical-pr-sequence.md) | **Step 1 + Step 2** — read & audit, then plan against the canonical 8-PR sequence with hard ordering and practical execution. |
 | [`prompt/03-pr-description.md`](./prompt/03-pr-description.md) | **Step 3** — required PR description structure (Summary / Checklist coverage / Refactoring opportunities / Test plan). |
 | [`prompt/04-wiki-seeding.md`](./prompt/04-wiki-seeding.md) | **Step 4** — optional, opt-in Wiki seeding via the GitHub web UI. |
+| [`prompt/05-migration-debrief.md`](./prompt/05-migration-debrief.md) | **Step 5** — mandatory session-end debrief: what landed, what didn't and why, out-of-scope issues filed, follow-ups, repo-state delta. |
 
 ---
 
@@ -40,6 +41,7 @@ Before doing anything else, fetch and read these files from that repo:
   - prompt/02-canonical-pr-sequence.md
   - prompt/03-pr-description.md
   - prompt/04-wiki-seeding.md
+  - prompt/05-migration-debrief.md
 
 ## Phase 0 — Migration Planning & Smart Adoption (mandatory first step)
 
@@ -106,7 +108,8 @@ prompt/02-canonical-pr-sequence.md (read & audit + plan the canonical
 8-PR sequence), Step 3 in prompt/03-pr-description.md (PR description
 structure for every approved PR), and — if the user opts in — Step 4
 in prompt/04-wiki-seeding.md (manual Wiki seeding via the GitHub web
-UI).
+UI), and finally Step 5 in prompt/05-migration-debrief.md (mandatory
+session-end debrief unless the user explicitly skips it).
 
 ## Final note on adaptation
 
