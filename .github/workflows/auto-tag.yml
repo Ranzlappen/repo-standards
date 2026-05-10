@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: auto-tag
@@ -29,6 +29,12 @@ jobs:
   auto-tag:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      # Job-scoped write — needed for `git tag` + `git push origin <tag>` +
+      # the force-update of the moving major-version pointer below. Workflow
+      # scope stays `contents: read` so OpenSSF Scorecard's Token-Permissions
+      # check sees least-privilege at the workflow level.
+      contents: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
