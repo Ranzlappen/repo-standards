@@ -144,8 +144,11 @@ Every cross-reference elsewhere in the repo (`UPGRADE_CHECKLIST.md`, `REFACTORIN
 12. **No PR opens without explicit user confirmation.** After the last
     commit of a category lands on the working branch, stop and ask the
     user to confirm before calling `mcp__github__create_pull_request` (or
-    its CLI equivalent). Drafts are okay if the user explicitly asks. PR
-    sequencing is sequential: PR N must merge before PR N+1 opens.
+    its CLI equivalent). Clicking the **"Approve plan mode"** button — or
+    replying with "yes", "approved", "proceed", "confirmed", "go ahead",
+    or similar — counts as explicit confirmation. Drafts are okay if the
+    user explicitly asks. PR sequencing is sequential: PR N must merge
+    before PR N+1 opens.
 
 13. **Out-of-scope findings auto-file an issue (opt-out).** When the
     upgrade pass surfaces something unrelated to the current task or PR,
