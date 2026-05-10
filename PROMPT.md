@@ -59,7 +59,9 @@ Per prompt/migration-planning.md, before touching any file:
 
 Output the Phase 0 deliverable (profile + scoring table + roadmap +
 guardrails ack + Dependabot status). WAIT for my explicit confirmation
-before invoking Step 0.
+before invoking Step 0. Clicking the **"Approve plan mode"** button — or
+replying with "yes", "approved", "proceed", "confirmed", "go ahead", or
+similar — counts as explicit confirmation.
 
 ## Non-negotiable ground rules (apply to every response)
 
