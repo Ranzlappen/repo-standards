@@ -1,6 +1,6 @@
 # Ground rules — non-negotiable
 
-The **15 non-negotiable ground rules** of the canonical Claude Code upgrade flow indexed by [`PROMPT.md`](../PROMPT.md). They apply to every commit, every PR, and every Step (0–4) of the flow.
+The **15 non-negotiable ground rules** of the canonical Claude Code upgrade flow indexed by [`PROMPT.md`](../PROMPT.md). They apply to every commit, every PR, and every Step (0–5) of the flow.
 
 - Rules **1–8** cover branching, behavior preservation, phased PRs, templates as starting points, length discipline, single-file projects, PWA detection, and default-to-autonomy.
 - Rules **9–12** codify the tiny-commit / Conventional Commits / mandatory-self-check / no-PR-without-confirmation rhythm — the same rhythm this repo's own v2 and v3 upgrade passes followed end to end.
