@@ -6,6 +6,29 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.0.5] — 2026-05-09
+
+Hotfix on top of v3.0.4. Lifts the live OpenSSF Scorecard score from `5.9 / 10` (below the repo's stated `≥ 7.0` floor in `templates/.github/SECURITY.md` + `templates/.github/GOVERNANCE.md`) by fixing the `Token-Permissions` regression (currently scoring `0 / 10`). Two live-root workflows — `auto-tag.yml` and `tag-release.yml` — declared `permissions: contents: write` at workflow scope. Scorecard's [Token-Permissions check](https://github.com/ossf/scorecard/blob/main/docs/checks.md#token-permissions) flags any non-`read` workflow-scope permission as a violation; the fix is to scope the `contents: write` to the only job in each workflow that actually needs it (the tag-create + tag-push step). No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3`; consumers pinned to the `v3` major-tag pick up everything in this release on their next workflow run.
+
+### Fixed
+
+- `.github/workflows/auto-tag.yml` (live root only — no template counterpart) — workflow-scope `permissions: contents: write` re-scoped to `permissions: contents: read`. The `auto-tag:` job now declares `permissions: contents: write` job-locally where it actually executes `git tag -a` + `git push origin <tag>` + the `git push --force origin v<MAJOR>` for the moving major-version pointer. Closes the OpenSSF Scorecard `Token-Permissions` regression flagged at https://api.scorecard.dev/projects/github.com/Ranzlappen/repo-standards.
+- `.github/workflows/tag-release.yml` (live root only — no template counterpart) — same shape: workflow-scope `permissions: contents: write` re-scoped to `permissions: contents: read`; the `tag:` job now declares `permissions: contents: write` job-locally where it executes `git tag -a` + `git push origin <tag>` (with optional `--force` per workflow_dispatch input).
+
+### Changed
+
+- `VERSION` bumped from `3.0.4` to `3.0.5`.
+- `.standards-version` bumped from `3.0.4` to `3.0.5` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.0.4` to `v3.0.5`.
+- Root `README.md` "Upgrade any repo to vX" headline + body bumped from `v3.0.4` to `v3.0.5`.
+- `PROMPT.md` master prompt banner bumped from `repo-standards v3.0.4` → `repo-standards v3.0.5` (line 27).
+
+### Migration notes
+
+- **No consumer action required.** The two re-scoped workflows are live-root only (`.github/workflows/auto-tag.yml` and `.github/workflows/tag-release.yml`), not part of the downstream-facing `templates/.github/workflows/` set. Downstream consumers don't ship these workflows; this is purely a self-compliance lift on the standards repo itself.
+- **Live OpenSSF Scorecard score** before this release: `5.9 / 10` (verified live at `https://api.scorecard.dev/projects/github.com/Ranzlappen/repo-standards`). Two further low-scoring checks remain — `Branch-Protection` (currently `3 / 10`) and `Code-Review` (currently `0 / 10`) — but both require GitHub Settings → Rules → Rulesets edits the maintainer performs separately (require ≥1 approval + dismiss stale + require branches up-to-date + uncheck "Allow administrators to bypass"). With those UI fixes in place + this release's Token-Permissions fix + a fresh Scorecard run, the aggregate is expected to lift from `5.9` to `≥ 7.5`.
+- **Deliberately skipped checks** (signal-to-effort ratio is poor for a templates repo): `CII-Best-Practices` (binary check requires multi-page questionnaire on `bestpractices.coreinfrastructure.org`; not pursued), `Fuzzing` and `Packaging` (both inherent to the repo type — templates repo, not a shipped library). `Signed-Releases` is deferred to the first artifact-shipping release (likely v3.1+ if a consumer ships a built artifact through `templates/.github/workflows/release-please.yml`'s opt-in npm/PyPI/GHCR jobs). `Contributors` and `Maintained` clear naturally over time.
+
 ## [3.0.4] — 2026-05-09
 
 Cleanup release. Closes the Node 20 deprecation deadline (every action with a Node-20 build has been bumped to its Node-24 successor via the dependabot run that fired on first activation of `dependabot.yml`), resolves the long-standing CoC-inlining decision (Issue #4) by shipping an opt-in full-text variant alongside the existing stub, and documents the GitHub Rulesets vs. legacy Branch-protection-rule gap in `security-scan.yml`. No semantic change to any rule, prompt file, governance doc, or checklist item — `prompt/00-version-check.md` still expects major `3`, consumers pinned to the `v3` major-tag pick up everything in this release on their next workflow run.
@@ -353,7 +376,11 @@ Every existing workflow now declares a least-privilege `permissions:` block, has
 - `.github/workflows/tag-release.yml` — manual `workflow_dispatch` helper that creates and pushes annotated tags from a GitHub runner.
 - `.github/workflows/auto-tag.yml` — push-to-main + VERSION-changed automated tagger (creates `vX.Y.Z` and force-updates `vMAJOR` for non-prereleases).
 
-[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/Ranzlappen/repo-standards/compare/v3.0.5...HEAD
+[3.0.5]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.5
+[3.0.4]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.4
+[3.0.3]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.3
+[3.0.2]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.2
 [3.0.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.1
 [3.0.0]: https://github.com/Ranzlappen/repo-standards/releases/tag/v3.0.0
 [2.1.1]: https://github.com/Ranzlappen/repo-standards/releases/tag/v2.1.1
