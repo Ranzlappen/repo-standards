@@ -5,11 +5,20 @@ name: Auto-tag on VERSION change
 # (for non-prerelease versions) force-updates the moving major-version
 # pointer (e.g. `v2`).
 #
+# Once a new tag is created, the downstream `build`, `release`, and
+# `provenance` jobs publish a signed, attested GitHub Release containing
+# a tarball of the standards toolkit. The SLSA L3 provenance is generated
+# by the official slsa-github-generator reusable workflow and signed via
+# Sigstore Fulcio (transparency log: Rekor). This satisfies OpenSSF
+# Scorecard's Packaging and Signed-Releases checks.
+#
 # Pre-release versions (anything containing a hyphen, e.g. 2.0.0-rc.1):
 #   - Tag the exact version (vX.Y.Z-suffix).
 #   - DO NOT move the major-version pointer.
+#   - DO publish a signed Release marked as prerelease.
 #
-# Manual / retroactive tagging stays in tag-release.yml.
+# Manual / retroactive tagging stays in tag-release.yml. Retroactive tags
+# do NOT currently get release artifacts; that is a follow-up.
 
 on:
   push:
@@ -35,6 +44,11 @@ jobs:
       # scope stays `contents: read` so OpenSSF Scorecard's Token-Permissions
       # check sees least-privilege at the workflow level.
       contents: write
+    outputs:
+      tag: ${{ steps.ver.outputs.tag }}
+      version: ${{ steps.ver.outputs.version }}
+      prerelease: ${{ steps.ver.outputs.prerelease }}
+      created: ${{ steps.created.outputs.created }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
         with:
@@ -102,3 +116,126 @@ jobs:
       - name: Skipped major pointer (prerelease)
         if: steps.check.outputs.exists == 'false' && steps.ver.outputs.prerelease == 'true'
         run: echo "Skipped moving ${{ steps.ver.outputs.major }} for prerelease ${{ steps.ver.outputs.tag }}"
+
+      - name: Record whether a new tag was created this run
+        id: created
+        run: |
+          if [ "${{ steps.check.outputs.exists }}" = "false" ]; then
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "created=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    name: Build release tarball
+    needs: auto-tag
+    if: needs.auto-tag.outputs.created == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      # Read-only — only fetches the freshly-created tag and packs source.
+      contents: read
+    outputs:
+      tarball-name: ${{ steps.pack.outputs.tarball-name }}
+      digest: ${{ steps.digest.outputs.digest }}
+    steps:
+      - name: Checkout at the new tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+        with:
+          ref: ${{ needs.auto-tag.outputs.tag }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Build reproducible tarball
+        id: pack
+        env:
+          TAG: ${{ needs.auto-tag.outputs.tag }}
+        run: |
+          set -euo pipefail
+          NAME="repo-standards-templates-${TAG}.tar.gz"
+          # Curated payload: the standards toolkit a downstream consumer
+          # would pin to. Excludes .git, .github (meta-CI), the dogfood
+          # marker file, and SPONSORS.md (this-repo-only).
+          tar --owner=0 --group=0 --numeric-owner --sort=name \
+              --mtime="1970-01-01 00:00:00 UTC" \
+              -czf "${NAME}" \
+              templates/ \
+              prompt/ \
+              scripts/ \
+              docs/ \
+              LICENSE \
+              README.md \
+              CHANGELOG.md \
+              VERSION \
+              PROMPT.md \
+              UPGRADE_CHECKLIST.md \
+              REFACTORING_GUIDE.md
+          sha256sum "${NAME}" | tee "${NAME}.sha256"
+          echo "tarball-name=${NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Compute base64 subject for SLSA generator
+        id: digest
+        env:
+          NAME: ${{ steps.pack.outputs.tarball-name }}
+        run: |
+          set -euo pipefail
+          # The SLSA generic generator expects sha256sum output (untruncated
+          # hex + two spaces + filename), base64-encoded with no line wrapping.
+          DIGEST="$(sha256sum "${NAME}" | base64 -w0)"
+          echo "digest=${DIGEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload tarball + checksum as workflow artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: release-payload
+          path: |
+            ${{ steps.pack.outputs.tarball-name }}
+            ${{ steps.pack.outputs.tarball-name }}.sha256
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Publish GitHub Release
+    needs: [auto-tag, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      # Required by softprops/action-gh-release to create the Release and
+      # upload assets via the Releases API. Workflow scope remains
+      # `contents: read` so Token-Permissions stays at 10/10.
+      contents: write
+    steps:
+      - name: Download release payload
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          name: release-payload
+
+      - name: Create GitHub Release with assets
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65  # v2.6.2
+        with:
+          tag_name: ${{ needs.auto-tag.outputs.tag }}
+          name: ${{ needs.auto-tag.outputs.tag }}
+          prerelease: ${{ needs.auto-tag.outputs.prerelease == 'true' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            ${{ needs.build.outputs.tarball-name }}
+            ${{ needs.build.outputs.tarball-name }}.sha256
+
+  provenance:
+    name: SLSA L3 provenance
+    needs: [auto-tag, build, release]
+    permissions:
+      # `actions: read`   — generator reads workflow-run metadata to attest.
+      # `id-token: write` — OIDC handshake against Sigstore Fulcio.
+      # `contents: write` — appends the .intoto.jsonl asset to the Release
+      #                     created by the `release` job above.
+      actions: read
+      id-token: write
+      contents: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@f7dd8c54c2067bafc12ca7a55595d5ee9b75204a  # v2.1.0
+    with:
+      base64-subjects: ${{ needs.build.outputs.digest }}
+      provenance-name: repo-standards-templates-${{ needs.auto-tag.outputs.tag }}.intoto.jsonl
+      upload-assets: true
+      upload-tag-name: ${{ needs.auto-tag.outputs.tag }}
