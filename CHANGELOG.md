@@ -6,6 +6,28 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.1.1] — 2026-05-10
+
+Patch release on top of v3.1.0. Fixes the SLSA-provenance generation in the new release pipeline. The first end-to-end run on `v3.1.0` succeeded for the tag, tarball, and GitHub Release, but the `provenance` job that called the `slsa-framework/slsa-github-generator` reusable workflow failed inside the generator's own steps (`Input required and not supplied: path`, exit 127) — leaving the published `v3.1.0` Release without a `.intoto.jsonl` attestation. v3.1.1 replaces the reusable-workflow path with [`actions/attest-build-provenance`](https://github.com/actions/attest-build-provenance) called inline from the existing `release` job. The attestation is signed via Sigstore Fulcio (Rekor transparency log) using GitHub OIDC and is attached to the Release as `<tarball>.sigstore.json`. Verification path moves from `slsa-verifier` → `gh attestation verify <tarball> --owner Ranzlappen`. Workflow-scope `contents: read` is preserved; the `release` job now also declares `id-token: write` + `attestations: write` at job scope (Token-Permissions stays at `10 / 10`). The `provenance` job is removed; the workflow is now three jobs (`auto-tag`, `build`, `release`) chained. No consumer-facing rule, prompt, or template change.
+
+### Fixed
+
+- `.github/workflows/auto-tag.yml` (live root only — no template counterpart) — the failed `provenance` job (which called `slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@f7dd8c54c2067bafc12ca7a55595d5ee9b75204a # v2.1.0`) is removed. Its responsibility moves into the existing `release` job as two new steps: `actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0` generates the Sigstore-signed SLSA build-provenance bundle, and a small shell step copies the bundle next to the tarball as `<tarball>.sigstore.json` so `softprops/action-gh-release` attaches it as a Release asset. The `release` job's permissions block now grants `id-token: write` and `attestations: write` (alongside the existing `contents: write`). The `build` job's `digest` output (only consumed by the removed reusable workflow) is dropped along with the corresponding `Compute base64 subject for SLSA generator` step.
+- `.github/SECURITY.md` supply-chain commitments table: the **Signed releases via sigstore / cosign** row mechanism column rewritten to credit `actions/attest-build-provenance` and the GitHub attestations API; verifier moves from `slsa-verifier verify-artifact …` to `gh attestation verify <tarball> --owner Ranzlappen`. The **SLSA build provenance** row rewritten with the same mechanism. Status remains `live` for both rows. The "Level 3" qualifier is removed from the provenance row title — `actions/attest-build-provenance` produces SLSA v1.0 build provenance; the L3 label was specific to the prior reusable-workflow trust model.
+
+### Changed
+
+- `VERSION` bumped from `3.1.0` to `3.1.1`.
+- `.standards-version` bumped from `3.1.0` to `3.1.1` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.1.0` to `v3.1.1`.
+- Root `README.md` "Upgrade any repo to vX" headline + body bumped from `v3.1.0` to `v3.1.1`.
+- `PROMPT.md` master prompt banner bumped from `repo-standards v3.1.0` → `repo-standards v3.1.1` (line 28).
+
+### Migration notes
+
+- **No consumer action required.** All changes are live-root-only (`.github/workflows/auto-tag.yml`, `.github/SECURITY.md`); `templates/.github/workflows/release-please.yml` retains its existing publish-path plumbing. Downstream consumers pinned to `@v3` pick up the fix on their next workflow run that touches `auto-tag.yml` (which is none — they don't ship it).
+- The published `v3.1.0` GitHub Release will continue to carry the tarball + sha256 but no signed attestation. Re-issuing v3.1.0 with provenance would force-move the existing tag, which is avoided. The `v3.1.1` release will be the first to ship with a `.sigstore.json` bundle attached; from there forward every tagged release accrues one. OpenSSF Scorecard's `Signed-Releases` check averages over the last 5 releases, so full credit lands after 5 successful post-fix releases.
+
 ## [3.1.0] — 2026-05-10
 
 Minor release. Two feature additions on top of v3.0.5: (1) signed, attested release artifacts published automatically on every VERSION bump — the `.github/workflows/auto-tag.yml` workflow now packs a curated source tarball, creates a GitHub Release, and attaches SLSA Level 3 provenance signed via Sigstore Fulcio (Rekor transparency log); and (2) a new mandatory **Step 5 — Migration debrief** in the canonical Claude Code upgrade flow (`prompt/05-migration-debrief.md`). The release pipeline lifts the live OpenSSF Scorecard `Packaging` check from `-1 / 10` to `10 / 10` and primes the `Signed-Releases` check toward `10 / 10` (full credit once five signed releases exist on the moving-window). Token-Permissions stays at `10 / 10`: workflow scope on `auto-tag.yml` remains `contents: read`; the three new jobs (`build`, `release`, `provenance`) each declare their own least-privilege blocks. Consumers pinned to `@v3` pick up both features on their next workflow run.
