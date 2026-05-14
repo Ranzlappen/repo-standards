@@ -32,7 +32,13 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 
 - [ ] **`.gitignore`** is appropriate for the project's language(s). No build artifacts, secrets, IDE config, or OS noise committed.
 - [ ] No secrets, API keys, or credentials in tracked files. Public client-side keys (e.g. Firebase config) are okay if security is enforced server-side, but this is documented in CLAUDE.md.
-- [ ] No files larger than ~5 MB unless justified (and then ideally via Git LFS).
+- [ ] **Upload hygiene** — tracked files respect GitHub's published push limits, enforced by `scripts/dogfood-audit.py` section [9/9]:
+  - [ ] **5 MB** — project soft cap (also enforced by the `check-added-large-files` pre-commit hook in `templates/.pre-commit-config.yaml`).
+  - [ ] **50 MB** — GitHub's push-warning threshold; anything at or above this fails the audit with an explicit warning.
+  - [ ] **100 MB** — GitHub's hard reject; pushes containing a file this large fail server-side.
+  - [ ] **1 GB** — GitHub's recommended max repo size; the audit fails if the total tracked-file size exceeds this.
+  - [ ] **Bundled JS/CSS ships minified** — any tracked `.js` / `.mjs` / `.cjs` / `.css` file larger than 100 KB must contain `.min.` in its name. Track only the minified artifact, never both raw and minified.
+  - [ ] **Legitimate large binaries use Git LFS** — copy `templates/.gitattributes.example` to `.gitattributes`, run `git lfs install`, and migrate existing offenders with `git lfs migrate import`.
 - [ ] **`.github/dependabot.yml`** exists with weekly schedule and the v2 expectations applied per ecosystem:
   - [ ] explicit `open-pull-requests-limit` (default: 10).
   - [ ] `labels: ["dependencies", "<ecosystem>"]` for triage.

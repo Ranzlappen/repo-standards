@@ -125,6 +125,19 @@ explicit confirmation before invoking Step 0.
 
 ---
 
+## Upload hygiene
+
+The standards enforce GitHub's published push limits as one of the dogfooded
+invariants. `scripts/dogfood-audit.py` section [9/9] runs on every PR and push
+and fails the build when tracked files exceed the **5 MB project soft cap**,
+hit GitHub's **50 MB warn** or **100 MB hard-reject** thresholds, when the
+**total tracked size exceeds 1 GB**, or when a bundled `.js` / `.mjs` / `.cjs`
+/ `.css` file over 100 KB is committed without `.min.` in its name. The full
+rule list (with checkboxes) lives in [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md)
+§2; for legitimate large binaries, copy
+[`templates/.gitattributes.example`](./templates/.gitattributes.example) and
+run `git lfs install`.
+
 ## Notes on the two flows
 
 **GitHub Action flow (recommended for phone):**
