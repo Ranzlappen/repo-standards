@@ -6,7 +6,7 @@ with a summary count. Called from .github/workflows/dogfood-audit.yml on
 every PR + push to main + weekly schedule, and runnable locally for fast
 feedback.
 
-Eight assertion groups covering the mechanically-verifiable invariants
+Nine assertion groups covering the mechanically-verifiable invariants
 in UPGRADE_CHECKLIST.md:
 
   [1] Root LICENSE — file exists, MIT first line, no <PLACEHOLDER>s.
@@ -21,12 +21,16 @@ in UPGRADE_CHECKLIST.md:
       mechanical verification).
   [8] Workflow-sidecar pairing — every templates/.github/workflows/*.yml
       has a matching .properties.json sidecar; no orphans.
+  [9] Upload hygiene — tracked files respect GitHub upload thresholds
+      (5 MB soft cap, 50 MB warn, 100 MB hard reject, 1 GB repo cap)
+      and bundled JS/CSS ships minified.
 """
 
 from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -98,7 +102,7 @@ def section(name: str) -> None:
 print("── dogfood-audit ──")
 print(f"Repo: {ROOT}")
 
-section("[1/8] Root LICENSE")
+section("[1/9] Root LICENSE")
 if assert_file("LICENSE"):
     text = (ROOT / "LICENSE").read_text()
     if text.splitlines()[0].strip() == "MIT License":
@@ -110,7 +114,7 @@ if assert_file("LICENSE"):
     else:
         ok("LICENSE has no unfilled placeholders")
 
-section("[2/8] Versioning files")
+section("[2/9] Versioning files")
 v_ok = assert_file("VERSION")
 sv_ok = assert_file(".standards-version")
 if v_ok and sv_ok:
@@ -127,7 +131,7 @@ if v_ok and sv_ok:
     else:
         ng(f"VERSION is not semver ({v!r})")
 
-section("[3/8] Root community files")
+section("[3/9] Root community files")
 for f in [
     "SPONSORS.md",
     ".github/CODE_OF_CONDUCT.md",
@@ -139,7 +143,7 @@ for f in [
 ]:
     assert_file(f)
 
-section("[4/8] Live workflows at .github/workflows/")
+section("[4/9] Live workflows at .github/workflows/")
 for wf in [
     "auto-tag",
     "self-validate",
@@ -151,7 +155,7 @@ for wf in [
 ]:
     assert_file(f".github/workflows/{wf}.yml")
 
-section("[5/8] README badges")
+section("[5/9] README badges")
 assert_grep(r"shields\.io/badge/standards-v\d+\.\d+\.\d+", "README.md", "Standards badge cites a semver")
 assert_grep(r"shields\.io/badge/License-MIT.*\]\(\./LICENSE\)", "README.md", "License badge points at ./LICENSE")
 assert_grep(
@@ -160,7 +164,7 @@ assert_grep(
     "OpenSSF Scorecard badge cites Ranzlappen/repo-standards",
 )
 
-section("[6/8] Modular prompt files")
+section("[6/9] Modular prompt files")
 for p in [
     "migration-planning",
     "00-version-check",
@@ -173,7 +177,7 @@ for p in [
     assert_file(f"prompt/{p}.md")
 assert_grep(r"repo-standards v\d+\.\d+\.\d+", "PROMPT.md", "PROMPT.md master prompt names a v3.x version")
 
-section("[7/8] Placeholder hygiene (rule 11 mechanical verification)")
+section("[7/9] Placeholder hygiene (rule 11 mechanical verification)")
 # Patterns explicitly enumerated in prompt/01-ground-rules.md rule 11.
 PLACEHOLDER_PATTERNS = [r"<PROJECT_NAME>", r"<OWNER>", r"<REPO>", r"<TODO>"]
 # Files where these patterns appear in *normative* contexts (rule definitions,
@@ -204,7 +208,7 @@ if leaks:
 else:
     ok("No <PROJECT_NAME>/<OWNER>/<REPO>/<TODO> leakage outside templates/")
 
-section("[8/8] Workflow-sidecar pairing (templates/.github/workflows/)")
+section("[8/9] Workflow-sidecar pairing (templates/.github/workflows/)")
 tmpl_dir = ROOT / "templates/.github/workflows"
 unpaired: list[str] = []
 orphans: list[str] = []
@@ -225,6 +229,93 @@ elif orphans:
     ng(f"Orphan sidecars (no matching .yml): {', '.join(orphans)}")
 else:
     ok(f"All {template_yml_count} workflow templates have valid .properties.json sidecars")
+
+# ───────────────────────────────────────────────────────────────────────────
+# Upload hygiene thresholds. The 5 MB soft cap mirrors
+# templates/.pre-commit-config.yaml's check-added-large-files (--maxkb=5000)
+# and UPGRADE_CHECKLIST.md §2. The 50 MB / 100 MB / 1 GB values are GitHub's
+# published push limits (warn / hard reject / recommended repo size).
+SIZE_SOFT_CAP = 5 * 1024 * 1024
+SIZE_GH_WARN = 50 * 1024 * 1024
+SIZE_GH_HARD = 100 * 1024 * 1024
+REPO_TOTAL_CAP = 1024 * 1024 * 1024
+# Bundled-asset minify rule: tracked JS/CSS over this size must be minified.
+# Set conservatively so configs (eslint.config.mjs, vitest.config.ts) don't trip.
+MIN_BUNDLE_BYTES = 100 * 1024
+BUNDLE_SUFFIXES = (".js", ".mjs", ".cjs", ".css")
+
+
+def human_size(n: int) -> str:
+    for unit in ("B", "KB", "MB", "GB"):
+        if n < 1024 or unit == "GB":
+            return f"{n:.1f} {unit}" if unit != "B" else f"{n} B"
+        n /= 1024  # type: ignore[assignment]
+    return f"{n} B"
+
+
+def tracked_files() -> list[Path]:
+    """Return tracked files (skips gitignored build artifacts naturally)."""
+    trace("git ls-files -z")
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(ROOT), "ls-files", "-z"],
+            check=True,
+            capture_output=True,
+        ).stdout
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        ng(f"git ls-files failed: {e}")
+        return []
+    return [ROOT / name for name in out.decode().split("\0") if name]
+
+
+section("[9/9] Upload hygiene (GitHub push limits + minified bundles)")
+files = tracked_files()
+oversize: list[tuple[Path, int]] = []
+total = 0
+for fp in files:
+    if not fp.is_file():
+        continue  # submodule or deleted-but-staged
+    sz = fp.stat().st_size
+    total += sz
+    if sz >= SIZE_SOFT_CAP:
+        oversize.append((fp, sz))
+
+if oversize:
+    ng(f"Oversize tracked files (>= 5 MB): {len(oversize)} found")
+    for fp, sz in oversize[:10]:
+        rel = fp.relative_to(ROOT).as_posix()
+        note = ""
+        if sz >= SIZE_GH_HARD:
+            note = "  ← GitHub hard reject (push will fail)"
+        elif sz >= SIZE_GH_WARN:
+            note = "  ← GitHub push warning threshold"
+        print(f"        {rel}  {human_size(sz)}{note}")
+else:
+    ok("No tracked files exceed 5 MB soft cap (GitHub warns at 50 MB, rejects at 100 MB)")
+
+if total >= REPO_TOTAL_CAP:
+    ng(f"Tracked total {human_size(total)} exceeds 1 GB GitHub repo recommendation")
+else:
+    ok(f"Tracked total {human_size(total)} under 1 GB GitHub repo recommendation")
+
+raw_bundles: list[tuple[Path, int]] = []
+for fp in files:
+    if not fp.is_file():
+        continue
+    if fp.suffix.lower() not in BUNDLE_SUFFIXES:
+        continue
+    if ".min." in fp.name.lower():
+        continue
+    sz = fp.stat().st_size
+    if sz > MIN_BUNDLE_BYTES:
+        raw_bundles.append((fp, sz))
+
+if raw_bundles:
+    ng(f"Non-minified bundled assets > 100 KB: {len(raw_bundles)} found (use .min.js / .min.css)")
+    for fp, sz in raw_bundles[:10]:
+        print(f"        {fp.relative_to(ROOT).as_posix()}  {human_size(sz)}")
+else:
+    ok("Tracked JS/CSS over 100 KB ships minified (or none present)")
 
 # ───────────────────────────────────────────────────────────────────────────
 print()
