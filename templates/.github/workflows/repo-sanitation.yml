@@ -1,0 +1,181 @@
+# Manual-only repo sanitation: delete CI artifacts and (opt-in) releases
+# whose name doesn't mark them as "stable".
+#
+# Triggered only by workflow_dispatch — there is no schedule, no
+# push/PR trigger. The destructive surface is intentionally a deliberate
+# button-press from the Actions UI.
+#
+# What gets kept:
+#   - Artifacts whose name matches `artifact_keep_pattern` (default
+#     `*stable*`, case-insensitive). Anything else is deleted.
+#   - Releases whose title (release.name) contains
+#     `release_keep_pattern` (default `stable`, case-insensitive), but
+#     ONLY when `delete_releases=true` is explicitly set. Otherwise
+#     releases are not touched at all.
+#
+# A Markdown job summary lists what was processed and what was
+# deleted (or would be deleted, if dry_run=true). Use dry_run=true the
+# first time to preview.
+#
+# Required permissions:
+#   actions: write   — delete workflow-run artifacts
+#   contents: write  — delete releases (and their tag refs)
+
+name: Repo sanitation
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_keep_pattern:
+        description: 'Artifact name glob to keep (case-insensitive). Default keeps any name containing "stable". Use `*` to keep everything.'
+        required: false
+        default: '*stable*'
+        type: string
+      delete_releases:
+        description: 'Opt-in: also delete releases whose title lacks the release-keep substring.'
+        required: false
+        default: false
+        type: boolean
+      release_keep_pattern:
+        description: 'Substring matched against release.name / title (case-insensitive). Used only when delete_releases=true.'
+        required: false
+        default: 'stable'
+        type: string
+      dry_run:
+        description: 'Preview only — list what would be deleted without deleting.'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: repo-sanitation
+  cancel-in-progress: false
+
+jobs:
+  sanitize:
+    name: Sanitize artifacts and (opt-in) releases
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Delete non-stable artifacts and (opt-in) releases
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7
+        with:
+          script: |
+            const artifactKeep = `${{ inputs.artifact_keep_pattern }}`;
+            const deleteReleases = `${{ inputs.delete_releases }}` === 'true';
+            const releaseKeep = `${{ inputs.release_keep_pattern }}`;
+            const dryRun = `${{ inputs.dry_run }}` === 'true';
+            const { owner, repo } = context.repo;
+
+            // fnmatch-style glob -> case-insensitive regex.
+            const globMatch = (name, pattern) => {
+              const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+                                     .replace(/\*/g, '.*')
+                                     .replace(/\?/g, '.');
+              return new RegExp('^' + escaped + '$', 'i').test(name || '');
+            };
+
+            const out = [];
+            out.push('# Repo sanitation report');
+            out.push('');
+            out.push('| Setting | Value |');
+            out.push('| --- | --- |');
+            out.push(`| Repo | \`${owner}/${repo}\` |`);
+            out.push(`| Mode | ${dryRun ? '**DRY RUN** (nothing deleted)' : '**LIVE** (deletions executed)'} |`);
+            out.push(`| Artifact keep glob | \`${artifactKeep}\` |`);
+            out.push(`| Delete releases | ${deleteReleases ? `yes, keep title contains \`${releaseKeep}\`` : 'no (opt-in not set)'} |`);
+            out.push('');
+
+            // ── Artifacts ────────────────────────────────────────────
+            const artifacts = await github.paginate(
+              github.rest.actions.listArtifactsForRepo,
+              { owner, repo, per_page: 100 }
+            );
+            const aKept = [];
+            const aDel = [];
+            for (const a of artifacts) {
+              if (globMatch(a.name, artifactKeep)) {
+                aKept.push(a);
+              } else {
+                aDel.push(a);
+                if (!dryRun) {
+                  await github.rest.actions.deleteArtifact({
+                    owner, repo, artifact_id: a.id,
+                  });
+                }
+              }
+            }
+
+            out.push('## Artifacts');
+            out.push(`- Scanned: **${artifacts.length}**`);
+            out.push(`- Kept (match \`${artifactKeep}\`): **${aKept.length}**`);
+            out.push(`- ${dryRun ? 'Would delete' : 'Deleted'}: **${aDel.length}**`);
+            out.push('');
+            if (aDel.length) {
+              out.push('| Name | Size | Age (days) |');
+              out.push('| --- | ---: | ---: |');
+              const now = Date.now();
+              for (const a of aDel.slice(0, 100)) {
+                const ageDays = Math.floor(
+                  (now - new Date(a.created_at).getTime()) / 86400000
+                );
+                const sizeKB = Math.round(a.size_in_bytes / 1024);
+                out.push(`| \`${a.name}\` | ${sizeKB} KB | ${ageDays} |`);
+              }
+              if (aDel.length > 100) {
+                out.push(`| _… ${aDel.length - 100} more not shown_ |  |  |`);
+              }
+              out.push('');
+            }
+
+            // ── Releases (opt-in) ────────────────────────────────────
+            out.push('## Releases');
+            if (!deleteReleases) {
+              out.push('Skipped — `delete_releases` input is false (opt-in only).');
+              out.push('');
+            } else {
+              const releases = await github.paginate(
+                github.rest.repos.listReleases,
+                { owner, repo, per_page: 100 }
+              );
+              const needle = releaseKeep.toLowerCase();
+              const rKept = [];
+              const rDel = [];
+              for (const r of releases) {
+                const title = (r.name || '').toLowerCase();
+                if (needle && title.includes(needle)) {
+                  rKept.push(r);
+                } else {
+                  rDel.push(r);
+                  if (!dryRun) {
+                    await github.rest.repos.deleteRelease({
+                      owner, repo, release_id: r.id,
+                    });
+                  }
+                }
+              }
+              out.push(`- Scanned: **${releases.length}**`);
+              out.push(`- Kept (title contains \`${releaseKeep}\`): **${rKept.length}**`);
+              out.push(`- ${dryRun ? 'Would delete' : 'Deleted'}: **${rDel.length}**`);
+              out.push('');
+              if (rDel.length) {
+                out.push('| Title | Tag | Created |');
+                out.push('| --- | --- | --- |');
+                for (const r of rDel.slice(0, 100)) {
+                  const created = (r.created_at || '').split('T')[0];
+                  out.push(`| ${r.name || '_(no title)_'} | \`${r.tag_name}\` | ${created} |`);
+                }
+                if (rDel.length > 100) {
+                  out.push(`| _… ${rDel.length - 100} more not shown_ |  |  |`);
+                }
+                out.push('');
+              }
+              out.push('> Note: deleting a release does **not** delete the underlying git tag. Tag refs persist unless removed separately.');
+              out.push('');
+            }
+
+            await core.summary.addRaw(out.join('\n')).write();
