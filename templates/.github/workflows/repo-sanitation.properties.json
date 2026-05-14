@@ -1,6 +1,6 @@
 {
   "name": "Repo sanitation",
-  "description": "Manual-only cleanup. Deletes CI artifacts whose name doesn't match the 'keep' glob (default '*stable*') and — opt-in — releases whose title doesn't contain 'stable'. Emits a Markdown job summary listing what was processed and deleted. Use dry_run=true to preview.",
+  "description": "Opt-in for most repos. Manual-only cleanup that deletes CI artifacts whose name doesn't match the 'keep' glob (default '*stable*') and — also opt-in — releases whose title doesn't contain 'stable'. Emits a Markdown job summary listing what was processed and deleted. Use dry_run=true to preview.",
   "iconName": "trash",
   "categories": ["Housekeeping", "Maintenance"],
   "filePatterns": []
