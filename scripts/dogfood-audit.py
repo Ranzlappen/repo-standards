@@ -13,7 +13,7 @@ in UPGRADE_CHECKLIST.md:
   [2] Versioning — VERSION + .standards-version exist, majors aligned,
       VERSION parses as semver.
   [3] Root community files — all 7 dogfooded files present.
-  [4] Live workflows — all 7 workflows present at .github/workflows/.
+  [4] Live workflows — all 8 workflows present at .github/workflows/.
   [5] README badges — Standards / License / OpenSSF Scorecard URLs valid.
   [6] Modular prompt files — all 7 prompt/*.md present + master prompt.
   [7] Placeholder hygiene — no <PROJECT_NAME>, <OWNER>, <REPO>, <TODO>
@@ -152,6 +152,7 @@ for wf in [
     "dependency-review",
     "workflow-summary",
     "dogfood-audit",
+    "repo-sanitation",
 ]:
     assert_file(f".github/workflows/{wf}.yml")
 

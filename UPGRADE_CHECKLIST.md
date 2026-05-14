@@ -64,6 +64,7 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
 - [ ] **A `security-scan.yml` workflow exists** with CodeQL + gitleaks, triggered on PRs, push-to-main, and a weekly schedule.
 - [ ] **Reusable workflow available** (`lint-and-test.yml`) for projects that want a single callable lint+test entry point.
 - [ ] **Workflow summary system available** (`workflow-summary.yml`, added in v3) — reusable workflow that produces a structured, AI-parsable Markdown summary (status, jobs table, warnings, errors, timings) emitted to `$GITHUB_STEP_SUMMARY` and optionally posted as a sticky PR comment keyed by an HTML-comment marker. Wire into long CI workflows for observability; the comment shape (headings, table columns, sort order) is committed-to so AI agents can parse it reliably.
+- [ ] **Manual repo sanitation available** (`repo-sanitation.yml`) — `workflow_dispatch`-only cleanup that deletes CI artifacts whose name doesn't match an allow-glob (default `*stable*`, case-insensitive) and, opt-in via the `delete_releases` input, releases whose title doesn't contain `stable`. Every run emits a Markdown job-summary table listing what was kept and what was deleted (or would be deleted, with `dry_run=true`). No schedule, no PR/push trigger — the destructive surface is a deliberate Actions-UI button press. Required `permissions:` are `actions: write` (artifacts) and `contents: write` (releases). Deleting a release does **not** remove the underlying git tag.
 
 ## 4. Project structure
 
