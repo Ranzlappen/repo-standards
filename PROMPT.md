@@ -128,15 +128,32 @@ explicit confirmation before invoking Step 0.
 ## Upload hygiene
 
 The standards enforce GitHub's published push limits as one of the dogfooded
-invariants. `scripts/dogfood-audit.py` section [9/9] runs on every PR and push
-and fails the build when tracked files exceed the **5 MB project soft cap**,
-hit GitHub's **50 MB warn** or **100 MB hard-reject** thresholds, when the
-**total tracked size exceeds 1 GB**, or when a bundled `.js` / `.mjs` / `.cjs`
-/ `.css` file over 100 KB is committed without `.min.` in its name. The full
-rule list (with checkboxes) lives in [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md)
-§2; for legitimate large binaries, copy
-[`templates/.gitattributes.example`](./templates/.gitattributes.example) and
-run `git lfs install`.
+invariants, in layered defense:
+
+- **First line of defense — `.gitignore`.** Start from
+  [`templates/.gitignore.example`](./templates/.gitignore.example); it
+  already excludes `node_modules/`, `dist/`, `build/`, `coverage/`,
+  `__pycache__/`, `.gradle/`, `_site/`, `public/`, and friends.
+- **Pre-commit backstop —**
+  [`templates/.pre-commit-config.yaml`](./templates/.pre-commit-config.yaml)
+  runs `check-added-large-files --maxkb=5000`, blocking 5 MB+ files
+  before they ever reach a remote.
+- **CI audit —**
+  [`scripts/dogfood-audit.py`](./scripts/dogfood-audit.py) section [9/9]
+  runs on every PR and push and fails the build when tracked files exceed
+  the **5 MB project soft cap**, hit GitHub's **50 MB warn** or **100 MB
+  hard-reject** thresholds, **total tracked size exceeds 1 GB**, a
+  bundled `.js` / `.mjs` / `.cjs` / `.css` file over 100 KB is committed
+  without `.min.` in its name, or a file is tracked under a bloat
+  directory (`node_modules/`, `dist/`, `build/`, etc.). The bundled-asset
+  threshold is a starting point — raise it via the `MAX_BUNDLE_SIZE_KB`
+  env var locally, or the repo variable of the same name in CI.
+- **Large binaries — Git LFS.** Copy
+  [`templates/.gitattributes.example`](./templates/.gitattributes.example)
+  and run `git lfs install` for legitimate large assets.
+
+The full rule list (with checkboxes) lives in
+[`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) §2.
 
 ## Notes on the two flows
 

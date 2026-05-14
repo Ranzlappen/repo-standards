@@ -35,6 +35,11 @@ jobs:
 
       - name: Run dogfood-audit
         id: audit
+        env:
+          # Optional repo-variable override for the bundled-asset minify
+          # threshold (default 100 KB). Empty when unset; the script falls
+          # back to the default.
+          MAX_BUNDLE_SIZE_KB: ${{ vars.MAX_BUNDLE_SIZE_KB }}
         run: |
           set -o pipefail
           python3 scripts/dogfood-audit.py -v | tee audit-output.txt

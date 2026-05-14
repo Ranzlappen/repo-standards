@@ -17,6 +17,12 @@
 # deleted (or would be deleted, if dry_run=true). Use dry_run=true the
 # first time to preview.
 #
+# Adoption: most consumer repos can skip wiring this up until artifact
+# storage or release-list noise becomes a real problem. The standards
+# repo ships it as the dogfooded default; small projects with a handful
+# of releases and minimal CI artifacts won't notice the difference
+# either way.
+#
 # Required permissions:
 #   actions: write   — delete workflow-run artifacts
 #   contents: write  — delete releases (and their tag refs)

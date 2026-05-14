@@ -37,7 +37,8 @@ This checklist is meant to be run by Claude Code via [`PROMPT.md`](./PROMPT.md),
   - [ ] **50 MB** — GitHub's push-warning threshold; anything at or above this fails the audit with an explicit warning.
   - [ ] **100 MB** — GitHub's hard reject; pushes containing a file this large fail server-side.
   - [ ] **1 GB** — GitHub's recommended max repo size; the audit fails if the total tracked-file size exceeds this.
-  - [ ] **Bundled JS/CSS ships minified** — any tracked `.js` / `.mjs` / `.cjs` / `.css` file larger than 100 KB must contain `.min.` in its name. Track only the minified artifact, never both raw and minified.
+  - [ ] **Bundled JS/CSS ships minified** — any tracked `.js` / `.mjs` / `.cjs` / `.css` file larger than the bundle threshold (default 100 KB) must contain `.min.` in its name. Track only the minified artifact, never both raw and minified. The 100 KB default is a starting point; raise it via the `MAX_BUNDLE_SIZE_KB` env var locally, or the repo variable of the same name in CI (the `dogfood-audit.yml` workflow plumbs it through). Projects with legitimately large vendor chunks (PWAs, etc.) commonly bump this to 250–500 KB.
+  - [ ] **No bloat directories committed** — the audit fails when tracked files appear under `node_modules/`, `dist/`, `build/`, `out/`, `.next/`, `coverage/`, `__pycache__/`, `.venv/`, `venv/`, `target/`, or `.gradle/`. This is defense-in-depth on top of `.gitignore`; catches the `git add -f` / pre-gitignore-merge case. (`.idea/` and `.vscode/` are deliberately excluded — some teams check them in intentionally.)
   - [ ] **Legitimate large binaries use Git LFS** — copy `templates/.gitattributes.example` to `.gitattributes`, run `git lfs install`, and migrate existing offenders with `git lfs migrate import`.
 - [ ] **`.github/dependabot.yml`** exists with weekly schedule and the v2 expectations applied per ecosystem:
   - [ ] explicit `open-pull-requests-limit` (default: 10).

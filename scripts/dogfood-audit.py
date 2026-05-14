@@ -29,6 +29,7 @@ in UPGRADE_CHECKLIST.md:
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import subprocess
 import sys
@@ -241,9 +242,35 @@ SIZE_GH_WARN = 50 * 1024 * 1024
 SIZE_GH_HARD = 100 * 1024 * 1024
 REPO_TOTAL_CAP = 1024 * 1024 * 1024
 # Bundled-asset minify rule: tracked JS/CSS over this size must be minified.
-# Set conservatively so configs (eslint.config.mjs, vitest.config.ts) don't trip.
-MIN_BUNDLE_BYTES = 100 * 1024
+# 100 KB is a starting point — configs (eslint.config.mjs, vitest.config.ts)
+# stay well under it. Projects with legitimately large vendor chunks (PWAs,
+# etc.) can raise the threshold via the MAX_BUNDLE_SIZE_KB env var locally,
+# or by setting a repo variable of the same name (the dogfood-audit workflow
+# plumbs it through).
+_DEFAULT_BUNDLE_KB = 100
+try:
+    _BUNDLE_KB = int(os.environ.get("MAX_BUNDLE_SIZE_KB") or _DEFAULT_BUNDLE_KB)
+except ValueError:
+    _BUNDLE_KB = _DEFAULT_BUNDLE_KB
+MIN_BUNDLE_BYTES = _BUNDLE_KB * 1024
 BUNDLE_SUFFIXES = (".js", ".mjs", ".cjs", ".css")
+# Directories whose presence in tracked files is almost always a mistake.
+# Defense-in-depth on top of templates/.gitignore.example — catches the
+# `git add -f` / pre-gitignore-merge case. .idea/ and .vscode/ are
+# deliberately omitted because some teams check them in intentionally.
+BLOAT_DIRS = {
+    "node_modules",
+    "dist",
+    "build",
+    "out",
+    ".next",
+    "coverage",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "target",
+    ".gradle",
+}
 
 
 def human_size(n: int) -> str:
@@ -312,11 +339,29 @@ for fp in files:
         raw_bundles.append((fp, sz))
 
 if raw_bundles:
-    ng(f"Non-minified bundled assets > 100 KB: {len(raw_bundles)} found (use .min.js / .min.css)")
+    ng(f"Non-minified bundled assets > {_BUNDLE_KB} KB: {len(raw_bundles)} found (use .min.js / .min.css)")
     for fp, sz in raw_bundles[:10]:
         print(f"        {fp.relative_to(ROOT).as_posix()}  {human_size(sz)}")
 else:
-    ok("Tracked JS/CSS over 100 KB ships minified (or none present)")
+    ok(f"Tracked JS/CSS over {_BUNDLE_KB} KB ships minified (or none present)")
+
+bloat: dict[str, int] = {}
+bloat_examples: dict[str, str] = {}
+for fp in files:
+    rel = fp.relative_to(ROOT).as_posix()
+    for part in rel.split("/"):
+        if part in BLOAT_DIRS:
+            bloat[part] = bloat.get(part, 0) + 1
+            bloat_examples.setdefault(part, rel)
+            break
+
+if bloat:
+    pretty = ", ".join(f"{d}/ ({n})" for d, n in sorted(bloat.items()))
+    ng(f"Tracked files inside bloat directories: {pretty}")
+    for d, ex in sorted(bloat_examples.items()):
+        print(f"        e.g. {ex}")
+else:
+    ok("No tracked files inside common bloat directories (node_modules/, dist/, etc.)")
 
 # ───────────────────────────────────────────────────────────────────────────
 print()
