@@ -1,11 +1,12 @@
 # Ground rules — non-negotiable
 
-The **16 non-negotiable ground rules** of the canonical Claude Code upgrade flow indexed by [`PROMPT.md`](../PROMPT.md). They apply to every commit, every PR, and every Step (0–5) of the flow.
+The **18 non-negotiable ground rules** of the canonical Claude Code upgrade flow indexed by [`PROMPT.md`](../PROMPT.md). They apply to every commit, every PR, and every Step (0–5) of the flow.
 
 - Rules **1–8** cover branching, behavior preservation, phased PRs, templates as starting points, length discipline, single-file projects, PWA detection, and default-to-autonomy.
 - Rules **9–12** codify the tiny-commit / Conventional Commits / mandatory-self-check / no-PR-without-confirmation rhythm — the same rhythm this repo's own v2 and v3 upgrade passes followed end to end.
 - Rules **13–15** cover out-of-scope auto-issuing (with opt-out), the single-feature-branch / single-PR alternative operating mode, and plan-file hygiene (the Plan Management & Clean State Rule).
 - Rule **16** is the **Conflict / Assumption Failure Protocol** — the critical-safety rule that overrides every other rule when an assumption fails or an unexpected problem hits mid-execution.
+- Rules **17–18** are the **branch-lifecycle rules** — the merged-PR branch guard (never keep committing to a branch whose PR already merged) and the rebase-when-behind rule (bring a working branch current against `main` before continuing).
 
 Every cross-reference elsewhere in the repo (`UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, `templates/CLAUDE.md.tmpl`, `templates/README.md.tmpl`) cites "`PROMPT.md` rule N" — those numbers map to the rules below.
 
@@ -199,3 +200,52 @@ Every cross-reference elsewhere in the repo (`UPGRADE_CHECKLIST.md`, `REFACTORIN
     wait. Clicking the **"Approve plan mode"** button — or replying
     with "yes", "approved", "proceed", "confirmed", "go ahead", or
     similar (per rule 12) — counts as explicit confirmation.
+
+17. **Merged-PR branch guard — never keep committing to a branch
+    whose PR already merged.** A long or resumed session can drift
+    into adding commits to the branch it was *last* on — but if that
+    branch's PR has already merged, the new commits land on a dead
+    branch. They will never be reviewed or merged through that closed
+    PR, and the **"View PR"** button in the Claude Code chat keeps
+    pointing at the already-merged PR (a known Claude Code failure
+    mode). Guard against it:
+      - **Check before you commit or push** in any continuing or
+        resumed session — and always before starting the next PR in
+        the canonical sequence — whether the current branch's PR is
+        still open. Use `gh pr view <branch> --json state,mergedAt`
+        (or the MCP `pull_request_read` equivalent). The branch is
+        also effectively dead if it is already contained in
+        `origin/main` (`git branch --merged origin/main` lists it).
+      - **If the PR is merged** (or the branch is already in
+        `origin/main`), do **not** add commits to it. Instead:
+        `git fetch origin main`, cut a **new** branch from
+        `origin/main` (the next canonical branch name, or a fresh
+        `<type>/<scope>` per rule 1), move the pending work there, and
+        open a **new** PR — subject to rule 12 confirmation.
+      - **GitHub cannot reopen a *merged* PR.** `gh pr reopen` only
+        works on PRs that were closed **without** merging (and whose
+        head branch still exists). So: closed-unmerged → reopening is
+        an option; merged → always a fresh branch and a new PR.
+      - This is the guard that makes the rule 1 (branch per PR) /
+        rule 12 (PR N merges before N+1 opens) transition safe — the
+        moment a PR merges, its branch is retired.
+
+18. **Keep the working branch current — rebase onto `main` when
+    behind.** When the working branch falls behind `origin/main` —
+    `main` moved while a PR was open, or you're about to start the
+    next PR in the sequence — bring it up to date by **rebasing, not
+    merging**:
+      - `git fetch origin main` then `git rebase origin/main`.
+      - Rebase (not a merge commit) keeps history linear, matching the
+        governance template's **Require linear history** and
+        **Require branches to be up to date before merging**
+        branch-protection rules (`templates/.github/GOVERNANCE.md`).
+        Squash-merge is the default merge style, so a linear working
+        branch is the expected input.
+      - New branches in the canonical 8-PR sequence are always cut
+        from freshly-fetched `origin/main`, so each one starts current
+        (this pairs with rule 17's "fetch main, cut a new branch").
+      - If the rebase hits conflicts the plan didn't anticipate, that
+        is a **rule 16** trigger: stop, state the conflict, propose
+        2–3 options, and wait for explicit confirmation before
+        resolving — do not silently force-resolve.
