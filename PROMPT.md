@@ -14,7 +14,7 @@ The numbered files (`00`–`05`) are the canonical Step sequence. The unnumbered
 | --- | --- |
 | [`prompt/migration-planning.md`](./prompt/migration-planning.md) | **Phase 0** — produce the tailored migration roadmap (repo profile + must/should/could/skip scoring + batch plan + AI-budget guardrails + Dependabot audit) before the version check. |
 | [`prompt/00-version-check.md`](./prompt/00-version-check.md) | **Step 0** — refuse on major mismatch; the gate that keeps v3 rules off a v2 repo and vice versa. |
-| [`prompt/01-ground-rules.md`](./prompt/01-ground-rules.md) | The **16 non-negotiable rules**: branching, behavior preservation, phased PRs, tiny commits, post-task self-check, plan-file hygiene, conflict / assumption-failure protocol, etc. |
+| [`prompt/01-ground-rules.md`](./prompt/01-ground-rules.md) | The **18 non-negotiable rules**: branching, behavior preservation, phased PRs, tiny commits, post-task self-check, plan-file hygiene, conflict / assumption-failure protocol, merged-branch guard, rebase-when-behind, etc. |
 | [`prompt/02-canonical-pr-sequence.md`](./prompt/02-canonical-pr-sequence.md) | **Step 1 + Step 2** — read & audit, then plan against the canonical 8-PR sequence with hard ordering and practical execution. |
 | [`prompt/03-pr-description.md`](./prompt/03-pr-description.md) | **Step 3** — required PR description structure (Summary / Checklist coverage / Refactoring opportunities / Test plan). |
 | [`prompt/04-wiki-seeding.md`](./prompt/04-wiki-seeding.md) | **Step 4** — optional, opt-in Wiki seeding via the GitHub web UI. |
@@ -67,7 +67,7 @@ similar — counts as explicit confirmation.
 
 ## Non-negotiable ground rules (apply to every response)
 
-The full 16 rules live in prompt/01-ground-rules.md. Headlines:
+The full 18 rules live in prompt/01-ground-rules.md. Headlines:
 
 1. Behavior preservation (rule 2). Keep 100% of original functionality,
    user flows, UI, storage keys, URLs, deployment shape, observable
@@ -99,6 +99,17 @@ The full 16 rules live in prompt/01-ground-rules.md. Headlines:
 8. Operating mode default = canonical 8-PR sequence (rule 14). The
    single-PR alternative mode is opt-in for focused work that would
    otherwise produce ≤3 PRs.
+9. Merged-PR branch guard (rule 17). In a continuing or resumed
+   session, before committing or pushing, check the current branch's
+   PR state (`gh pr view <branch> --json state,mergedAt`). If it
+   already merged, don't pile commits onto the dead branch — the
+   chat's "View PR" button would point at the merged PR. Fetch main,
+   cut a fresh branch, open a new PR. GitHub cannot reopen a *merged*
+   PR (only closed-unmerged ones).
+10. Keep the branch current (rule 18). When the working branch is
+    behind origin/main, rebase onto it (`git fetch origin main &&
+    git rebase origin/main`) — rebase, not merge, to preserve linear
+    history.
 
 ## After Phase 0 confirms
 
