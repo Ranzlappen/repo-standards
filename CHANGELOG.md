@@ -6,6 +6,33 @@ Consumer repos pin a major version (`v1`, `v2`, …) by referencing the matching
 
 ## [Unreleased]
 
+## [3.2.0] — 2026-05-24
+
+Minor release. Adds two new **branch-lifecycle ground rules** to the canonical Claude Code upgrade flow (`prompt/01-ground-rules.md`), taking the rule count from 16 → 18. **Rule 17 — Merged-PR branch guard** addresses a known Claude Code failure mode: in a long or resumed session, Claude keeps committing to the branch it was last on, but if that branch's PR has already merged, the new commits land on a dead branch and the chat's "View PR" button keeps pointing at the already-merged PR. The rule requires checking the current branch's PR state before committing in any continuing/resumed session and, when the PR has merged, cutting a fresh branch from `origin/main` for a new PR — because GitHub cannot reopen a *merged* PR (`gh pr reopen` only works on PRs closed *without* merging). **Rule 18 — rebase-when-behind** requires bringing a behind working branch up to date by rebasing onto `origin/main` (not merging), to preserve linear history per the governance template's branch-protection rules. Both are **append-only** additions: rule numbering 1–16 is unchanged, so every `PROMPT.md rule N` cross-reference in `UPGRADE_CHECKLIST.md`, `REFACTORING_GUIDE.md`, `templates/CLAUDE.md.tmpl`, and `README.md` stays valid. No template, workflow, or audit-count change.
+
+### Added
+
+- `prompt/01-ground-rules.md` — **rule 17 (Merged-PR branch guard)** and **rule 18 (Keep the working branch current — rebase onto `main` when behind)**, appended after rule 16. Rule 17: before committing/pushing in a continuing or resumed session — and before starting the next PR in the canonical sequence — verify the branch's PR is still open (`gh pr view <branch> --json state,mergedAt` or MCP `pull_request_read`; a branch already in `origin/main` is likewise retired); if merged, `git fetch origin main`, cut a new branch, move pending work there, and open a new PR (subject to rule 12). Rule 18: `git fetch origin main && git rebase origin/main` when behind; rebase not merge; a surprise rebase conflict is a rule 16 trigger.
+- `UPGRADE_CHECKLIST.md` §13 — new **"Branch-lifecycle discipline observed (v3.2)"** item so maintainers know the repo expects sessions to follow rules 17–18 (no commits onto a merged-PR branch; rebase a behind branch onto `origin/main`).
+
+### Changed
+
+- `prompt/01-ground-rules.md` preamble: count "16 non-negotiable ground rules" → "18", plus a new grouping bullet describing rules 17–18 as the branch-lifecycle rules.
+- `PROMPT.md`: modular-structure table cell "16 non-negotiable rules" → "18" (with merged-branch-guard / rebase-when-behind added to the inline list); "The full 16 rules live in…" → "18"; two new headline bullets (9 + 10) summarizing rules 17 & 18 appended under "Non-negotiable ground rules" (existing headline numbers unchanged).
+- `prompt/02-canonical-pr-sequence.md` line 5: "The 16 ground rules … especially rules 9, 11, 12, and 16" → "18 ground rules" with rules 17 (merged-branch guard) and 18 (rebase when behind) added to the "especially relevant" callout.
+- `prompt/migration-planning.md` §4 "Session length" guardrail: added a one-line resume reminder to re-check the working branch's PR state per rule 17 (and rebase per rule 18) before adding commits — the resume path is exactly where the merged-branch failure mode bites.
+- Surface ground-rule counts bumped 16 → 18 in `README.md` (rows 41 + 123) and `docs/README.md` (rows 13 + 42).
+- `REFACTORING_GUIDE.md` line 9: corrected a stale count — "alongside the other **14** ground rules" → "**17**" (rule 2 + 17 others = 18; the figure had not been updated when rule 16 landed in v3.0.5).
+- `VERSION` bumped from `3.1.1` to `3.2.0`.
+- `.standards-version` bumped from `3.1.1` to `3.2.0` (kept aligned with `VERSION`).
+- Root `README.md` standards badge bumped from `v3.1.1` to `v3.2.0`; "Upgrade any repo to vX" headline + body bumped to `v3.2.0`.
+- `PROMPT.md` master-prompt banner bumped from `repo-standards v3.1.1` → `repo-standards v3.2.0` (line 28).
+
+### Migration notes
+
+- **No consumer action required to stay valid** — append-only rule numbering means existing `PROMPT.md rule N` cross-references are unaffected. Consumers pinned to `@v3` pick up rules 17–18 the next time a session fetches the prompt files.
+- Rules 17–18 are behavioral session rules, not template/workflow files; there is nothing to copy into a downstream repo. The new `UPGRADE_CHECKLIST.md` §13 item is the only audit-surface addition.
+
 ## [3.1.1] — 2026-05-10
 
 Patch release on top of v3.1.0. Fixes the SLSA-provenance generation in the new release pipeline. The first end-to-end run on `v3.1.0` succeeded for the tag, tarball, and GitHub Release, but the `provenance` job that called the `slsa-framework/slsa-github-generator` reusable workflow failed inside the generator's own steps (`Input required and not supplied: path`, exit 127) — leaving the published `v3.1.0` Release without a `.intoto.jsonl` attestation. v3.1.1 replaces the reusable-workflow path with [`actions/attest-build-provenance`](https://github.com/actions/attest-build-provenance) called inline from the existing `release` job. The attestation is signed via Sigstore Fulcio (Rekor transparency log) using GitHub OIDC and is attached to the Release as `<tarball>.sigstore.json`. Verification path moves from `slsa-verifier` → `gh attestation verify <tarball> --owner Ranzlappen`. Workflow-scope `contents: read` is preserved; the `release` job now also declares `id-token: write` + `attestations: write` at job scope (Token-Permissions stays at `10 / 10`). The `provenance` job is removed; the workflow is now three jobs (`auto-tag`, `build`, `release`) chained. No consumer-facing rule, prompt, or template change.
