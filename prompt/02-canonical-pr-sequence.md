@@ -2,7 +2,7 @@
 
 **Step 1** (read & audit) and **Step 2** (plan) of the canonical Claude Code upgrade flow indexed by [`PROMPT.md`](../PROMPT.md). The 8-PR table is the canonical mapping of branches → scopes for a v2 upgrade pass; consumer repos pin a major and follow this exact sequence (skipping any PR whose scope is empty for the repo, with a one-line reason).
 
-Hard ordering and practical execution sequencing live below the table. Step 0 (`prompt/00-version-check.md`) must pass before Step 1 begins. The 16 ground rules in [`prompt/01-ground-rules.md`](./01-ground-rules.md) — especially rules 9 (tiny commits), 11 (post-task self-check), 12 (no PR without confirmation), and 16 (conflict / assumption-failure protocol) — apply to every commit made under this sequence.
+Hard ordering and practical execution sequencing live below the table. Step 0 (`prompt/00-version-check.md`) must pass before Step 1 begins. The 18 ground rules in [`prompt/01-ground-rules.md`](./01-ground-rules.md) — especially rules 9 (tiny commits), 11 (post-task self-check), 12 (no PR without confirmation), 16 (conflict / assumption-failure protocol), 17 (merged-branch guard — retire a branch the moment its PR merges), and 18 (rebase a behind branch onto `main`) — apply to every commit made under this sequence.
 
 ---
 
