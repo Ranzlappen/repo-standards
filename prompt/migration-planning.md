@@ -105,7 +105,7 @@ Phase 0 is also where the AI tooling's own constraints get surfaced. Failing to 
 
 **Token budget per turn.** Keep each response under ~30% of the model's context window. Summarize long tool-result dumps (full-repo `find`, large file reads) in-context and discard the raw output once consumed. Respect compaction — if the harness compacts, restate the current batch goal in the next turn so the compacted summary doesn't lose the thread.
 
-**Session length.** Cap continuous work at ~4 hours per session. Beyond that, accuracy degrades and the user loses the ability to review at the same pace Claude generates. Recommend a break + resume on a fresh session with the plan file (preserved across sessions per [`prompt/01-ground-rules.md`](./01-ground-rules.md) rule 15) as the resume point.
+**Session length.** Cap continuous work at ~4 hours per session. Beyond that, accuracy degrades and the user loses the ability to review at the same pace Claude generates. Recommend a break + resume on a fresh session with the plan file (preserved across sessions per [`prompt/01-ground-rules.md`](./01-ground-rules.md) rule 15) as the resume point. On resume, before adding any commit, re-check the working branch's PR state per [rule 17](./01-ground-rules.md) — if the PR already merged, cut a fresh branch from `origin/main` rather than piling commits onto a dead branch (and rebase a behind branch per rule 18).
 
 **Fair use.** Stay within Anthropic's API usage policy. If the GitHub Action flow hits rate limits, distribute work across sessions (one PR per session) rather than blocking on a single long-running run.
 
