@@ -10,7 +10,7 @@ It's deliberately empty at the v3.0 cut. The folder exists so future how-tos, AD
 | --- | --- |
 | [`README.md`](../README.md) | Front door — what the project is, badge wall, "What's in here" table, how-to-use-it flows, community standards. |
 | [`PROMPT.md`](../PROMPT.md) | Entry-point index for the canonical upgrade prompt. Thin (~80 lines). |
-| [`prompt/`](../prompt/) | Modular source of the upgrade prompt — Step 0 / 16 ground rules / Steps 1–2 / Step 3 / Step 4 / Step 5. Each file is independently fetchable. |
+| [`prompt/`](../prompt/) | Modular source of the upgrade prompt — Step 0 / 18 ground rules / Steps 1–2 / Step 3 / Step 4 / Step 5. Each file is independently fetchable. |
 | [`UPGRADE_CHECKLIST.md`](../UPGRADE_CHECKLIST.md) | The audit Claude Code runs against any repo. Pass/fail items grouped by category. |
 | [`REFACTORING_GUIDE.md`](../REFACTORING_GUIDE.md) | How to split big single-file projects without changing behavior. PWA Refactor Addendum lives here. |
 | [`SPONSORS.md`](../SPONSORS.md) | Sponsorship thank-you doc + boundaries. |
@@ -39,7 +39,7 @@ Examples that *don't* belong here:
 
 - One-off Q&A → use [GitHub Discussions](https://github.com/Ranzlappen/repo-standards/discussions).
 - Bug reports / feature requests → use [Issues](https://github.com/Ranzlappen/repo-standards/issues).
-- The 16 ground rules / the canonical 8-PR sequence / the audit checklist → those have their own dedicated files at the root, don't duplicate.
+- The 18 ground rules / the canonical 8-PR sequence / the audit checklist → those have their own dedicated files at the root, don't duplicate.
 
 ## Anything in `docs/` that's also valuable cold should still be linked from `README.md`
 
