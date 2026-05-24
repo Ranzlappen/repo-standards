@@ -6,7 +6,7 @@ This guide is referenced by [`UPGRADE_CHECKLIST.md`](./UPGRADE_CHECKLIST.md) sec
 
 > **Rule-2 anchor.** [`PROMPT.md`](./PROMPT.md) rule 2 — canonically
 > defined in [`prompt/01-ground-rules.md`](./prompt/01-ground-rules.md)
-> alongside the other 14 ground rules — is the source of truth for
+> alongside the other 17 ground rules — is the source of truth for
 > behavior preservation, and it is **non-negotiable**: every refactor
 > keeps 100% of the target repo's original functionality, analyzes the
 > repo *before* editing, and flags repo-specific risks / edge-cases in
